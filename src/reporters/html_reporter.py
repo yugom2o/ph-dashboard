@@ -110,11 +110,19 @@ class HTMLReporter:
                 },
             ]
 
-            adapt_points = [
-                "国内の商習慣・稟議フローに合わせた機能最適化",
-                "日本語による高品質なUI/UXと顧客サポートの提供",
-                "国内の既存ツール（SFA、会計、チャット等）とのAPI連携",
-            ]
+            # 日本版の設計・アレンジポイント
+            adapt_points = it.get("adapt_points")
+            if not adapt_points or not isinstance(adapt_points, list):
+                adapt_points = [
+                    "国内商習慣（稟議フロー・請求書対応）に合わせた機能最適化",
+                    "日本の主要SaaS（チャット・会計・SFA）とのAPI連携",
+                    "日本語特有の文脈・商習慣に最適化したUIとサポート",
+                ]
+
+            # 元のプロダクトの日本語詳細解説
+            orig_text = it.get("original_summary_ja")
+            if not orig_text:
+                orig_text = desc[:200] + "..." if len(desc) > 200 else desc
 
             products_data.append(
                 {
@@ -124,12 +132,12 @@ class HTMLReporter:
                     "cat": category,
                     "tagline": tagline,
                     "url": ph_url,
-                    "orig": desc[:150] + "..." if len(desc) > 150 else desc,
-                    "origNote": "Product Hunt掲載情報より",
-                    "idea": one_line or f"日本版 {name}",
+                    "orig": orig_text,
+                    "origNote": "元プロダクトの機能概要 (日本語解説)" if it.get("original_summary_ja") else "Product Hunt掲載情報より",
+                    "idea": one_line or f"{name}の日本展開モデル",
                     "body": body,
                     "target": targets or ["法人営業チーム", "中小企業"],
-                    "adapt": adapt_points,
+                    "adapt": adapt_points[:3],
                     "signals": signals,
                 }
             )
