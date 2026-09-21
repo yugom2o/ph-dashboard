@@ -74,8 +74,14 @@ class DailyPipeline:
             ][:fetch_limit]
         else:
             products = self.collector.fetch_daily_products(limit=fetch_limit)
+            # APIトークン無効などで取得0件の場合、RSSコレクターへ自動フォールバック
+            if not products and isinstance(self.collector, ProductHuntAPICollector):
+                print("[Info] Product Hunt API取得に失敗したため、公式RSSフィードへ自動フォールバックします...")
+                fallback_collector = ProductHuntRSSCollector()
+                products = fallback_collector.fetch_daily_products(limit=fetch_limit)
 
         print(f"-> 取得完了: {len(products)} 件")
+
 
         # 2. 履歴照合と重複除外
         print("\n[Step 2/5] 履歴DBとの照合・重複チェック...")
