@@ -152,7 +152,15 @@ class Database:
 
     def _parse_row(self, row: sqlite3.Row) -> Dict[str, Any]:
         d = dict(row)
-        if d.get("jp_competitors"):
+        if d.get("raw_json"):
+            try:
+                raw = json.loads(d["raw_json"])
+                for k, v in raw.items():
+                    if k not in d or not d[k] or k in ["adapt_points", "original_summary_ja"]:
+                        d[k] = v
+            except Exception:
+                pass
+        if d.get("jp_competitors") and isinstance(d["jp_competitors"], str):
             try:
                 d["jp_competitors"] = json.loads(d["jp_competitors"])
             except Exception:
