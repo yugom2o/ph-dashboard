@@ -78,9 +78,12 @@ class MarkdownReporter:
             ph_url = it.get("ph_url", "")
             official_url = it.get("official_url", "")
 
+            orig_ja = it.get("original_summary_ja")
             md.append(f"### {idx}. 【ランク {rank} (スコア: {score})】{name}")
             md.append(f"> **キャッチコピー**: {tagline}  ")
-            if desc:
+            if orig_ja:
+                md.append(f"> **元プロダクト詳細 (日本語)**: {orig_ja}  ")
+            elif desc:
                 md.append(f"> **概要**: {desc[:300]}...  ")
             md.append(f"> **リンク**: [Product Hunt]({ph_url})" + (f" | [公式サイト]({official_url})" if official_url else ""))
             md.append("")
@@ -106,8 +109,15 @@ class MarkdownReporter:
             md.append("")
 
             md.append(f"* **🇯🇵 日本版ローカライズ・ビジネスアイデア**:")
-            md.append(f"  * **ターゲット**: {it.get('target_market', '中小企業・B2B')}")
-            md.append(f"  * **アレンジ具体案**: {it.get('jp_adaptation', '国内商習慣に即したUIとテンプレート')}")
+            md.append(f"  * **コンセプト**: **{it.get('one_line_summary', '未定義')}**")
+            md.append(f"  * **想定ターゲット**: {it.get('target_market', '中小企業・B2B')}")
+            md.append(f"  * **事業化具体像**: {it.get('jp_adaptation', '国内商習慣に即したUIとテンプレート')}")
+            
+            adapt_pts = it.get("adapt_points")
+            if isinstance(adapt_pts, list) and adapt_pts:
+                md.append("  * **日本版の必須機能・設計ポイント**:")
+                for pt in adapt_pts:
+                    md.append(f"    - {pt}")
             md.append(f"  * **参入障壁・配慮事項**: {it.get('jp_barriers', '法規制および日本語コミュニケーション対応')}")
             md.append("")
 
