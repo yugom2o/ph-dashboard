@@ -1,8 +1,17 @@
 import base64
+import io
 import os
+import sys
 from pathlib import Path
+
+# Windows環境での文字化け・絵文字UnicodeEncodeError(cp932)防止
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+
 import requests
 from config import BASE_DIR, GITHUB_REPO, GITHUB_TOKEN
+
 
 # アップロード対象の拡張子やファイル
 INCLUDE_EXTS = {".py", ".html", ".md", ".txt", ".yml", ".yaml"}
