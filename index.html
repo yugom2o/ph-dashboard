@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0e1218">
+<title>Product Hunt 🇯🇵 日本市場タイムマシン事業 日次判定ダッシュボード</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0e1218;
+    --surface: #151a22;
+    --surface-2: #1c222c;
+    --line: rgba(255, 255, 255, .08);
+    --line-strong: rgba(255, 255, 255, .18);
+    --text: #eaeef4;
+    --muted: #a3adbb;
+    --faint: #7f8a99;
+    --accent: #8b9cff;
+    --good: #6ee7b7;
+    --mid: #fcd34d;
+    --low: #fda4af;
+    --saved: #fbbf24;
+    --sans: 'Inter', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', system-ui, sans-serif;
+  }
+
+  /* ランク色（タイル・ドット・見出しで共通利用） */
+  .r-S { --c: #fb7185; --c-bg: rgba(251, 113, 133, .14); }
+  .r-A { --c: #fbbf24; --c-bg: rgba(251, 191, 36, .14); }
+  .r-B { --c: #60a5fa; --c-bg: rgba(96, 165, 250, .14); }
+  .r-C { --c: #94a3b8; --c-bg: rgba(148, 163, 184, .14); }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 400 15px/1.75 var(--sans);
+    -webkit-font-smoothing: antialiased;
+    word-break: auto-phrase;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+  h1, h2, h3, p, dl, dd { margin: 0; }
+  button { font: inherit; color: inherit; }
+  ::selection { background: rgba(139, 156, 255, .35); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .sr {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .wrap {
+    max-width: 1120px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  @media (min-width: 640px) {
+    .wrap { padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px)); }
+  }
+
+  .ic { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ───────── ヘッダー ───────── */
+  .site-header { padding-top: calc(22px + env(safe-area-inset-top, 0px)); padding-bottom: 20px; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .logo {
+    width: 40px; height: 40px; border-radius: 12px; flex: none;
+    background: #ff6154; color: #fff;
+    display: grid; place-items: center;
+    font: 800 20px/1 'Inter', sans-serif;
+  }
+  .brand h1 { font-size: 17px; line-height: 1.3; font-weight: 700; letter-spacing: -.01em; }
+  .brand .date { font-size: 14px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 40px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent;
+    color: var(--muted); font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--line-strong); }
+  .print-btn { white-space: nowrap; }
+  @media (max-width: 639px) {
+    .print-btn { width: 44px; min-height: 44px; padding: 0; }
+    .print-btn span { display: none; }
+  }
+  .btn.plain { border-color: transparent; padding: 0 10px; }
+  .btn.plain:hover { background: var(--surface); }
+
+  /* ───────── 絞り込み ───────── */
+  .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  @media (min-width: 900px) {
+    .controls { flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; }
+  }
+  .chips {
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+    margin: 0 -16px; padding: 2px 16px;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  @media (min-width: 640px) { .chips { margin: 0 -28px; padding: 2px 28px; } }
+  @media (min-width: 900px) { .chips { margin: 0; padding: 2px 0; overflow: visible; } }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; flex: none;
+    height: 40px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent;
+    color: var(--muted); font-size: 14px; font-weight: 500; line-height: 1;
+    white-space: nowrap; cursor: pointer;
+    transition: color .15s, background .15s, border-color .15s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--line-strong); }
+  .chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--bg); }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .chip .n { font-variant-numeric: tabular-nums; font-weight: 600; opacity: .65; }
+  .chip .ic { width: 16px; height: 16px; color: var(--saved); }
+
+  .search { position: relative; display: block; flex: none; }
+  @media (min-width: 900px) { .search { width: 300px; } }
+  .search .ic { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--faint); pointer-events: none; }
+  .search input {
+    width: 100%; height: 44px; padding: 0 44px 0 42px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    color: var(--text); font: 400 16px/1 var(--sans);
+    transition: border-color .15s;
+  }
+  .search input::placeholder { color: var(--faint); }
+  .search input:hover { border-color: var(--line-strong); }
+  .search input:focus { outline: none; border-color: var(--accent); }
+  .search input::-webkit-search-cancel-button { display: none; }
+  .search .clear {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 36px; height: 36px; border: 0; border-radius: 10px; background: transparent;
+    color: var(--muted); cursor: pointer; display: grid; place-items: center;
+  }
+  .search .clear:hover { color: var(--text); background: var(--surface-2); }
+  .search .clear .ic { position: static; transform: none; width: 16px; height: 16px; color: inherit; }
+
+  /* ───────── リスト見出し ───────── */
+  .list-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+  .list-head h2 { font-size: 20px; line-height: 1.4; font-weight: 700; letter-spacing: -.01em; }
+  .list-head h2 .lh-rank { font-family: 'Inter', sans-serif; font-weight: 800; color: var(--c); margin-right: 10px; }
+  .list-head p { font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .list-tools { display: flex; align-items: center; gap: 4px; flex: none; }
+  .list-tools .count { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; padding-right: 6px; }
+
+  /* ───────── カード ───────── */
+  .cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (min-width: 960px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
+
+  .card {
+    --gap: 20px;
+    display: flex; flex-direction: column; gap: var(--gap);
+    padding: 20px; border-radius: 20px;
+    background: var(--surface); border: 1px solid var(--line);
+    transition: border-color .2s;
+  }
+  .card:hover { border-color: var(--line-strong); }
+  @media (min-width: 640px) { .card { padding: 28px; --gap: 22px; } }
+
+  .card-head { display: flex; align-items: center; gap: 14px; }
+  .tile {
+    width: 44px; height: 44px; border-radius: 12px; flex: none;
+    background: var(--c-bg); color: var(--c);
+    display: grid; place-items: center;
+    font: 800 22px/1 'Inter', sans-serif;
+  }
+  .ident { min-width: 0; }
+  .name { font-size: 17px; line-height: 1.35; font-weight: 700; letter-spacing: -.005em; font-feature-settings: "palt"; overflow-wrap: anywhere; }
+  .cat { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  /* 元のプロダクト → 日本版 → ターゲット */
+  .brief { display: flex; flex-direction: column; gap: 20px; }
+  .lbl { display: block; font-size: 13px; line-height: 1.5; color: var(--faint); margin-bottom: 4px; }
+  .lbl-note { margin-left: 8px; }
+  .orig { padding-left: 14px; border-left: 2px solid var(--line-strong); }
+  .orig p { font-size: 15px; line-height: 1.7; color: var(--muted); }
+  .jp .lbl { color: var(--c); font-weight: 600; }
+  .idea {
+    font-size: 18px; line-height: 1.6; font-weight: 700; letter-spacing: .005em;
+    font-feature-settings: "palt"; text-wrap: balance;
+  }
+  @media (min-width: 640px) { .idea { font-size: 20px; } }
+  .card.pass .idea { color: var(--muted); }
+  .jp-body { font-size: 15px; line-height: 1.8; color: #cbd3de; margin-top: 8px; }
+  .target { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .target .lbl { margin: 0; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .tag {
+    padding: 3px 12px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    font-size: 14px; line-height: 1.6; color: var(--text);
+  }
+
+  .signals {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+  }
+  @media (min-width: 640px) { .signals { gap: 18px 24px; } }
+  @media (max-width: 339px) { .signals { grid-template-columns: minmax(0, 1fr); } }
+  .sig dt { font-size: 13px; color: var(--faint); line-height: 1.5; }
+  .sig dd { font-size: 15px; font-weight: 600; line-height: 1.5; margin-top: 2px; }
+  .sig dd.good { color: var(--good); }
+  .sig dd.mid { color: var(--mid); }
+  .sig dd.low { color: var(--low); }
+
+  .card-actions {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding-top: 12px; border-top: 1px solid var(--line);
+    margin-top: -4px;
+  }
+  .more-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    min-height: 40px; padding: 0 10px 0 4px; margin-left: -4px;
+    border: 0; border-radius: 10px; background: transparent;
+    color: var(--muted); font-size: 14px; font-weight: 500; cursor: pointer;
+  }
+  .more-btn:hover { color: var(--text); }
+  .more-btn .ic { width: 18px; height: 18px; transition: transform .25s ease; }
+  .card.open .more-btn .ic { transform: rotate(180deg); }
+
+  .icons { display: flex; align-items: center; gap: 2px; margin-right: -8px; }
+  .icon-btn {
+    width: 40px; height: 40px; border: 0; border-radius: 12px; background: transparent;
+    color: var(--muted); cursor: pointer;
+    display: grid; place-items: center; text-decoration: none;
+    transition: color .15s, background .15s;
+  }
+  .icon-btn:hover { color: var(--text); background: var(--surface-2); }
+  .icon-btn.on { color: var(--saved); }
+  .icon-btn.on .ic { fill: currentColor; }
+
+  /* 詳細（開閉） */
+  .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; margin-top: calc(-1 * var(--gap)); }
+  .more-in { overflow: hidden; min-height: 0; visibility: hidden; transition: visibility 0s .28s; }
+  .card.open .more { grid-template-rows: 1fr; }
+  .card.open .more-in { visibility: visible; transition-delay: 0s; }
+  .more-pad { display: flex; flex-direction: column; gap: 20px; padding-top: var(--gap); }
+  .adapt { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .adapt li { position: relative; padding-left: 18px; font-size: 15px; line-height: 1.75; color: #cbd3de; }
+  .adapt li::before { content: ""; position: absolute; left: 0; top: .8em; width: 6px; height: 6px; border-radius: 2px; background: var(--c); }
+  .notes { display: flex; flex-direction: column; gap: 12px; }
+  .notes dt { font-size: 13px; color: var(--faint); line-height: 1.5; }
+  .notes dd { font-size: 14px; color: var(--muted); line-height: 1.7; }
+  .src { font-size: 13px; color: var(--faint); line-height: 1.6; overflow-wrap: anywhere; }
+
+  /* ───────── 空状態 / トースト ───────── */
+  .empty { padding: 72px 16px; text-align: center; }
+  .empty-title { font-size: 17px; font-weight: 700; }
+  .empty-body { font-size: 14px; color: var(--muted); margin: 6px 0 20px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+    padding: 12px 20px; border-radius: 14px;
+    background: var(--text); color: var(--bg);
+    font-size: 14px; font-weight: 600; line-height: 1.4; white-space: nowrap;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
+    transition: opacity .2s ease, transform .2s ease; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* タッチ端末は44px以上のタップ領域 */
+  @media (pointer: coarse) {
+    .chip { height: 44px; }
+    .icon-btn { width: 44px; height: 44px; }
+    .more-btn, .btn { min-height: 44px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0s !important; transition-delay: 0s !important; }
+  }
+
+  /* ───────── 印刷（A4・明色・詳細を展開） ───────── */
+  @media print {
+    :root {
+      --bg: #fff; --surface: #fff; --surface-2: #f3f4f6; --line: #d5dae1; --line-strong: #b8c0cc;
+      --text: #111827; --muted: #374151; --faint: #4b5563;
+      --good: #047857; --mid: #b45309; --low: #be123c;
+    }
+    .r-S { --c: #e11d48; --c-bg: #ffe4e9; }
+    .r-A { --c: #b45309; --c-bg: #fef3c7; }
+    .r-B { --c: #1d4ed8; --c-bg: #dbeafe; }
+    .r-C { --c: #475569; --c-bg: #e2e8f0; }
+    *, *::before, *::after { transition: none !important; }
+    body { padding-bottom: 0; font-size: 12pt; }
+    .site-header .print-btn, .controls, .list-tools, .card-actions, .toast { display: none !important; }
+    .cards { grid-template-columns: 1fr; gap: 12px; }
+    .card { break-inside: avoid; padding: 18px; }
+    .more { grid-template-rows: 1fr !important; }
+    .more-in { visibility: visible !important; }
+    .adapt li, .jp-body { color: #111827; }
+    .tile, .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  /* ロックモーダル用スタイル */
+  #lockModal {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(14, 18, 24, .88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .lock-card {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 18px;
+    padding: 32px 28px;
+    max-width: 400px; width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .6);
+    text-align: center;
+  }
+  .lock-icon {
+    width: 48px; height: 48px; margin: 0 auto 16px;
+    background: rgba(139, 156, 255, .15);
+    border: 1px solid rgba(139, 156, 255, .3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent); font-size: 22px;
+  }
+  .lock-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .lock-card p { font-size: 13.5px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+  .lock-input {
+    width: 100%; padding: 12px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text); font-size: 15px;
+    margin-bottom: 16px; outline: none; transition: border-color .2s;
+  }
+  .lock-input:focus { border-color: var(--accent); }
+  .lock-save-row {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 13px; color: var(--muted); margin-bottom: 20px; cursor: pointer; user-select: none;
+  }
+  .lock-save-row input { cursor: pointer; }
+  .lock-btn {
+    width: 100%; padding: 12px;
+    background: var(--accent); color: #0b0f17;
+    border: none; border-radius: 10px;
+    font-weight: 700; font-size: 15px; cursor: pointer;
+    transition: opacity .2s, transform .1s;
+  }
+  .lock-btn:hover { opacity: .9; }
+  .lock-btn:active { transform: scale(.98); }
+  #lockError {
+    color: var(--low); font-size: 13px; margin-top: 14px; display: none;
+  }
+</style>
+</head>
+
+<body>
+
+
+<!-- パスワード保護モーダル -->
+<div id="lockModal">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h2>非公開ダッシュボード</h2>
+    <p>閲覧するにはパスワードを入力してください。<br>データはAES-256で安全に保護されています。</p>
+    <form id="lockForm" onsubmit="event.preventDefault(); handleUnlock();">
+      <input type="password" id="lockInput" class="lock-input" placeholder="パスワードを入力" autofocus required autocomplete="current-password">
+      <label class="lock-save-row">
+        <input type="checkbox" id="lockRemember" checked>
+        この端末にパスワードを記憶する
+      </label>
+      <button type="submit" class="lock-btn">解除して開く</button>
+      <div id="lockError">パスワードが正しくありません</div>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- アイコン -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <div class="wrap bar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">P</div>
+      <div>
+        <h1>PH Japan Market Analyzer</h1>
+        <p class="date" id="reportDate"></p>
+      </div>
+    </div>
+    <button class="btn print-btn" type="button" onclick="window.print()" aria-label="印刷 / PDF保存">
+      <svg class="ic" aria-hidden="true"><use href="#i-print"/></svg>
+      <span>印刷 / PDF</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="controls" aria-label="絞り込み">
+    <div class="chips" id="chips" role="group" aria-label="判定ランク"></div>
+    <label class="search">
+      <span class="sr">キーワード検索</span>
+      <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="q" type="search" placeholder="キーワードで検索" autocomplete="off" enterkeyhint="search">
+      <button id="clear" class="clear" type="button" aria-label="検索をクリア" hidden>
+        <svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>
+      </button>
+    </label>
+  </section>
+
+  <div class="list-head">
+    <div>
+      <h2 id="listTitle"></h2>
+      <p id="listDesc"></p>
+    </div>
+    <div class="list-tools">
+      <span class="count" id="count" aria-live="polite"></span>
+      <button class="btn plain" id="toggleAll" type="button">すべて開く</button>
+    </div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="empty" id="empty" hidden>
+    <p class="empty-title" id="emptyTitle"></p>
+    <p class="empty-body" id="emptyBody"></p>
+    <button class="btn" id="emptyBtn" type="button"></button>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   データ（毎日の更新はここだけ）
+   rank : S / A / B / C
+   orig : 元のプロダクトが何をするか（1文）／ origNote : その根拠（タグラインより要約 など）
+   idea / body : 日本版の見出しと説明 ／ target : 日本版のターゲット（複数可）
+   adapt : 日本版の設計ポイント（3つ程度、省略可）
+   signals の t : good（強み） / mid（普通） / low（弱み） / 省略で無色
+   n    : 「詳細」を開いたときに表示する補足
+   ========================================================= */
+const REPORT_DATE = '2026-09-21';
+
+const RANKS = {
+  S: { label: '即検討推奨',   desc: '国内強いペイン・先行余地大' },
+  A: { label: '有望・要調整', desc: '商慣習の最適化で勝算' },
+  B: { label: '要検証',       desc: 'ニッチ特化なら成立余地' },
+  C: { label: '見送り',       desc: '市場小またはARR化困難' }
+};
+
+const IS_ENCRYPTED = true;
+const ENCRYPTED_PAYLOAD = {"salt": "KWjWosaAcZTaS/ZF1nME5Q==", "iv": "8yYbnQGDztjkL7li", "data": "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"};
+let PRODUCTS = [];
+
+/* =========================================================
+   ロジック
+   ========================================================= */
+const KEY = 'ph_saved_products';           // 既存のブックマークを引き継ぐ
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = (s) => String(s).normalize('NFKC').toLowerCase();
+const ico = (id) => `<svg class="ic" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+
+let rank = 'all';
+let query = '';
+let saved = loadSaved();
+const els = new Map();
+
+function loadSaved() {
+  try { const v = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(v) ? v : []; }
+  catch (e) { return []; }
+}
+function persistSaved() {
+  try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* 保存不可の環境では無視 */ }
+}
+
+/* 検索用インデックスの構築 */
+function buildIndex() {
+  PRODUCTS.forEach((p) => {
+    p._idx = norm([
+      p.name, p.cat, p.tagline, p.orig, p.idea, p.body,
+      ...(p.target || []), ...(p.adapt || []),
+      ...(p.signals || []).flatMap((s) => [s.k, s.v, s.n || ''])
+    ].join(' '));
+  });
+}
+
+
+/* ---------- 描画 ---------- */
+function renderChips() {
+  const count = (r) => PRODUCTS.filter((p) => p.rank === r).length;
+  const chip = (key, inner) =>
+    `<button class="chip ${RANKS[key] ? 'r-' + key : ''}" type="button" data-rank="${key}" aria-pressed="false">${inner}</button>`;
+
+  $('#chips').innerHTML =
+    chip('all', `すべて <span class="n">${PRODUCTS.length}</span>`) +
+    Object.keys(RANKS).map((r) => chip(r, `<span class="dot"></span>${r} <span class="n">${count(r)}</span>`)).join('') +
+    chip('saved', `${ico('bookmark')}保存 <span class="n" id="savedN">0</span>`);
+}
+
+function cardHTML(p) {
+  const sigs = p.signals.map((s) =>
+    `<div class="sig"><dt>${esc(s.k)}</dt><dd class="${s.t || ''}">${esc(s.v)}</dd></div>`).join('');
+  const notes = p.signals.filter((s) => s.n).map((s) =>
+    `<div><dt>${esc(s.k)}</dt><dd>${esc(s.n)}</dd></div>`).join('');
+  const tags = (p.target || []).map((t) => `<li class="tag">${esc(t)}</li>`).join('');
+  const adapt = (p.adapt || []).map((a) => `<li>${esc(a)}</li>`).join('');
+
+  return `
+  <article class="card r-${p.rank}${p.pass ? ' pass' : ''}" data-id="${esc(p.id)}">
+    <div class="card-head">
+      <div class="tile"><span class="sr">${p.rank}ランク</span><span aria-hidden="true">${p.rank}</span></div>
+      <div class="ident">
+        <h3 class="name">${esc(p.name)}</h3>
+        <p class="cat">${esc(p.cat)}</p>
+      </div>
+    </div>
+
+    <div class="brief">
+      <div class="orig">
+        <span class="lbl">元のプロダクト${p.origNote ? `<span class="lbl-note">${esc(p.origNote)}</span>` : ''}</span>
+        <p>${esc(p.orig)}</p>
+      </div>
+      <div class="jp">
+        <span class="lbl">${esc(p.jpLabel || '日本版')}</span>
+        <p class="idea">${esc(p.idea)}</p>
+        <p class="jp-body">${esc(p.body)}</p>
+      </div>
+      <div class="target">
+        <span class="lbl">ターゲット</span>
+        <ul class="tags">${tags}</ul>
+      </div>
+    </div>
+
+    <dl class="signals">${sigs}</dl>
+
+    <div class="card-actions">
+      <button class="more-btn" type="button" data-act="toggle" aria-expanded="false" aria-controls="more-${esc(p.id)}">
+        詳細${ico('chevron')}
+      </button>
+      <div class="icons">
+        <button class="icon-btn" type="button" data-act="bookmark" aria-pressed="false" aria-label="${esc(p.name)}を保存">${ico('bookmark')}</button>
+        <button class="icon-btn" type="button" data-act="copy" aria-label="内容をコピー">${ico('copy')}</button>
+        <a class="icon-btn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="Product Huntで見る">${ico('link')}</a>
+      </div>
+    </div>
+
+    <div class="more" id="more-${esc(p.id)}">
+      <div class="more-in">
+        <div class="more-pad">
+          ${adapt ? `<div><span class="lbl">日本版の設計ポイント</span><ul class="adapt">${adapt}</ul></div>` : ''}
+          ${notes ? `<div><span class="lbl">判定メモ</span><dl class="notes">${notes}</dl></div>` : ''}
+          <p class="src">Product Hunt: “${esc(p.tagline)}”</p>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderCards() {
+  $('#cards').innerHTML = PRODUCTS.map(cardHTML).join('');
+  document.querySelectorAll('.card').forEach((el) => els.set(el.dataset.id, el));
+}
+
+/* ---------- 絞り込み ---------- */
+function apply() {
+  const terms = norm(query).split(/\s+/).filter(Boolean);
+  let shown = 0;
+
+  PRODUCTS.forEach((p) => {
+    const okRank = rank === 'all' || (rank === 'saved' ? saved.includes(p.id) : p.rank === rank);
+    const okText = terms.every((t) => p._idx.includes(t));
+    const show = okRank && okText;
+    els.get(p.id).hidden = !show;
+    if (show) shown++;
+  });
+
+  document.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.rank === rank)));
+  $('#clear').hidden = !query;
+
+  // 見出し
+  const h = $('#listTitle');
+  if (rank === 'all') {
+    h.textContent = 'すべて';
+    $('#listDesc').textContent = `${REPORT_DATE}に収集した${PRODUCTS.length}件`;
+  } else if (rank === 'saved') {
+    h.textContent = '保存済み';
+    $('#listDesc').textContent = 'しおりを付けたプロダクト';
+  } else {
+    h.innerHTML = `<span class="lh-rank r-${rank}">${rank}</span>${esc(RANKS[rank].label)}`;
+    $('#listDesc').textContent = RANKS[rank].desc;
+  }
+  $('#count').textContent = `${shown}件`;
+
+  // 空状態
+  const empty = $('#empty');
+  empty.hidden = shown > 0;
+  if (shown === 0) {
+    const noSaved = rank === 'saved' && saved.length === 0 && !query;
+    $('#emptyTitle').textContent = noSaved ? '保存したものはまだありません' : '該当するものがありません';
+    $('#emptyBody').textContent  = noSaved ? 'カードのしおりアイコンで保存できます。' : 'キーワードや絞り込みを変えてみてください。';
+    $('#emptyBtn').textContent   = noSaved ? 'すべて表示' : '条件をリセット';
+  }
+  syncToggleAll();
+}
+
+/* ---------- 詳細の開閉 ---------- */
+function setOpen(card, open) {
+  card.classList.toggle('open', open);
+  card.querySelector('.more-btn').setAttribute('aria-expanded', String(open));
+}
+function visibleCards() { return [...document.querySelectorAll('.card:not([hidden])')]; }
+function syncToggleAll() {
+  const cards = visibleCards();
+  const allOpen = cards.length > 0 && cards.every((c) => c.classList.contains('open'));
+  const btn = $('#toggleAll');
+  btn.textContent = allOpen ? 'すべて閉じる' : 'すべて開く';
+  btn.hidden = cards.length === 0;
+}
+
+/* ---------- ブックマーク ---------- */
+function refreshSaved() {
+  $('#savedN').textContent = saved.length;
+  PRODUCTS.forEach((p) => {
+    const b = els.get(p.id).querySelector('[data-act="bookmark"]');
+    const on = saved.includes(p.id);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+}
+function toggleSaved(id) {
+  const i = saved.indexOf(id);
+  if (i > -1) { saved.splice(i, 1); toast('保存を解除しました'); }
+  else        { saved.push(id);     toast('保存しました'); }
+  persistSaved();
+  refreshSaved();
+  if (rank === 'saved') apply();
+}
+
+/* ---------- コピー / トースト ---------- */
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  toast(ok ? 'コピーしました' : 'コピーできませんでした');
+}
+function copyIdea(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  const text = `${p.name}（元: ${p.orig}）\n日本版: ${p.idea}\n${p.body}\nターゲット: ${(p.target || []).join('、')}`;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => toast('コピーしました'), () => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+/* ---------- イベント ---------- */
+$('#chips').addEventListener('click', (e) => {
+  const c = e.target.closest('.chip');
+  if (!c) return;
+  rank = c.dataset.rank;
+  apply();
+});
+
+$('#q').addEventListener('input', (e) => { query = e.target.value; apply(); });
+$('#clear').addEventListener('click', () => { $('#q').value = ''; query = ''; apply(); $('#q').focus(); });
+
+$('#cards').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const card = b.closest('.card');
+  const id = card.dataset.id;
+  if (b.dataset.act === 'toggle')   { setOpen(card, !card.classList.contains('open')); syncToggleAll(); }
+  if (b.dataset.act === 'bookmark') toggleSaved(id);
+  if (b.dataset.act === 'copy')     copyIdea(id);
+});
+
+$('#toggleAll').addEventListener('click', () => {
+  const cards = visibleCards();
+  const open = !cards.every((c) => c.classList.contains('open'));
+  cards.forEach((c) => setOpen(c, open));
+  syncToggleAll();
+});
+
+$('#emptyBtn').addEventListener('click', () => {
+  $('#q').value = ''; query = ''; rank = 'all'; apply();
+});
+
+/* ---------- 暗号化・復号処理 (WebCrypto API) ---------- */
+const PASS_KEY = 'ph_dash_password';
+
+async function decryptPayload(password, payload) {
+  const enc = new TextEncoder();
+  const salt = Uint8Array.from(atob(payload.salt), (c) => c.charCodeAt(0));
+  const iv = Uint8Array.from(atob(payload.iv), (c) => c.charCodeAt(0));
+  const data = Uint8Array.from(atob(payload.data), (c) => c.charCodeAt(0));
+
+  const baseKey = await window.crypto.subtle.importKey(
+    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  const key = await window.crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+    baseKey,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
+  const decrypted = await window.crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv }, key, data
+  );
+  const dec = new TextDecoder();
+  return JSON.parse(dec.decode(decrypted));
+}
+
+async function handleUnlock() {
+  const input = document.getElementById('lockInput');
+  const remember = document.getElementById('lockRemember').checked;
+  const err = document.getElementById('lockError');
+  err.style.display = 'none';
+
+  if (!input || !input.value) return;
+
+  try {
+    const products = await decryptPayload(input.value, ENCRYPTED_PAYLOAD);
+    PRODUCTS = products;
+    if (remember) {
+      localStorage.setItem(PASS_KEY, input.value);
+    }
+    const modal = document.getElementById('lockModal');
+    if (modal) modal.style.display = 'none';
+    initDashboard();
+  } catch (e) {
+    err.style.display = 'block';
+  }
+}
+
+/* ---------- 初期化 ---------- */
+function initDashboard() {
+  buildIndex();
+  $('#reportDate').textContent = `${REPORT_DATE} 収集`;
+  renderChips();
+  renderCards();
+  refreshSaved();
+  apply();
+}
+
+(async function() {
+  if (IS_ENCRYPTED && ENCRYPTED_PAYLOAD) {
+    const savedPass = localStorage.getItem(PASS_KEY);
+    if (savedPass) {
+      try {
+        const products = await decryptPayload(savedPass, ENCRYPTED_PAYLOAD);
+        PRODUCTS = products;
+        const modal = document.getElementById('lockModal');
+        if (modal) modal.style.display = 'none';
+        initDashboard();
+        return;
+      } catch (e) {
+        localStorage.removeItem(PASS_KEY);
+      }
+    }
+    // パスワード未保存または復号失敗時はモーダルを表示
+    const modal = document.getElementById('lockModal');
+    if (modal) modal.style.display = 'flex';
+  } else {
+    initDashboard();
+  }
+})();
+</script>
+</body>
+</html>
