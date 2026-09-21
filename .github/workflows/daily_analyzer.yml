@@ -2,8 +2,8 @@ name: Product Hunt Daily Analyzer
 
 on:
   schedule:
-    # 毎日 日本時間 07:00 (UTC 22:00) に自動実行
-    - cron: '0 22 * * *'
+    # 毎日 日本時間 06:35 (UTC 21:35) に自動実行 (毎時00分の世界的な混雑遅延を回避し、07:00前に確実に完了させる)
+    - cron: '35 21 * * *'
   workflow_dispatch: # GitHub画面からの手動実行ボタン
 
 permissions:
