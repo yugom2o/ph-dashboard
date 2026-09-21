@@ -24,7 +24,7 @@ for directory in [DATA_DIR, REPORTS_DIR, TEMPLATES_DIR, DOCS_DIR]:
 # APIキー・設定値
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 PRODUCTHUNT_TOKEN = os.getenv("PRODUCTHUNT_TOKEN", "")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 DAILY_FETCH_LIMIT = int(os.getenv("DAILY_FETCH_LIMIT", "10"))
 
 # ダッシュボード保護＆GitHub Pages公開設定
