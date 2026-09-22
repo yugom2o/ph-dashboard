@@ -640,7 +640,7 @@ function apply() {
     }
   } else if (rank === 'today') {
     h.textContent = '本日新着';
-    $('#listDesc').textContent = `${REPORT_DATE} に収集・分析された最新プロダクト（${todayCount}件）`;
+    $('#listDesc').textContent = `${REPORT_DATE} 日次レポート掲載プロダクト（全${todayCount}件）`;
   } else if (rank === 'saved') {
     h.textContent = '保存済み';
     $('#listDesc').textContent = 'しおりを付けたプロダクト';
@@ -809,7 +809,10 @@ async function handleUnlock() {
 /* ---------- 初期化 ---------- */
 function initDashboard() {
   buildIndex();
-  $('#reportDate').textContent = `${REPORT_DATE} 収集`;
+  // 本日新着データが存在する場合は初期表示を「本日新着」にする
+  const hasToday = PRODUCTS.some((p) => p.date === REPORT_DATE);
+  rank = hasToday ? 'today' : 'all';
+  $('#reportDate').textContent = `最終更新: ${REPORT_DATE}`;
   renderChips();
   renderCards();
   refreshSaved();
