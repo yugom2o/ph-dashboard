@@ -1,4 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+JST = timezone(timedelta(hours=9))
 from typing import Optional
 from config import DAILY_FETCH_LIMIT, PRODUCTHUNT_TOKEN
 from src.collectors import ProductHuntAPICollector, ProductHuntRSSCollector
@@ -29,7 +31,7 @@ class DailyPipeline:
 
     def run(self, limit: Optional[int] = None, target_date: Optional[str] = None):
         fetch_limit = limit or DAILY_FETCH_LIMIT
-        today_str = target_date or datetime.now().strftime("%Y-%m-%d")
+        today_str = target_date or datetime.now(JST).strftime("%Y-%m-%d")
 
         print(f"==================================================")
         print(f"🚀 Product Hunt 日次分析パイプライン開始: {today_str}")
@@ -144,10 +146,14 @@ class DailyPipeline:
         md_file = self.md_reporter.generate_daily_report(today_evaluations, today_str)
         print(f"  -> Markdown レポート出力: {md_file}")
 
-        # HTML ダッシュボード
+        # HTML ダッシュボード (日本語詳細解説がある高品質データのみ抽出)
         all_recent = self.db.get_all_recent_evaluations(limit=50)
-        html_file = self.html_reporter.generate_dashboard(all_recent, today_str)
+        valid_recent = [it for it in all_recent if it.get("original_summary_ja")]
+        if not valid_recent:
+            valid_recent = all_recent
+        html_file = self.html_reporter.generate_dashboard(valid_recent, today_str)
         print(f"  -> HTML ダッシュボード更新: {html_file}")
+
         print(f"  -> GitHub Pages用ファイル更新: {self.html_reporter.docs_output_path}")
 
         # GitHub への自動アップロード (設定時のみ)
@@ -155,9 +161,17 @@ class DailyPipeline:
             print("\n[Step 5b] GitHub Pagesへ自動アップロード中...")
             self.github_uploader.upload_file(
                 file_path=html_file,
+                target_path="dashboard.html",
+                commit_message=f"Update daily dashboard: {today_str}",
+            )
+            self.github_uploader.upload_file(
+                file_path=html_file,
                 target_path="index.html",
                 commit_message=f"Update daily dashboard: {today_str}",
             )
+            import os
+            if not os.getenv("GITHUB_ACTIONS"):
+                self.github_uploader.trigger_workflow_dispatch("daily_analyzer.yml")
 
         print("\n==================================================")
         print(f"🎉 日次パイプライン完了！")
