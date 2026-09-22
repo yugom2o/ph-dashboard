@@ -53,3 +53,27 @@ class GitHubUploader:
         except Exception as e:
             print(f"[Error] Exception during GitHub upload: {e}")
             return False
+
+    def trigger_workflow_dispatch(self, workflow_name: str = "daily_analyzer.yml", ref: str = "main") -> bool:
+        """GitHub Actions ワークフローを手動トリガーして即時ビルド・デプロイ"""
+        if not self.token or not self.repo:
+            return False
+
+        url = f"https://api.github.com/repos/{self.repo}/actions/workflows/{workflow_name}/dispatches"
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/vnd.github.v3+json",
+        }
+        payload = {"ref": ref}
+
+        try:
+            resp = requests.post(url, headers=headers, json=payload, timeout=15)
+            if resp.status_code == 204:
+                print(f"[Success] Successfully triggered GitHub Actions workflow: {workflow_name}")
+                return True
+            else:
+                print(f"[Warning] Failed to trigger workflow: HTTP {resp.status_code} - {resp.text}")
+                return False
+        except Exception as e:
+            print(f"[Warning] Exception triggering workflow: {e}")
+            return False
