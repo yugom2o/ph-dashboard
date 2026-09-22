@@ -124,9 +124,12 @@ class HTMLReporter:
             if not orig_text:
                 orig_text = desc[:200] + "..." if len(desc) > 200 else desc
 
+            item_date = it.get("analyzed_date") or it.get("first_seen_date") or report_date
+
             products_data.append(
                 {
                     "id": it.get("product_id") or it.get("id") or name.lower().replace(" ", "-"),
+                    "date": item_date,
                     "rank": rank,
                     "name": name,
                     "cat": category,
