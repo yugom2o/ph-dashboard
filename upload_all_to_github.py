@@ -13,8 +13,10 @@ import requests
 from config import BASE_DIR, GITHUB_REPO, GITHUB_TOKEN
 
 
+import hashlib
+
 # アップロード対象の拡張子やファイル
-INCLUDE_EXTS = {".py", ".html", ".md", ".txt", ".yml", ".yaml"}
+INCLUDE_EXTS = {".py", ".html", ".md", ".txt", ".yml", ".yaml", ".db"}
 EXCLUDE_DIRS = {".venv", ".git", "__pycache__", "scratch", ".system_generated"}
 EXCLUDE_FILES = {".env"}  # .env はセキュリティ保護のため絶対に除外
 
@@ -74,12 +76,18 @@ def upload_project():
         file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{rel_path}"
         sha = None
 
+        content_bytes = local_path.read_bytes()
+        # Git Blob SHA の計算
+        git_sha = hashlib.sha1(b"blob " + str(len(content_bytes)).encode() + b"\0" + content_bytes).hexdigest()
+
         # 既存SHAの確認
         get_res = requests.get(file_url, headers=headers)
         if get_res.status_code == 200:
             sha = get_res.json().get("sha")
+            if sha == git_sha:
+                print(f"  [{idx}/{len(files_to_upload)}] [SKIP] {rel_path} (変更なし)")
+                continue
 
-        content_bytes = local_path.read_bytes()
         content_b64 = base64.b64encode(content_bytes).decode("utf-8")
 
         payload = {
