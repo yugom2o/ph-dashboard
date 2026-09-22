@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -35,6 +37,7 @@ jobs:
 
       - name: Run Daily Analyzer
         env:
+          TZ: 'Asia/Tokyo'
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PRODUCTHUNT_TOKEN: ${{ secrets.PRODUCTHUNT_TOKEN }}
           GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
@@ -64,4 +67,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Automated daily analysis: update reports and history"
-          file_pattern: "reports/*.md data/*.db dashboard.html docs/index.html"
+          file_pattern: "reports/*.md data/*.db dashboard.html docs/index.html index.html"
