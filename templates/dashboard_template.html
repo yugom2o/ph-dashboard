@@ -352,8 +352,26 @@
   }
   .lock-btn:hover { opacity: .9; }
   .lock-btn:active { transform: scale(.98); }
-  #lockError {
-    color: var(--low); font-size: 13px; margin-top: 14px; display: none;
+  .date-chip {
+    font-size: 11px;
+    color: var(--muted);
+    background: rgba(255, 255, 255, .06);
+    padding: 2px 7px;
+    border-radius: 6px;
+    margin-left: 6px;
+    font-weight: 500;
+    vertical-align: middle;
+  }
+  .new-chip {
+    font-size: 11px;
+    color: #34d399;
+    background: rgba(52, 211, 153, .14);
+    border: 1px solid rgba(52, 211, 153, .3);
+    padding: 1px 7px;
+    border-radius: 6px;
+    margin-left: 6px;
+    font-weight: 600;
+    vertical-align: middle;
   }
 </style>
 </head>
@@ -506,11 +524,13 @@ function buildIndex() {
 /* ---------- 描画 ---------- */
 function renderChips() {
   const count = (r) => PRODUCTS.filter((p) => p.rank === r).length;
+  const todayCount = PRODUCTS.filter((p) => p.date === REPORT_DATE).length;
   const chip = (key, inner) =>
     `<button class="chip ${RANKS[key] ? 'r-' + key : ''}" type="button" data-rank="${key}" aria-pressed="false">${inner}</button>`;
 
   $('#chips').innerHTML =
     chip('all', `すべて <span class="n">${PRODUCTS.length}</span>`) +
+    (todayCount > 0 ? chip('today', `✨ 本日新着 <span class="n">${todayCount}</span>`) : '') +
     Object.keys(RANKS).map((r) => chip(r, `<span class="dot"></span>${r} <span class="n">${count(r)}</span>`)).join('') +
     chip('saved', `${ico('bookmark')}保存 <span class="n" id="savedN">0</span>`);
 }
@@ -523,13 +543,18 @@ function cardHTML(p) {
   const tags = (p.target || []).map((t) => `<li class="tag">${esc(t)}</li>`).join('');
   const adapt = (p.adapt || []).map((a) => `<li>${esc(a)}</li>`).join('');
 
+  const isToday = p.date === REPORT_DATE;
+  const dateBadge = isToday
+    ? `<span class="new-chip">本日新着</span>`
+    : (p.date ? `<span class="date-chip">📅 ${esc(p.date)}</span>` : '');
+
   return `
   <article class="card r-${p.rank}${p.pass ? ' pass' : ''}" data-id="${esc(p.id)}">
     <div class="card-head">
       <div class="tile"><span class="sr">${p.rank}ランク</span><span aria-hidden="true">${p.rank}</span></div>
       <div class="ident">
         <h3 class="name">${esc(p.name)}</h3>
-        <p class="cat">${esc(p.cat)}</p>
+        <p class="cat">${esc(p.cat)}${dateBadge}</p>
       </div>
     </div>
 
@@ -585,7 +610,9 @@ function apply() {
   let shown = 0;
 
   PRODUCTS.forEach((p) => {
-    const okRank = rank === 'all' || (rank === 'saved' ? saved.includes(p.id) : p.rank === rank);
+    const okRank = rank === 'all' || 
+                   (rank === 'today' ? p.date === REPORT_DATE : 
+                   (rank === 'saved' ? saved.includes(p.id) : p.rank === rank));
     const okText = terms.every((t) => p._idx.includes(t));
     const show = okRank && okText;
     els.get(p.id).hidden = !show;
@@ -595,17 +622,32 @@ function apply() {
   document.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.rank === rank)));
   $('#clear').hidden = !query;
 
+  // ヘッダー日付表示
+  const dateEl = $('#reportDate');
+  if (dateEl) {
+    dateEl.textContent = `最終更新: ${REPORT_DATE}`;
+  }
+
   // 見出し
   const h = $('#listTitle');
+  const todayCount = PRODUCTS.filter((p) => p.date === REPORT_DATE).length;
   if (rank === 'all') {
     h.textContent = 'すべて';
-    $('#listDesc').textContent = `${REPORT_DATE}に収集した${PRODUCTS.length}件`;
+    if (todayCount > 0) {
+      $('#listDesc').textContent = `本日(${REPORT_DATE})新着: ${todayCount}件 ／ 蓄積データ: 全${PRODUCTS.length}件`;
+    } else {
+      $('#listDesc').textContent = `最新分析日: ${REPORT_DATE} ／ 蓄積データ: 全${PRODUCTS.length}件`;
+    }
+  } else if (rank === 'today') {
+    h.textContent = '本日新着';
+    $('#listDesc').textContent = `${REPORT_DATE} に収集・分析された最新プロダクト（${todayCount}件）`;
   } else if (rank === 'saved') {
     h.textContent = '保存済み';
     $('#listDesc').textContent = 'しおりを付けたプロダクト';
   } else {
     h.innerHTML = `<span class="lh-rank r-${rank}">${rank}</span>${esc(RANKS[rank].label)}`;
-    $('#listDesc').textContent = RANKS[rank].desc;
+    const rankTotal = PRODUCTS.filter((p) => p.rank === rank).length;
+    $('#listDesc').textContent = `${RANKS[rank].desc}（全${rankTotal}件）`;
   }
   $('#count').textContent = `${shown}件`;
 
