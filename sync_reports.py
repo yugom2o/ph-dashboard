@@ -6,10 +6,17 @@ import os
 import sys
 from pathlib import Path
 
-# Windows環境での文字化け防止
-if sys.platform == "win32":
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+# Windows環境・バックグラウンド実行(pythonw)での文字化けやNoneTypeエラー防止
+LOG_FILE = Path(__file__).resolve().parent / "sync_reports.log"
+if sys.stdout is not None:
+    if sys.platform == "win32":
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+else:
+    # pythonw.exe などのヘッドレス環境ではログファイルへリダイレクト
+    f_log = open(LOG_FILE, "a", encoding="utf-8", buffering=1)
+    sys.stdout = f_log
+    sys.stderr = f_log
 
 import requests
 from config import BASE_DIR, DATA_DIR, GITHUB_REPO, GITHUB_TOKEN, REPORTS_DIR
