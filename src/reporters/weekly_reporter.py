@@ -59,6 +59,13 @@ class WeeklyReporter:
 
         out_file = self.output_dir / f"{week_label}_GlobalTech週報.md"
         out_file.write_text("\n".join(md), encoding="utf-8")
+
+        # note / ニュースレター コピペ用プレーンファイル
+        note_dir = self.output_dir / "note"
+        note_dir.mkdir(parents=True, exist_ok=True)
+        note_file = note_dir / f"{week_label}_note投稿原稿.md"
+        note_file.write_text(analysis_text, encoding="utf-8")
+
         return out_file
 
     def _call_gemini_weekly(
@@ -73,9 +80,12 @@ class WeeklyReporter:
         # プロダクト情報の要約リストを作成
         summary_list = []
         for it in items[:30]:
+            img_info = f" (画像URL: {it.get('image_url')})" if it.get('image_url') else ""
+            url_info = f" (公式URL: {it.get('official_url')})" if it.get('official_url') else ""
             summary_list.append(
-                f"- 【{it.get('rank')}ランク / {it.get('score')}点】{it.get('name')}: {it.get('tagline')}\n"
-                f"  日本市場向け: {it.get('one_line_summary')} (ターゲット: {it.get('target_market')})"
+                f"- 【{it.get('rank')}ランク / {it.get('score')}点】{it.get('name')}: {it.get('tagline')}{url_info}{img_info}\n"
+                f"  日本市場向け: {it.get('one_line_summary')} (ターゲット: {it.get('target_market')})\n"
+                f"  機能概要: {it.get('original_summary_ja', it.get('description', ''))[:150]}"
             )
         products_context = "\n".join(summary_list)
 
@@ -91,15 +101,27 @@ noteや週刊ニュースレター（Substack等）にそのまま掲載でき�
 ---
 
 ### 【構成と出力ルール】:
-1. **メインタイトル**: 読者が読みたくなる魅力的で専門性の高いタイトル（例: 『【週刊】海外AIスタートアップ定点観測：〇〇領域の急成長と日本市場での勝機』）
-2. **今週のマクロトレンド総括**: 今週ローンチされた海外プロダクトから見える共通の潮流・変化（3〜5行で鋭く考察）
-3. **今週の注目カテゴリ＆キーワードTOP3**: どんな領域（例: 営業DX、自律型Agent、動画ローコード等）が熱かったか
-4. **編集部厳選！日本上陸・ローカライズ期待のプロダクトTOP3**:
-   - プロダクト名、概要、なぜ日本市場で刺さるのか、想定される日本版ビジネスモデルを詳しく解説
-5. **日本市場でのタイムマシン事業チャンス（今週のインサイト）**: 日本の起業家・個人開発者・新規事業担当者が今すぐ仕掛けるべき論点
-6. **X（Twitter）発信用ツリー投稿案**: この週報を要約した140字×3〜4連ツイート案
+1. **メディア紹介ヘッダー**: 
+   > 🌐 **Global Tech Radar Japan**：海外でローンチ・急成長中の最新AIツールおよびTechプロダクトを毎朝自動収集し、「日本市場でのタイムマシン事業（ローカライズビジネス）が成立するか」を分析する独自メディアです。毎朝の速報は [Threads (@get_globaltechinfo)](https://www.threads.net/@get_globaltechinfo) にて配信中。
+2. **メインタイトル**: 読者が読みたくなる魅力的で専門性の高いタイトル（例: 『【週刊】海外AIスタートアップ定点観測：〇〇領域の急成長と日本市場での勝機』）
+3. **今週のマクロトレンド総括**: 今週ローンチされた海外プロダクトから見える共通の潮流・変化（3〜5行で鋭く考察）
+4. **今週の注目カテゴリ＆キーワードTOP3**: どんな領域（例: 営業DX、自律型Agent、動画ローコード等）が熱かったか
+5. **編集部厳選！日本上陸・ローカライズ期待のプロダクトTOP3〜5**:
+   各プロダクトについて以下を記述してください：
+   - 見出し（H3）: 🏆 【ランク X / YY点】プロダクト名
+   - 画像（もし画像URLがあれば Markdown形式 `![プロダクト名](画像URL)` で必ず掲載）
+   - 公式サイトリンク: `🔗 公式サイト: [URL](URL)`
+   - ツール概要（何ができるのか日本語で分かりやすく）
+   - 🇯🇵 日本市場での勝機・想定ターゲット・アレンジ案
+   - 想定マネタイズ・価格帯
+6. **日本市場でのタイムマシン事業チャンス（今週のインサイト）**: 日本の起業家・個人開発者・新規事業担当者が今すぐ仕掛けるべき論点
+7. **読者アクション・編集後記**:
+   - 毎朝の速報: Threads（@get_globaltechinfo）の案内
+   - Webダッシュボードの案内
+   - 新規事業・リサーチ相談の案内
+8. **X（Twitter）発信用ツリー投稿案**: この週報を要約した140字×3〜4連ツイート案
 
-※注意: 情報源として「Product Hunt」などの外部媒体名は伏せ、「海外最新テック動向」「独自リサーチ」というスタンスで執筆してください。Markdown形式で出力してください。
+※注意: 情報源として「Product Hunt」などの外部収集元媒体名は伏せ、「海外最新テック動向」「独自リサーチ」というスタンスで執筆してください。Markdown形式で出力してください。
 """
         try:
             from google.genai import types
@@ -130,18 +152,25 @@ noteや週刊ニュースレター（Substack等）にそのまま掲載でき�
             featured = items[:3]
 
         top_cards = []
-        for it in featured[:3]:
+        for it in featured[:5]:
+            img_md = f"![{it.get('name')} 製品ビジュアル]({it.get('image_url')})\n\n" if it.get("image_url") else ""
+            off_md = f"- **🔗 公式サイト**: [{it.get('official_url')}]({it.get('official_url')})\n" if it.get("official_url") else ""
             top_cards.append(
                 f"### 🏆 【ランク {it.get('rank', 'A')} / {it.get('score', 80)}点】{it.get('name')}\n"
+                f"{img_md}"
+                f"{off_md}"
                 f"- **海外公式キャッチコピー**: {it.get('tagline', '')}\n"
-                f"- **ツール概要**: {it.get('original_summary_ja', it.get('description', ''))[:180]}...\n"
+                f"- **ツール概要**: {it.get('original_summary_ja', it.get('description', ''))[:200]}...\n"
                 f"- **🇯🇵 日本市場での勝機**: **{it.get('one_line_summary', '')}**\n"
                 f"- **想定ターゲット**: {it.get('target_market', '中小企業・B2B')}\n"
                 f"- **ビジネスモデル**: {it.get('pricing_model', '月額サブスクリプション')}\n"
             )
         cards_md = "\n".join(top_cards)
 
-        return f"""# 🌐 【週刊】Global Tech Radar：海外最新AI・テック潮流と日本市場の勝機 ({start_date} ~ {end_date})
+        return f"""> 🌐 **Global Tech Radar Japan**：海外でローンチ・急成長中の最新AIツールおよびTechプロダクトを毎朝自動収集し、**「日本市場でのタイムマシン事業（ローカライズビジネス）が成立するか」** を分析する独自リサーチメディアです。  
+> 毎朝の速報・高画質ビジュアル付きポストは **[Threads (@get_globaltechinfo)](https://www.threads.net/@get_globaltechinfo)** にて完全自動配信中。
+
+# 🌐 【週刊】Global Tech Radar：海外最新AI・テック潮流と日本市場の勝機 ({start_date} ~ {end_date})
 
 今週リサーチした **{len(items)}件** の海外最新プロダクトから、特に日本市場へのローカライズ（タイムマシン経営）成立性が高いモデルを総括分析します。
 
@@ -171,6 +200,13 @@ noteや週刊ニュースレター（Substack等）にそのまま掲載でき�
 1. **「日本の業務エコシステム」への適応**: SalesforceやNotionだけでなく、freee、Sansan、PR TIMES、Slack/LINE WORKSとのシームレスな連携。
 2. **商習慣に合わせたフォーマット出力**: 海外ではWeb上のダッシュボード完結が好まれますが、日本では「社内稟議に通しやすいPowerPoint(PPTX)形式」や「Excelエクスポート」の需要が根強く残っています。
 3. **セキュリティと国内サポート**: 企業の独自データを取り扱うSaaSの場合、国内サーバー稼働や機密保持基準の明示が即決の鍵となります。
+
+---
+
+## 📣 編集後記 & 読者限定リンク
+* ⚡ **毎朝の速報（Threads）**: [@get_globaltechinfo](https://www.threads.net/@get_globaltechinfo) をフォローして最新AIツールを毎朝チェック
+* 📊 **Webダッシュボード**: [直近の分析データベースを閲覧する](https://yugom2o.github.io/ph-dashboard/)
+* 💼 **新規事業・競合リサーチのご相談**: 海外SaaSの徹底調査や、特定領域のタイムマシン事業化のご相談はお気軽にお寄せください。
 
 ---
 
