@@ -141,8 +141,14 @@ class HTMLReporter:
                     "body": body,
                     "target": targets or ["法人営業チーム", "中小企業"],
                     "adapt": adapt_points[:3],
-                    "signals": signals,
                     "snsDraft": it.get("sns_post_draft") or "",
+                    "snsReplyDraft": it.get("sns_reply_draft") or (
+                        f"🇯🇵 日本市場でのタイムマシン事業チャンス\n\n"
+                        f"💡 コンセプト: {one_line}\n"
+                        f"🎯 ターゲット: {target_str}\n"
+                        f"🚀 勝機: {body[:120]}...\n\n"
+                        f"🔗 公式サイト: {it.get('official_url') or ph_url}"
+                    ) if one_line else "",
                     "image": it.get("image_url") or "",
                 }
             )
