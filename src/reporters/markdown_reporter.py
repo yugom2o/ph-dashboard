@@ -80,6 +80,7 @@ class MarkdownReporter:
             desc = it.get("description", "")
             official_url = it.get("official_url", "")
             orig_ja = it.get("original_summary_ja")
+            image_url = it.get("image_url")
             sns_draft = it.get("sns_post_draft")
 
             if sns_draft:
@@ -89,9 +90,13 @@ class MarkdownReporter:
                     "score": score,
                     "draft": sns_draft,
                     "url": official_url,
+                    "image_url": image_url,
                 })
 
             md.append(f"### {idx}. 【ランク {rank} (スコア: {score})】{name}")
+            if image_url:
+                md.append(f"![{name} アイキャッチ]({image_url})  ")
+                md.append("")
             md.append(f"> **キャッチコピー**: {tagline}  ")
             if orig_ja:
                 md.append(f"> **元プロダクト詳細 (日本語)**: {orig_ja}  ")
@@ -152,6 +157,8 @@ class MarkdownReporter:
                 if s["url"]:
                     md.append(f"\n🔗 公式サイト: {s['url']}")
                 md.append("```")
+                if s.get("image_url"):
+                    md.append(f"🖼️ **Threads添付画像**: [画像を開く]({s['image_url']})")
                 md.append("")
             md.append("---")
             md.append("")
