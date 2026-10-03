@@ -49,6 +49,20 @@ jobs:
         run: |
           python run_daily.py
 
+      - name: Run Weekly Report on Weekends
+        env:
+          TZ: 'Asia/Tokyo'
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          # 毎週日曜日 (JST) に過去1週間のまとめとnote用原稿を自動生成
+          DAY_OF_WEEK=$(date +%u)
+          if [ "$DAY_OF_WEEK" -eq 7 ]; then
+            echo "Today is Sunday! Generating weekly trend report for note..."
+            python run_weekly.py
+          fi
+
       - name: Prepare Pages Artifact
         run: |
           mkdir -p public
@@ -70,4 +84,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Automated daily analysis: update reports and history"
-          file_pattern: "reports/*.md data/*.db dashboard.html docs/index.html index.html"
+          file_pattern: "reports/*.md reports/weekly/*.md reports/weekly/**/*.md data/*.db dashboard.html docs/index.html index.html"
