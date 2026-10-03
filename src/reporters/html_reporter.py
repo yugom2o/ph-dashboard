@@ -134,14 +134,15 @@ class HTMLReporter:
                     "name": name,
                     "cat": category,
                     "tagline": tagline,
-                    "url": ph_url,
+                    "url": it.get("official_url") or ph_url,
                     "orig": orig_text,
-                    "origNote": "元プロダクトの機能概要 (日本語解説)" if it.get("original_summary_ja") else "Product Hunt掲載情報より",
+                    "origNote": "海外最新ツールの機能概要 (日本語解説)" if it.get("original_summary_ja") else "海外公式発表より",
                     "idea": one_line or f"{name}の日本展開モデル",
                     "body": body,
                     "target": targets or ["法人営業チーム", "中小企業"],
                     "adapt": adapt_points[:3],
                     "signals": signals,
+                    "snsDraft": it.get("sns_post_draft") or "",
                 }
             )
 
