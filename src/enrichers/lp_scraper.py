@@ -3,7 +3,7 @@ import re
 import shutil
 import subprocess
 from typing import Optional
-from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 import requests
 from bs4 import BeautifulSoup
 
@@ -12,8 +12,7 @@ class LPScraper:
     def __init__(self, timeout: int = 10):
         self.timeout = timeout
         self.headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.8",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
         }
 
     @staticmethod
@@ -116,3 +115,45 @@ class LPScraper:
         except Exception as e:
             print(f"[Warning] Failed to fetch LP content for {target_url}: {e}")
             return None
+
+    def fetch_og_image(self, url: str) -> Optional[str]:
+        """
+        指定されたWebページ (Product Huntページまたは公式LP) から
+        高解像度なOGP画像 / アイキャッチURLを抽出
+        """
+        if not url or not url.startswith("http"):
+            return None
+
+        # Product HuntのリダイレクトURLの場合は解決
+        target_url = self.resolve_official_url(url) or url
+
+        try:
+            resp = requests.get(target_url, headers=self.headers, timeout=self.timeout)
+            if resp.status_code != 200:
+                return None
+
+            soup = BeautifulSoup(resp.content, "html.parser")
+            # 1. og:image
+            meta = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "og:image"})
+            if not meta or not meta.get("content"):
+                # 2. twitter:image
+                meta = soup.find("meta", property="twitter:image") or soup.find("meta", attrs={"name": "twitter:image"})
+
+            if meta and meta.get("content"):
+                img_url = meta.get("content").strip()
+                # 相対パスを絶対URLへ変換
+                full_url = urljoin(target_url, img_url)
+
+                # Threads API用に画像パラメータ最適化 (imgixの場合はJPEGフォーマットを強制)
+                if "imgix.net" in full_url:
+                    if "auto=format" in full_url and "format=" not in full_url:
+                        full_url = full_url.replace("auto=format", "auto=format&format=jpeg")
+                    elif "format=" not in full_url:
+                        sep = "&" if "?" in full_url else "?"
+                        full_url = f"{full_url}{sep}format=jpeg"
+
+                return full_url
+        except Exception as e:
+            print(f"[Warning] Failed to fetch og:image from {target_url}: {e}")
+
+        return None
