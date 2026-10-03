@@ -1,5 +1,5 @@
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 import requests
 from config import THREADS_ACCESS_TOKEN, THREADS_USER_ID
 
@@ -201,3 +201,87 @@ class ThreadsPublisher:
         if image_url:
             return self.publish_image(text=text, image_url=image_url)
         return self.publish_text(text=text)
+
+    def publish_reply(self, parent_post_id: str, text: str) -> Optional[str]:
+        """指定された親ポストにぶら下げるリプライ（ツリー投稿）を公開"""
+        if not self.is_configured:
+            print("[Threads] エラー: THREADS_ACCESS_TOKEN が未設定です。")
+            return None
+
+        # ユーザーIDが未確定なら先に取得
+        if not self.user_id:
+            profile = self.get_user_profile()
+            if not profile or not self.user_id:
+                print("[Threads] エラー: ユーザーIDを取得できませんでした。")
+                return None
+
+        print(f"[Threads] リプライ投稿処理を開始します (親Post ID: {parent_post_id})...")
+
+        create_url = f"{self.BASE_URL}/{self.user_id}/threads"
+        create_payload = {
+            "media_type": "TEXT",
+            "text": text,
+            "reply_to_id": parent_post_id,
+            "access_token": self.access_token,
+        }
+
+        try:
+            c_resp = requests.post(create_url, data=create_payload, timeout=20)
+            c_data = c_resp.json()
+
+            if c_resp.status_code != 200 or "id" not in c_data:
+                print(f"[Threads] リプライコンテナ作成に失敗しました: {c_data}")
+                return None
+
+            creation_id = c_data["id"]
+            print(f"[Threads] リプライコンテナ作成成功 (creation_id: {creation_id})")
+
+            # Threads側の処理待ち (2秒待機)
+            time.sleep(2)
+
+            publish_url = f"{self.BASE_URL}/{self.user_id}/threads_publish"
+            publish_payload = {
+                "creation_id": creation_id,
+                "access_token": self.access_token,
+            }
+
+            p_resp = requests.post(publish_url, data=publish_payload, timeout=20)
+            p_data = p_resp.json()
+
+            if p_resp.status_code == 200 and "id" in p_data:
+                reply_id = p_data["id"]
+                print(f"[Threads] 🎉 リプライが正常に公開されました！ (Reply ID: {reply_id})")
+                return reply_id
+            else:
+                print(f"[Threads] リプライ公開に失敗しました: {p_data}")
+                return None
+
+        except Exception as e:
+            print(f"[Threads] リプライ投稿処理中に例外が発生しました: {e}")
+            return None
+
+    def publish_thread(
+        self,
+        post1_text: str,
+        post2_text: Optional[str] = None,
+        image_url: Optional[str] = None,
+    ) -> Tuple[Optional[str], Optional[str]]:
+        """
+        2段階ツリー投稿を実行:
+        1通目（親ポスト: 画像付きまたはテキスト）を公開後、
+        2通目（リプライ: 事業化考察＋公式リンク案内）を自動でぶら下げて投稿。
+        """
+        # Step 1: 親ポストの投稿
+        parent_id = self.publish(text=post1_text, image_url=image_url)
+        if not parent_id:
+            return None, None
+
+        if not post2_text:
+            return parent_id, None
+
+        # Step 2: Meta側のDB反映を待機 (4秒)
+        print("[Threads] 親ポスト反映待ち (4秒待機後、2通目リプライを自動投稿)...")
+        time.sleep(4)
+
+        reply_id = self.publish_reply(parent_post_id=parent_id, text=post2_text)
+        return parent_id, reply_id
