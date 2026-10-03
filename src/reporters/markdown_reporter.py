@@ -20,7 +20,7 @@ class MarkdownReporter:
 
         # YAML Frontmatter (Obsidian / Dataview 対応)
         md.append("---")
-        md.append("type: ph-daily-report")
+        md.append("type: global-tech-radar")
         md.append(f"date: {target_date}")
         md.append(f"total_analyzed: {total}")
         md.append(f"s_rank_count: {s_count}")
@@ -28,15 +28,16 @@ class MarkdownReporter:
         md.append(f"b_rank_count: {b_count}")
         md.append(f"c_rank_count: {c_count}")
         md.append("tags:")
-        md.append("  - producthunt")
+        md.append("  - global-tech-radar")
         md.append("  - timemachine-business")
         md.append("  - market-analysis")
+        md.append("  - ai-tools")
         md.append("---")
         md.append("")
 
         # ヘッダー
-        md.append("# 🚀 Product Hunt デイリー分析レポート: 日本版タイムマシン事業機会")
-        md.append(f"**収集日**: {target_date}  ")
+        md.append("# 🌐 Global Tech Radar: 海外最新テック＆日本市場適応レポート")
+        md.append(f"**収集・分析日**: {target_date}  ")
         md.append(f"**分析プロダクト数**: {total} 件  ")
         md.append(
             f"**有望判定サマリー**: 【Sランク (即検討)】{s_count}件 / "
@@ -51,7 +52,7 @@ class MarkdownReporter:
         # 一覧サマリーテーブル
         md.append("## 📊 本日の注目プロダクト & 日本市場判定サマリー")
         md.append("")
-        md.append("| ランク | スコア | プロダクト | 元のタグライン | 日本市場での一言判定 | 想定アレンジ / 収益モデル |")
+        md.append("| ランク | スコア | プロダクト | 海外キャッチコピー | 日本市場での一言判定 | 想定アレンジ / 収益モデル |")
         md.append("| :---: | :---: | :--- | :--- | :--- | :--- |")
         for it in items:
             rank = it.get("rank", "-")
@@ -69,23 +70,35 @@ class MarkdownReporter:
         md.append("## 🔍 詳細分析カード (各プロダクトの深掘り)")
         md.append("")
 
+        sns_drafts = []
+
         for idx, it in enumerate(items, start=1):
             rank = it.get("rank", "C")
             score = it.get("score", 0)
             name = it.get("name", "")
             tagline = it.get("tagline", "")
             desc = it.get("description", "")
-            ph_url = it.get("ph_url", "")
             official_url = it.get("official_url", "")
-
             orig_ja = it.get("original_summary_ja")
+            sns_draft = it.get("sns_post_draft")
+
+            if sns_draft:
+                sns_drafts.append({
+                    "name": name,
+                    "rank": rank,
+                    "score": score,
+                    "draft": sns_draft,
+                    "url": official_url,
+                })
+
             md.append(f"### {idx}. 【ランク {rank} (スコア: {score})】{name}")
             md.append(f"> **キャッチコピー**: {tagline}  ")
             if orig_ja:
                 md.append(f"> **元プロダクト詳細 (日本語)**: {orig_ja}  ")
             elif desc:
                 md.append(f"> **概要**: {desc[:300]}...  ")
-            md.append(f"> **リンク**: [Product Hunt]({ph_url})" + (f" | [公式サイト]({official_url})" if official_url else ""))
+            if official_url:
+                md.append(f"> **公式リンク**: [{name} 公式サイト]({official_url})  ")
             md.append("")
 
             md.append(f"* **💡 日本市場でのペイン・背景**:")
@@ -127,6 +140,22 @@ class MarkdownReporter:
             md.append("---")
             md.append("")
 
-        file_path = self.output_dir / f"{target_date}_ProductHunt日次分析レポート.md"
+        # SNS発信ドラフトセクション
+        if sns_drafts:
+            md.append("## 📱 本日のSNS発信ドラフト (X / Threads用)")
+            md.append("> S・Aランクを中心に、そのままコピー＆ペーストして発信できるポスト案です。微調整してご活用ください。")
+            md.append("")
+            for s in sns_drafts:
+                md.append(f"### 投稿案: 【ランク {s['rank']}】{s['name']} (スコア: {s['score']})")
+                md.append("```text")
+                md.append(s["draft"])
+                if s["url"]:
+                    md.append(f"\n🔗 公式サイト: {s['url']}")
+                md.append("```")
+                md.append("")
+            md.append("---")
+            md.append("")
+
+        file_path = self.output_dir / f"{target_date}_GlobalTech日次分析レポート.md"
         file_path.write_text("\n".join(md), encoding="utf-8")
         return file_path
