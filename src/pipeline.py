@@ -1,11 +1,18 @@
 from datetime import datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=9))
-from typing import Optional
-from config import DAILY_FETCH_LIMIT, PRODUCTHUNT_TOKEN
+from typing import Any, Dict, List, Optional
+from config import (
+    DAILY_FETCH_LIMIT,
+    PRODUCTHUNT_TOKEN,
+    THREADS_AUTO_PUBLISH,
+    THREADS_MAX_DAILY_POSTS,
+)
 from src.collectors import ProductHuntAPICollector, ProductHuntRSSCollector
 from src.enrichers import LPScraper
 from src.evaluators import GeminiEvaluator
+from src.notifiers import WebhookNotifier
+from src.publishers import ThreadsPublisher
 from src.reporters import HTMLReporter, MarkdownReporter
 from src.reporters.github_uploader import GitHubUploader
 from src.storage import Database
@@ -21,7 +28,8 @@ class DailyPipeline:
         self.md_reporter = MarkdownReporter()
         self.html_reporter = HTMLReporter()
         self.github_uploader = GitHubUploader()
-
+        self.notifier = WebhookNotifier()
+        self.threads_publisher = ThreadsPublisher()
 
         # コレクター選定
         if PRODUCTHUNT_TOKEN and not is_mock:
@@ -29,12 +37,17 @@ class DailyPipeline:
         else:
             self.collector = ProductHuntRSSCollector()
 
-    def run(self, limit: Optional[int] = None, target_date: Optional[str] = None):
+    def run(
+        self,
+        limit: Optional[int] = None,
+        target_date: Optional[str] = None,
+        publish_threads: Optional[bool] = None,
+    ):
         fetch_limit = limit or DAILY_FETCH_LIMIT
         today_str = target_date or datetime.now(JST).strftime("%Y-%m-%d")
 
         print(f"==================================================")
-        print(f"🚀 Product Hunt 日次分析パイプライン開始: {today_str}")
+        print(f"🌐 Global Tech Radar 日次分析パイプライン開始: {today_str}")
         print(f"モード: {'モック (テスト)' if self.is_mock else '実動 (Gemini + Grounding)'} / 上限: {fetch_limit}件")
         print(f"==================================================")
 
@@ -136,6 +149,13 @@ class DailyPipeline:
             self.db.save_product(product_dict)
             self.db.save_evaluation(p.id, eval_result.model_dump(), today_str)
 
+            # Sランクまたはスコア85以上の場合は即時アラート送信
+            if eval_result.rank == "S" or eval_result.score >= 85:
+                alert_item = {**product_dict, **eval_result.model_dump()}
+                if self.notifier.is_configured:
+                    print("  -> 🎯 高スコア注目案件のためWebhookアラートを送信中...")
+                    self.notifier.send_high_score_alert(alert_item)
+
         # 5. レポート生成
         print("\n[Step 5/5] レポートおよびダッシュボード生成中...")
         today_evaluations = self.db.get_evaluations_by_date(today_str)
@@ -156,6 +176,19 @@ class DailyPipeline:
 
         print(f"  -> GitHub Pages用ファイル更新: {self.html_reporter.docs_output_path}")
 
+        # Webhook日次完了サマリー通知
+        if self.notifier.is_configured:
+            s_cnt = sum(1 for it in today_evaluations if it.get("rank") == "S")
+            a_cnt = sum(1 for it in today_evaluations if it.get("rank") == "A")
+            top_sorted = sorted(today_evaluations, key=lambda x: x.get("score", 0), reverse=True)
+            self.notifier.send_daily_summary(
+                report_date=today_str,
+                total=len(today_evaluations),
+                s_count=s_cnt,
+                a_count=a_cnt,
+                top_items=top_sorted,
+            )
+
         # GitHub への自動アップロード (設定時のみ)
         if self.github_uploader.token and self.github_uploader.repo:
             print("\n[Step 5b] GitHub Pagesへ自動アップロード中...")
@@ -173,9 +206,65 @@ class DailyPipeline:
             if not os.getenv("GITHUB_ACTIONS"):
                 self.github_uploader.trigger_workflow_dispatch("daily_analyzer.yml")
 
+        # 6. Threads への自動投稿 (有効時)
+        should_publish_threads = (
+            publish_threads if publish_threads is not None else THREADS_AUTO_PUBLISH
+        )
+        if should_publish_threads:
+            print("\n[Step 6] Threadsへの自動投稿を処理中...")
+            if not self.threads_publisher.is_configured:
+                print("  [Skip] THREADS_ACCESS_TOKEN が未設定のためスキップします。")
+            elif self.is_mock:
+                print("  [Mock] モックモードのためThreads投稿をシミュレート（API呼び出しはスキップ）")
+            else:
+                self._publish_top_product_to_threads(today_evaluations)
+
         print("\n==================================================")
         print(f"🎉 日次パイプライン完了！")
         print(f"Obsidianノート: {md_file.name}")
         print(f"ダッシュボード: {html_file.name}")
         print("==================================================")
+
+    def _publish_top_product_to_threads(self, evaluations: List[Dict[str, Any]]):
+        """本日最も有望なプロダクトをThreadsに自動投稿"""
+        # Sランク優先、次にAランク、スコア降順
+        rank_order = {"S": 1, "A": 2, "B": 3, "C": 4}
+        candidates = sorted(
+            evaluations,
+            key=lambda x: (rank_order.get(x.get("rank", "C"), 5), -x.get("score", 0)),
+        )
+
+        posted_count = 0
+        for item in candidates:
+            if posted_count >= THREADS_MAX_DAILY_POSTS:
+                break
+
+            p_id = item.get("product_id") or item.get("id")
+            if not p_id:
+                continue
+
+            # 既に投稿済みならスキップ
+            if self.db.is_already_posted_to_threads(p_id):
+                continue
+
+            draft = item.get("sns_post_draft")
+            if not draft:
+                continue
+
+            official_url = item.get("official_url")
+            post_text = draft
+            if official_url and official_url not in post_text:
+                post_text += f"\n\n🔗 公式: {official_url}"
+
+            print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} ...")
+            post_id = self.threads_publisher.publish_text(post_text)
+
+            if post_id:
+                self.db.record_threads_post(p_id, post_id, post_text)
+                posted_count += 1
+                print(f"  -> 🎉 Threads投稿成功！ (Post ID: {post_id})")
+
+        if posted_count == 0:
+            print("  [Info] 本日は新規投稿対象（未投稿のS/Aランクプロダクト）がありませんでした。")
+
 
