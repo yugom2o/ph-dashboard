@@ -48,11 +48,32 @@ def main():
         default=None,
         help="分析対象日付 (YYYY-MM-DD形式。未指定時は本日)",
     )
+    parser.add_argument(
+        "--threads",
+        action="store_true",
+        default=None,
+        help="Threadsへの自動投稿を実行する (config.py の THREADS_AUTO_PUBLISH 設定を上書きして有効化)",
+    )
+    parser.add_argument(
+        "--no-threads",
+        action="store_true",
+        help="Threadsへの自動投稿をスキップする",
+    )
 
     args = parser.parse_args()
 
+    publish_threads = None
+    if args.threads:
+        publish_threads = True
+    elif args.no_threads:
+        publish_threads = False
+
     pipeline = DailyPipeline(is_mock=args.mock, force=args.force)
-    pipeline.run(limit=args.limit, target_date=args.date)
+    pipeline.run(
+        limit=args.limit,
+        target_date=args.date,
+        publish_threads=publish_threads,
+    )
 
 
 if __name__ == "__main__":
