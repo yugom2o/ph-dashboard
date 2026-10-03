@@ -65,6 +65,7 @@ class DailyPipeline:
                     official_url="https://leadsparker.com",
                     votes_count=482,
                     category="B2B Sales / AI Pitch",
+                    image_url="https://ph-files.imgix.net/0f6cfaa5-0557-4e08-a5d1-ac7963dd2b58.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024",
                 ),
                 ProductItem(
                     id="jevtown",
@@ -75,6 +76,7 @@ class DailyPipeline:
                     official_url="https://jevtown.ai",
                     votes_count=350,
                     category="Social / PR / Marketing",
+                    image_url="https://ph-files.imgix.net/a3ccaa67-e5b0-4d5c-9e25-add309cc6b3d.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024",
                 ),
                 ProductItem(
                     id="supacut",
@@ -85,6 +87,7 @@ class DailyPipeline:
                     official_url="https://supacut.video",
                     votes_count=295,
                     category="Video Editing / Creator",
+                    image_url="https://ph-files.imgix.net/424c9e7a-eb3d-4b60-b8d0-4f512096dd1e.webp?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024",
                 ),
             ][:fetch_limit]
         else:
@@ -119,6 +122,16 @@ class DailyPipeline:
             if p.official_url:
                 p.official_url = self.enricher.resolve_official_url(p.official_url)
 
+            # アイキャッチ・OGP画像の抽出 (Product Huntページ または 公式サイト)
+            if not p.image_url and not self.is_mock:
+                print(f"  アイキャッチ画像を抽出中...")
+                if p.ph_url:
+                    p.image_url = self.enricher.fetch_og_image(p.ph_url)
+                if not p.image_url and p.official_url:
+                    p.image_url = self.enricher.fetch_og_image(p.official_url)
+                if p.image_url:
+                    print(f"  -> 画像URL取得成功: {p.image_url[:80]}...")
+
             lp_text = ""
             if p.official_url and not self.is_mock:
                 print(f"  公式サイトをクロール中: {p.official_url}")
@@ -148,6 +161,7 @@ class DailyPipeline:
                 "official_url": p.official_url,
                 "votes_count": p.votes_count,
                 "category": p.category,
+                "image_url": p.image_url,
                 "first_seen_date": today_str,
             }
             self.db.save_product(product_dict)
@@ -256,15 +270,16 @@ class DailyPipeline:
                 continue
 
             official_url = item.get("official_url")
+            image_url = item.get("image_url")
             post_text = draft
             if official_url and official_url not in post_text:
                 post_text += f"\n\n🔗 公式: {official_url}"
 
-            print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} ...")
-            post_id = self.threads_publisher.publish_text(post_text)
+            print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} (画像: {'あり' if image_url else 'なし'}) ...")
+            post_id = self.threads_publisher.publish(text=post_text, image_url=image_url)
 
             if post_id:
-                self.db.record_threads_post(p_id, post_id, post_text)
+                self.db.record_threads_post(p_id, post_id, post_text, image_url=image_url)
                 posted_count += 1
                 print(f"  -> 🎉 Threads投稿成功！ (Post ID: {post_id})")
 
