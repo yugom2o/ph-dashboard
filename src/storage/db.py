@@ -31,6 +31,7 @@ class Database:
                     official_url TEXT,
                     votes_count INTEGER DEFAULT 0,
                     category TEXT,
+                    image_url TEXT,
                     first_seen_date TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -67,11 +68,23 @@ class Database:
                     product_id TEXT NOT NULL,
                     post_id TEXT NOT NULL,
                     text TEXT,
+                    image_url TEXT,
                     posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (product_id) REFERENCES products(id)
                 )
                 """
             )
+            # 既存テーブルへのカラム追加マイグレーション
+            cursor.execute("PRAGMA table_info(products)")
+            prod_cols = [c[1] for c in cursor.fetchall()]
+            if "image_url" not in prod_cols:
+                cursor.execute("ALTER TABLE products ADD COLUMN image_url TEXT")
+
+            cursor.execute("PRAGMA table_info(threads_posts)")
+            tp_cols = [c[1] for c in cursor.fetchall()]
+            if "image_url" not in tp_cols:
+                cursor.execute("ALTER TABLE threads_posts ADD COLUMN image_url TEXT")
+
             # インデックス
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_products_ph_url ON products(ph_url)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_eval_analyzed_date ON evaluations(analyzed_date)")
@@ -111,7 +124,8 @@ class Database:
                         description = ?,
                         official_url = coalesce(?, official_url),
                         votes_count = ?,
-                        category = ?
+                        category = ?,
+                        image_url = coalesce(?, image_url)
                     WHERE id = ?
                     """,
                     (
@@ -121,6 +135,7 @@ class Database:
                         product_data.get("official_url"),
                         product_data.get("votes_count", 0),
                         product_data.get("category", ""),
+                        product_data.get("image_url"),
                         actual_id,
                     ),
                 )
@@ -131,15 +146,16 @@ class Database:
                 """
                 INSERT INTO products (
                     id, name, tagline, description, ph_url, official_url,
-                    votes_count, category, first_seen_date
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    votes_count, category, image_url, first_seen_date
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     name = excluded.name,
                     tagline = excluded.tagline,
                     description = excluded.description,
                     official_url = coalesce(excluded.official_url, products.official_url),
                     votes_count = excluded.votes_count,
-                    category = excluded.category
+                    category = excluded.category,
+                    image_url = coalesce(excluded.image_url, products.image_url)
                 """,
                 (
                     product_data["id"],
@@ -150,6 +166,7 @@ class Database:
                     product_data.get("official_url"),
                     product_data.get("votes_count", 0),
                     product_data.get("category", ""),
+                    product_data.get("image_url"),
                     product_data.get("first_seen_date", datetime.now().strftime("%Y-%m-%d")),
                 ),
             )
@@ -268,16 +285,16 @@ class Database:
             )
             return cursor.fetchone()[0] > 0
 
-    def record_threads_post(self, product_id: str, post_id: str, text: str) -> int:
+    def record_threads_post(self, product_id: str, post_id: str, text: str, image_url: Optional[str] = None) -> int:
         """Threadsへの投稿実績を記録"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO threads_posts (product_id, post_id, text)
-                VALUES (?, ?, ?)
+                INSERT INTO threads_posts (product_id, post_id, text, image_url)
+                VALUES (?, ?, ?, ?)
                 """,
-                (product_id, post_id, text),
+                (product_id, post_id, text, image_url),
             )
             conn.commit()
             return cursor.lastrowid
