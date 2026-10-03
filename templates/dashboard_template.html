@@ -558,6 +558,11 @@ function cardHTML(p) {
       </div>
     </div>
 
+    ${p.image ? `
+    <div class="thumb" style="overflow:hidden; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); aspect-ratio:2/1; max-height:220px;">
+      <img src="${esc(p.image)}" alt="${esc(p.name)}" style="width:100%; height:100%; object-fit:cover; display:block;" loading="lazy" onerror="this.parentElement.style.display='none'">
+    </div>` : ''}
+
     <div class="brief">
       <div class="orig">
         <span class="lbl">元のプロダクト${p.origNote ? `<span class="lbl-note">${esc(p.origNote)}</span>` : ''}</span>
