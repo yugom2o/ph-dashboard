@@ -115,6 +115,10 @@ class DailyPipeline:
             print(f"\n--- [{idx}/{len(target_products)}] {p.name} ---")
             print(f"  タグライン: {p.tagline}")
 
+            # 公式サイトURLの正規化（Product HuntリダイレクトURLの解決）
+            if p.official_url:
+                p.official_url = self.enricher.resolve_official_url(p.official_url)
+
             lp_text = ""
             if p.official_url and not self.is_mock:
                 print(f"  公式サイトをクロール中: {p.official_url}")
