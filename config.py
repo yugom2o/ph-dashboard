@@ -40,6 +40,7 @@ THREADS_ACCESS_TOKEN = os.getenv("THREADS_ACCESS_TOKEN", "")
 THREADS_USER_ID = os.getenv("THREADS_USER_ID", "")
 THREADS_AUTO_PUBLISH = os.getenv("THREADS_AUTO_PUBLISH", "false").lower() in ("true", "1", "yes")
 THREADS_MAX_DAILY_POSTS = int(os.getenv("THREADS_MAX_DAILY_POSTS", "1"))
+THREADS_ENABLE_THREAD_REPLY = os.getenv("THREADS_ENABLE_THREAD_REPLY", "true").lower() in ("true", "1", "yes")
 
 
 
