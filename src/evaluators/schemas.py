@@ -1,4 +1,4 @@
-from typing import List, Literal
+from typing import List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -39,3 +39,7 @@ class EvaluationResult(BaseModel):
         description="日本市場向けに開発する際の具体的な機能・設計ポイント3選（例: ['PR TIMES・有価証券報告書の自動スクレイピング', '国内商談でそのまま使えるPowerPoint出力', 'HubSpotやSalesforce連携']）",
     )
     recommendation: str = Field(..., description="結論と推奨アクション（個人開発/スタートアップ/大企業新規事業としての参入是非）")
+    sns_post_draft: Optional[str] = Field(
+        default=None,
+        description="SNS（X / Threads）発信用ポスト案（140〜250字程度。フック・概要・日本市場での勝機・考察・ハッシュタグを含む。※情報源としてProduct Hunt等の特定媒体名は伏せ『海外で話題の最新ツール』等と表現すること）",
+    )
