@@ -69,6 +69,8 @@ class Database:
                     post_id TEXT NOT NULL,
                     text TEXT,
                     image_url TEXT,
+                    reply_post_id TEXT,
+                    reply_text TEXT,
                     posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (product_id) REFERENCES products(id)
                 )
@@ -84,6 +86,10 @@ class Database:
             tp_cols = [c[1] for c in cursor.fetchall()]
             if "image_url" not in tp_cols:
                 cursor.execute("ALTER TABLE threads_posts ADD COLUMN image_url TEXT")
+            if "reply_post_id" not in tp_cols:
+                cursor.execute("ALTER TABLE threads_posts ADD COLUMN reply_post_id TEXT")
+            if "reply_text" not in tp_cols:
+                cursor.execute("ALTER TABLE threads_posts ADD COLUMN reply_text TEXT")
 
             # インデックス
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_products_ph_url ON products(ph_url)")
@@ -285,16 +291,24 @@ class Database:
             )
             return cursor.fetchone()[0] > 0
 
-    def record_threads_post(self, product_id: str, post_id: str, text: str, image_url: Optional[str] = None) -> int:
-        """Threadsへの投稿実績を記録"""
+    def record_threads_post(
+        self,
+        product_id: str,
+        post_id: str,
+        text: str,
+        image_url: Optional[str] = None,
+        reply_post_id: Optional[str] = None,
+        reply_text: Optional[str] = None,
+    ) -> int:
+        """Threadsへの投稿実績を記録 (親ポストおよびリプライ)"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO threads_posts (product_id, post_id, text, image_url)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO threads_posts (product_id, post_id, text, image_url, reply_post_id, reply_text)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
-                (product_id, post_id, text, image_url),
+                (product_id, post_id, text, image_url, reply_post_id, reply_text),
             )
             conn.commit()
             return cursor.lastrowid
