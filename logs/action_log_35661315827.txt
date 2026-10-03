@@ -1,0 +1,525 @@
+ï»¿2026-09-21T22:11:04.8762465Z Current runner version: '2.337.0'
+2026-09-21T22:11:04.8781390Z ##[group]Runner Image Provisioner
+2026-09-21T22:11:04.8782086Z Hosted Compute Agent
+2026-09-21T22:11:04.8782749Z Version: 20260828.587
+2026-09-21T22:11:04.8783297Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-09-21T22:11:04.8783817Z Build Date: 2026-08-28T16:44:25Z
+2026-09-21T22:11:04.8784324Z Worker ID: {4a5268d4-fea8-4852-9281-cf56f448b42b}
+2026-09-21T22:11:04.8784849Z Azure Region: centralus
+2026-09-21T22:11:04.8785273Z ##[endgroup]
+2026-09-21T22:11:04.8786340Z ##[group]Operating System
+2026-09-21T22:11:04.8786822Z Ubuntu
+2026-09-21T22:11:04.8787196Z 24.04.5
+2026-09-21T22:11:04.8787553Z LTS
+2026-09-21T22:11:04.8787935Z ##[endgroup]
+2026-09-21T22:11:04.8788341Z ##[group]Runner Image
+2026-09-21T22:11:04.8788779Z Image: ubuntu-24.04
+2026-09-21T22:11:04.8789182Z Version: 20260907.300.1
+2026-09-21T22:11:04.8790520Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260907.300/images/ubuntu/Ubuntu2404-Readme.md
+2026-09-21T22:11:04.8791611Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260907.300
+2026-09-21T22:11:04.8792278Z ##[endgroup]
+2026-09-21T22:11:04.8793348Z ##[group]GITHUB_TOKEN Permissions
+2026-09-21T22:11:04.8795269Z Contents: write
+2026-09-21T22:11:04.8795706Z Metadata: read
+2026-09-21T22:11:04.8796102Z Pages: write
+2026-09-21T22:11:04.8796522Z ##[endgroup]
+2026-09-21T22:11:04.8798027Z Secret source: Actions
+2026-09-21T22:11:04.8798722Z Cache mode: write
+2026-09-21T22:11:04.8799216Z Prepare workflow directory
+2026-09-21T22:11:04.9034676Z Prepare all required actions
+2026-09-21T22:11:04.9074385Z Getting action download info
+2026-09-21T22:11:05.1597576Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-09-21T22:11:05.5161826Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-09-21T22:11:05.7104160Z Download action repository 'actions/configure-pages@v5' (SHA:983d7736d9b0ae728b81ab479565c72886d7745b)
+2026-09-21T22:11:06.1134112Z Download action repository 'actions/upload-pages-artifact@v3' (SHA:56afc609e74202658d3ffba0e8f6dda462b719fa)
+2026-09-21T22:11:06.2846446Z Download action repository 'actions/deploy-pages@v4' (SHA:d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e)
+2026-09-21T22:11:06.8759780Z Download action repository 'stefanzweifel/git-auto-commit-action@v5' (SHA:b863ae1933cb653a53c021fe36dbb774e1fb9403)
+2026-09-21T22:11:07.1277962Z Getting action download info
+2026-09-21T22:11:07.2340226Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-09-21T22:11:07.5601052Z Complete job name: analyze-and-deploy
+2026-09-21T22:11:07.6075165Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-21T22:11:07.6080747Z ##[group]Run actions/checkout@v4
+2026-09-21T22:11:07.6081124Z with:
+2026-09-21T22:11:07.6081399Z   repository: yugom2o/ph-dashboard
+2026-09-21T22:11:07.6083347Z   token: ***
+2026-09-21T22:11:07.6083645Z   ssh-strict: true
+2026-09-21T22:11:07.6083884Z   ssh-user: git
+2026-09-21T22:11:07.6084129Z   persist-credentials: true
+2026-09-21T22:11:07.6084403Z   clean: true
+2026-09-21T22:11:07.6084660Z   sparse-checkout-cone-mode: true
+2026-09-21T22:11:07.6084929Z   fetch-depth: 1
+2026-09-21T22:11:07.6085150Z   fetch-tags: false
+2026-09-21T22:11:07.6085410Z   show-progress: true
+2026-09-21T22:11:07.6085632Z   lfs: false
+2026-09-21T22:11:07.6085959Z   submodules: false
+2026-09-21T22:11:07.6086188Z   set-safe-directory: true
+2026-09-21T22:11:07.6086481Z   allow-unsafe-pr-checkout: false
+2026-09-21T22:11:07.6086848Z ##[endgroup]
+2026-09-21T22:11:07.6821189Z Syncing repository: yugom2o/ph-dashboard
+2026-09-21T22:11:07.6822313Z ##[group]Getting Git version info
+2026-09-21T22:11:07.6823316Z Working directory is '/home/runner/work/ph-dashboard/ph-dashboard'
+2026-09-21T22:11:07.6823983Z [command]/usr/bin/git version
+2026-09-21T22:11:08.0021979Z git version 2.55.0
+2026-09-21T22:11:08.0037098Z ##[endgroup]
+2026-09-21T22:11:08.0049492Z Temporarily overriding HOME='/home/runner/work/_temp/fb80c293-f4d1-4fa7-8782-0a744179125b' before making global git config changes
+2026-09-21T22:11:08.0050420Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-21T22:11:08.0053779Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ph-dashboard/ph-dashboard
+2026-09-21T22:11:08.1042208Z Deleting the contents of '/home/runner/work/ph-dashboard/ph-dashboard'
+2026-09-21T22:11:08.1045452Z ##[group]Initializing the repository
+2026-09-21T22:11:08.1050172Z [command]/usr/bin/git init /home/runner/work/ph-dashboard/ph-dashboard
+2026-09-21T22:11:08.3173360Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-09-21T22:11:08.3173934Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-09-21T22:11:08.3174307Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-09-21T22:11:08.3174582Z hint: call:
+2026-09-21T22:11:08.3174746Z hint:
+2026-09-21T22:11:08.3174981Z hint: 	git config --global init.defaultBranch <name>
+2026-09-21T22:11:08.3175200Z hint:
+2026-09-21T22:11:08.3175435Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-09-21T22:11:08.3175804Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-09-21T22:11:08.3176067Z hint:
+2026-09-21T22:11:08.3176231Z hint: 	git branch -m <name>
+2026-09-21T22:11:08.3176423Z hint:
+2026-09-21T22:11:08.3176677Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-09-21T22:11:08.3206769Z Initialized empty Git repository in /home/runner/work/ph-dashboard/ph-dashboard/.git/
+2026-09-21T22:11:08.3217733Z [command]/usr/bin/git remote add origin https://github.com/yugom2o/ph-dashboard
+2026-09-21T22:11:08.3278413Z ##[endgroup]
+2026-09-21T22:11:08.3278895Z ##[group]Disabling automatic garbage collection
+2026-09-21T22:11:08.3282329Z [command]/usr/bin/git config --local gc.auto 0
+2026-09-21T22:11:08.3305543Z ##[endgroup]
+2026-09-21T22:11:08.3305941Z ##[group]Setting up auth
+2026-09-21T22:11:08.3310598Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-21T22:11:08.3333278Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-21T22:11:08.4994331Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-21T22:11:08.5019456Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-21T22:11:08.5173968Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-21T22:11:08.5201382Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-21T22:11:08.5349116Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-09-21T22:11:08.5743065Z ##[endgroup]
+2026-09-21T22:11:08.5743455Z ##[group]Fetching the repository
+2026-09-21T22:11:08.5752958Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b48204556cc7c84abdc051b8017277abc14ed667:refs/remotes/origin/main
+2026-09-21T22:11:09.8209735Z From https://github.com/yugom2o/ph-dashboard
+2026-09-21T22:11:09.8213435Z  * [new ref]         b48204556cc7c84abdc051b8017277abc14ed667 -> origin/main
+2026-09-21T22:11:09.8225107Z ##[endgroup]
+2026-09-21T22:11:09.8225542Z ##[group]Determining the checkout info
+2026-09-21T22:11:09.8226363Z ##[endgroup]
+2026-09-21T22:11:09.8226754Z [command]/usr/bin/git sparse-checkout disable
+2026-09-21T22:11:09.8264128Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-09-21T22:11:09.8288938Z ##[group]Checking out the ref
+2026-09-21T22:11:09.8293004Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-09-21T22:11:09.8396815Z Switched to a new branch 'main'
+2026-09-21T22:11:09.8405551Z branch 'main' set up to track 'origin/main'.
+2026-09-21T22:11:09.8414510Z ##[endgroup]
+2026-09-21T22:11:09.8436068Z [command]/usr/bin/git log -1 --format=%H
+2026-09-21T22:11:09.8452546Z b48204556cc7c84abdc051b8017277abc14ed667
+2026-09-21T22:11:09.8638104Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-21T22:11:09.8639490Z ##[group]Run actions/setup-python@v5
+2026-09-21T22:11:09.8639696Z with:
+2026-09-21T22:11:09.8639858Z   python-version: 3.12
+2026-09-21T22:11:09.8640022Z   cache: pip
+2026-09-21T22:11:09.8640174Z   check-latest: false
+2026-09-21T22:11:09.8641804Z   token: ***
+2026-09-21T22:11:09.8641961Z   update-environment: true
+2026-09-21T22:11:09.8642147Z   allow-prereleases: false
+2026-09-21T22:11:09.8642338Z   freethreaded: false
+2026-09-21T22:11:09.8642500Z ##[endgroup]
+2026-09-21T22:11:09.9568709Z ##[group]Installed versions
+2026-09-21T22:11:10.2344325Z (node:2025) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-21T22:11:10.2345008Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-21T22:11:10.2345424Z Successfully set up CPython (3.12.14)
+2026-09-21T22:11:10.2345993Z ##[endgroup]
+2026-09-21T22:11:10.2729661Z [command]/opt/hostedtoolcache/Python/3.12.14/x64/bin/pip cache dir
+2026-09-21T22:11:12.2794343Z /home/runner/.cache/pip
+2026-09-21T22:11:12.4958068Z Cache hit for: setup-python-Linux-x64-24.04-Ubuntu-python-3.12.14-pip-1470d1713fb5bb5b305aef9a3538d3b163342a0fb64eeeac907ebc0306ba41ca
+2026-09-21T22:11:12.5030803Z (node:2025) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-09-21T22:11:13.3480054Z Received 13998695 of 13998695 (100.0%), 19.7 MBs/sec
+2026-09-21T22:11:13.3480387Z Cache Size: ~13 MB (13998695 B)
+2026-09-21T22:11:13.3503823Z [command]/usr/bin/tar -xf /home/runner/work/_temp/7da56be2-a568-4819-8201-76c594728669/cache.tzst -P -C /home/runner/work/ph-dashboard/ph-dashboard --use-compress-program unzstd
+2026-09-21T22:11:13.4328718Z Cache restored successfully
+2026-09-21T22:11:13.4338065Z Cache restored from key: setup-python-Linux-x64-24.04-Ubuntu-python-3.12.14-pip-1470d1713fb5bb5b305aef9a3538d3b163342a0fb64eeeac907ebc0306ba41ca
+2026-09-21T22:11:13.4447905Z ##[group]Run python -m pip install --upgrade pip
+2026-09-21T22:11:13.4448341Z [36;1mpython -m pip install --upgrade pip[0m
+2026-09-21T22:11:13.4448640Z [36;1mpip install -r requirements.txt[0m
+2026-09-21T22:11:13.4474315Z shell: /usr/bin/bash -e {0}
+2026-09-21T22:11:13.4474541Z env:
+2026-09-21T22:11:13.4474748Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:13.4475077Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:11:13.4475381Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:13.4475667Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:13.4475931Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:13.4476206Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:11:13.4476472Z ##[endgroup]
+2026-09-21T22:11:14.8166295Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages (26.2.1)
+2026-09-21T22:11:15.6192423Z Collecting cryptography<=46.0.3 (from -r requirements.txt (line 1))
+2026-09-21T22:11:15.6202950Z   Using cached cryptography-46.0.3-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (5.7 kB)
+2026-09-21T22:11:15.8906121Z Collecting google-genai>=0.1.1 (from -r requirements.txt (line 2))
+2026-09-21T22:11:15.8917179Z   Using cached google_genai-2.24.0-py3-none-any.whl.metadata (56 kB)
+2026-09-21T22:11:15.9143162Z Collecting requests>=2.31.0 (from -r requirements.txt (line 3))
+2026-09-21T22:11:15.9150972Z   Using cached requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+2026-09-21T22:11:15.9754425Z Collecting pydantic>=2.5.0 (from -r requirements.txt (line 4))
+2026-09-21T22:11:15.9762754Z   Using cached pydantic-2.13.5-py3-none-any.whl.metadata (110 kB)
+2026-09-21T22:11:15.9941533Z Collecting python-dotenv>=1.0.0 (from -r requirements.txt (line 5))
+2026-09-21T22:11:15.9950647Z   Using cached python_dotenv-1.2.3-py3-none-any.whl.metadata (29 kB)
+2026-09-21T22:11:16.0115725Z Collecting beautifulsoup4>=4.12.0 (from -r requirements.txt (line 6))
+2026-09-21T22:11:16.0123860Z   Using cached beautifulsoup4-4.15.0-py3-none-any.whl.metadata (3.8 kB)
+2026-09-21T22:11:16.1795045Z Collecting jinja2>=3.1.2 (from -r requirements.txt (line 7))
+2026-09-21T22:11:16.1803306Z   Using cached jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+2026-09-21T22:11:16.2406880Z Collecting cffi>=2.0.0 (from cryptography<=46.0.3->-r requirements.txt (line 1))
+2026-09-21T22:11:16.2417232Z   Using cached cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.5 kB)
+2026-09-21T22:11:16.2586042Z Collecting anyio<5.0.0,>=4.8.0 (from google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:16.2594132Z   Using cached anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+2026-09-21T22:11:16.2814999Z Collecting google-auth<3.0.0,>=2.56.0 (from google-auth[requests]<3.0.0,>=2.56.0->google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:16.2822987Z   Using cached google_auth-2.58.0-py3-none-any.whl.metadata (6.0 kB)
+2026-09-21T22:11:16.3038841Z Collecting httpx<1.0.0,>=0.28.1 (from google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:16.3047095Z   Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+2026-09-21T22:11:16.3242427Z Collecting tenacity<9.2.0,>=8.2.3 (from google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:16.3250204Z   Using cached tenacity-9.1.4-py3-none-any.whl.metadata (1.2 kB)
+2026-09-21T22:11:16.3891871Z Collecting websockets<17.0,>=13.0.0 (from google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:16.3901526Z   Using cached websockets-16.1.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.8 kB)
+2026-09-21T22:11:16.4069198Z Collecting typing-extensions<5.0.0,>=4.14.0 (from google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:16.4077663Z   Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+2026-09-21T22:11:16.4215860Z Collecting distro<2,>=1.7.0 (from google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:16.4223425Z   Using cached distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+2026-09-21T22:11:16.4750433Z Collecting sniffio (from google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:16.4756165Z   Using cached sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+2026-09-21T22:11:16.5424048Z Collecting charset_normalizer<4,>=2 (from requests>=2.31.0->-r requirements.txt (line 3))
+2026-09-21T22:11:16.5434171Z   Using cached charset_normalizer-3.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (45 kB)
+2026-09-21T22:11:16.5601397Z Collecting idna<4,>=2.5 (from requests>=2.31.0->-r requirements.txt (line 3))
+2026-09-21T22:11:16.5610481Z   Using cached idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+2026-09-21T22:11:16.7217085Z Collecting urllib3<3,>=1.26 (from requests>=2.31.0->-r requirements.txt (line 3))
+2026-09-21T22:11:16.7228336Z   Using cached urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+2026-09-21T22:11:16.7507229Z Collecting certifi>=2023.5.7 (from requests>=2.31.0->-r requirements.txt (line 3))
+2026-09-21T22:11:16.7516826Z   Using cached certifi-2026.7.22-py3-none-any.whl.metadata (2.5 kB)
+2026-09-21T22:11:16.7660028Z Collecting annotated-types>=0.6.0 (from pydantic>=2.5.0->-r requirements.txt (line 4))
+2026-09-21T22:11:16.7669069Z   Using cached annotated_types-0.8.0-py3-none-any.whl.metadata (15 kB)
+2026-09-21T22:11:17.1779413Z Collecting pydantic-core==2.46.5 (from pydantic>=2.5.0->-r requirements.txt (line 4))
+2026-09-21T22:11:17.1791338Z   Using cached pydantic_core-2.46.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+2026-09-21T22:11:17.2081799Z Collecting typing-inspection>=0.4.2 (from pydantic>=2.5.0->-r requirements.txt (line 4))
+2026-09-21T22:11:17.2091366Z   Using cached typing_inspection-0.4.4-py3-none-any.whl.metadata (2.6 kB)
+2026-09-21T22:11:17.2311228Z Collecting pyasn1-modules>=0.2.1 (from google-auth<3.0.0,>=2.56.0->google-auth[requests]<3.0.0,>=2.56.0->google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:17.2320195Z   Using cached pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+2026-09-21T22:11:17.2556498Z Collecting httpcore==1.* (from httpx<1.0.0,>=0.28.1->google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:17.2564346Z   Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+2026-09-21T22:11:17.2982456Z Collecting h11>=0.16 (from httpcore==1.*->httpx<1.0.0,>=0.28.1->google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:17.2989957Z   Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+2026-09-21T22:11:17.3277834Z Collecting soupsieve>=1.6.1 (from beautifulsoup4>=4.12.0->-r requirements.txt (line 6))
+2026-09-21T22:11:17.3286129Z   Using cached soupsieve-2.9.2-py3-none-any.whl.metadata (4.6 kB)
+2026-09-21T22:11:17.3865141Z Collecting MarkupSafe>=2.0 (from jinja2>=3.1.2->-r requirements.txt (line 7))
+2026-09-21T22:11:17.3873890Z   Using cached markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+2026-09-21T22:11:17.4016792Z Collecting pycparser (from cffi>=2.0.0->cryptography<=46.0.3->-r requirements.txt (line 1))
+2026-09-21T22:11:17.4024824Z   Using cached pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+2026-09-21T22:11:17.4888463Z Collecting pyasn1<0.7.0,>=0.6.1 (from pyasn1-modules>=0.2.1->google-auth<3.0.0,>=2.56.0->google-auth[requests]<3.0.0,>=2.56.0->google-genai>=0.1.1->-r requirements.txt (line 2))
+2026-09-21T22:11:17.4898090Z   Using cached pyasn1-0.6.4-py3-none-any.whl.metadata (8.4 kB)
+2026-09-21T22:11:17.4940237Z Using cached cryptography-46.0.3-cp311-abi3-manylinux_2_34_x86_64.whl (4.5 MB)
+2026-09-21T22:11:17.4963682Z Using cached google_genai-2.24.0-py3-none-any.whl (1.1 MB)
+2026-09-21T22:11:17.4976221Z Using cached requests-2.34.2-py3-none-any.whl (73 kB)
+2026-09-21T22:11:17.4983979Z Using cached pydantic-2.13.5-py3-none-any.whl (472 kB)
+2026-09-21T22:11:17.4994092Z Using cached pydantic_core-2.46.5-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+2026-09-21T22:11:17.5009020Z Using cached anyio-4.15.1-py3-none-any.whl (132 kB)
+2026-09-21T22:11:17.5017608Z Using cached charset_normalizer-3.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (248 kB)
+2026-09-21T22:11:17.5025942Z Using cached distro-1.9.0-py3-none-any.whl (20 kB)
+2026-09-21T22:11:17.5033414Z Using cached google_auth-2.58.0-py3-none-any.whl (262 kB)
+2026-09-21T22:11:17.5042033Z Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+2026-09-21T22:11:17.5049957Z Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+2026-09-21T22:11:17.5057944Z Using cached idna-3.20-py3-none-any.whl (69 kB)
+2026-09-21T22:11:17.5066395Z Using cached tenacity-9.1.4-py3-none-any.whl (28 kB)
+2026-09-21T22:11:17.5074221Z Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-09-21T22:11:17.5081970Z Using cached urllib3-2.8.0-py3-none-any.whl (135 kB)
+2026-09-21T22:11:17.5090479Z Using cached websockets-16.1.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (187 kB)
+2026-09-21T22:11:17.5098788Z Using cached python_dotenv-1.2.3-py3-none-any.whl (22 kB)
+2026-09-21T22:11:17.5106266Z Using cached beautifulsoup4-4.15.0-py3-none-any.whl (109 kB)
+2026-09-21T22:11:17.5114161Z Using cached jinja2-3.1.6-py3-none-any.whl (134 kB)
+2026-09-21T22:11:17.5121920Z Using cached annotated_types-0.8.0-py3-none-any.whl (13 kB)
+2026-09-21T22:11:17.5129667Z Using cached certifi-2026.7.22-py3-none-any.whl (136 kB)
+2026-09-21T22:11:17.5137902Z Using cached cffi-2.1.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (221 kB)
+2026-09-21T22:11:17.5146206Z Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+2026-09-21T22:11:17.5153972Z Using cached markupsafe-3.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+2026-09-21T22:11:17.5161586Z Using cached pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
+2026-09-21T22:11:17.5169694Z Using cached pyasn1-0.6.4-py3-none-any.whl (84 kB)
+2026-09-21T22:11:17.5177582Z Using cached soupsieve-2.9.2-py3-none-any.whl (37 kB)
+2026-09-21T22:11:17.5185347Z Using cached typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+2026-09-21T22:11:17.5192895Z Using cached pycparser-3.0-py3-none-any.whl (48 kB)
+2026-09-21T22:11:17.5200254Z Using cached sniffio-1.3.1-py3-none-any.whl (10 kB)
+2026-09-21T22:11:17.6244637Z Installing collected packages: websockets, urllib3, typing-extensions, tenacity, soupsieve, sniffio, python-dotenv, pycparser, pyasn1, MarkupSafe, idna, h11, distro, charset_normalizer, certifi, annotated-types, typing-inspection, requests, pydantic-core, pyasn1-modules, jinja2, httpcore, cffi, beautifulsoup4, anyio, pydantic, httpx, cryptography, google-auth, google-genai
+2026-09-21T22:11:20.4958157Z 
+2026-09-21T22:11:20.4977416Z Successfully installed MarkupSafe-3.0.3 annotated-types-0.8.0 anyio-4.15.1 beautifulsoup4-4.15.0 certifi-2026.7.22 cffi-2.1.1 charset_normalizer-3.5.1 cryptography-46.0.3 distro-1.9.0 google-auth-2.58.0 google-genai-2.24.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 jinja2-3.1.6 pyasn1-0.6.4 pyasn1-modules-0.4.2 pycparser-3.0 pydantic-2.13.5 pydantic-core-2.46.5 python-dotenv-1.2.3 requests-2.34.2 sniffio-1.3.1 soupsieve-2.9.2 tenacity-9.1.4 typing-extensions-4.16.0 typing-inspection-0.4.4 urllib3-2.8.0 websockets-16.1.1
+2026-09-21T22:11:20.5888526Z ##[group]Run python run_daily.py
+2026-09-21T22:11:20.5888782Z [36;1mpython run_daily.py[0m
+2026-09-21T22:11:20.5907187Z shell: /usr/bin/bash -e {0}
+2026-09-21T22:11:20.5907388Z env:
+2026-09-21T22:11:20.5907602Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:20.5907906Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:11:20.5908210Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:20.5908482Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:20.5908759Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:20.5909047Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:11:20.5909468Z   GEMINI_API_KEY: ***
+2026-09-21T22:11:20.5909708Z   PRODUCTHUNT_TOKEN: ***
+2026-09-21T22:11:20.5909906Z   GEMINI_MODEL: gemini-3.5-flash-lite
+2026-09-21T22:11:20.5910115Z   DASHBOARD_PASSWORD: ***
+2026-09-21T22:11:20.5910343Z   DAILY_FETCH_LIMIT: 10
+2026-09-21T22:11:20.5910519Z ##[endgroup]
+2026-09-21T22:11:27.8714830Z Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+2026-09-21T22:11:53.7927022Z ==================================================
+2026-09-21T22:11:53.7927819Z ð Product Hunt æ¥æ¬¡åæãã¤ãã©ã¤ã³éå§: 2026-09-21
+2026-09-21T22:11:53.7928082Z ã¢ã¼ã: å®å (Gemini + Grounding) / ä¸é: 10ä»¶
+2026-09-21T22:11:53.7928301Z ==================================================
+2026-09-21T22:11:53.7928704Z 
+2026-09-21T22:11:53.7929139Z [Step 1/5] Product Huntããææ°ãã­ãã¯ããåå¾ä¸­...
+2026-09-21T22:11:53.7929603Z [Warning] Failed to fetch from Product Hunt GraphQL API: 401 Client Error: Unauthorized for url: https://api.producthunt.com/v2/api/graphql
+2026-09-21T22:11:53.7930120Z [Info] Product Hunt APIåå¾ã«å¤±æãããããå¬å¼RSSãã£ã¼ãã¸èªåãã©ã¼ã«ããã¯ãã¾ã...
+2026-09-21T22:11:53.7930375Z -> åå¾å®äº: 10 ä»¶
+2026-09-21T22:11:53.7930488Z 
+2026-09-21T22:11:53.7930607Z [Step 2/5] å±¥æ­´DBã¨ã®ç§åã»éè¤ãã§ãã¯...
+2026-09-21T22:11:53.7930821Z   [ã¹ã­ããæ¸] Arcjet (æ¢ã«è©ä¾¡æ¸ã¿)
+2026-09-21T22:11:53.7931014Z   [ã¹ã­ããæ¸] Sai (æ¢ã«è©ä¾¡æ¸ã¿)
+2026-09-21T22:11:53.7931209Z   [ã¹ã­ããæ¸] PostSider (æ¢ã«è©ä¾¡æ¸ã¿)
+2026-09-21T22:11:53.7931433Z   [ã¹ã­ããæ¸] Lead Sparker (æ¢ã«è©ä¾¡æ¸ã¿)
+2026-09-21T22:11:53.7931639Z   [ã¹ã­ããæ¸] Sell to State (æ¢ã«è©ä¾¡æ¸ã¿)
+2026-09-21T22:11:53.7931846Z   [ã¹ã­ããæ¸] Jev (æ¢ã«è©ä¾¡æ¸ã¿)
+2026-09-21T22:11:53.7932030Z   [ã¹ã­ããæ¸] Supacut (æ¢ã«è©ä¾¡æ¸ã¿)
+2026-09-21T22:11:53.7932222Z -> æ°è¦åæå¯¾è±¡: 3 ä»¶
+2026-09-21T22:11:53.7932314Z 
+2026-09-21T22:11:53.7932470Z [Step 3-4/5] LPæå ±è£å® & Geminiã«ããæ¥æ¬å¸å ´ã­ã¼ã«ã©ã¤ãºåæ...
+2026-09-21T22:11:53.7932830Z 
+2026-09-21T22:11:53.7932911Z --- [1/3] OmniDICOM ---
+2026-09-21T22:11:53.7933204Z   ã¿ã°ã©ã¤ã³: DICOM viewing and metadata editing on Mac and Windows
+2026-09-21T22:11:53.7933535Z   å¬å¼ãµã¤ããã¯ã­ã¼ã«ä¸­: https://www.producthunt.com/r/p/1256713?app_id=339
+2026-09-21T22:11:53.7933822Z   -> LPãã­ã¹ãæ½åºæå: 450æå­
+2026-09-21T22:11:53.7934048Z   AIè©ä¾¡ä¸­ (ç«¶åWebæ¤ç´¢ + ã¿ã¤ã ãã·ã³äºæ¥­å¤å®)...
+2026-09-21T22:11:53.7934270Z   -> å¤å®çµæ: ãã©ã³ã¯ Cã (ã¹ã³ã¢: 35)
+2026-09-21T22:11:53.7934616Z   -> ä¸è¨ãµããªã¼: ãä¸­å°å»çæ©é¢ã»ã¯ãªããã¯åããMac/Windowsã§DICOMç»åã®é²è¦§ã¨ã¡ã¿ãã¼ã¿ç·¨éãã¯ã©ã¦ãå±æãã»ã­ã¥ã¢ã«è¡ããã©ã¦ã¶/ãã¹ã¯ãããSaaS
+2026-09-21T22:11:53.7934833Z 
+2026-09-21T22:11:53.7934899Z --- [2/3] Flicka ---
+2026-09-21T22:11:53.7935141Z   ã¿ã°ã©ã¤ã³: Launch-ready product demos, from a Chrome extension
+2026-09-21T22:11:53.7935453Z   å¬å¼ãµã¤ããã¯ã­ã¼ã«ä¸­: https://www.producthunt.com/r/p/1256085?app_id=339
+2026-09-21T22:11:53.7935719Z   -> LPãã­ã¹ãæ½åºæå: 450æå­
+2026-09-21T22:11:53.7935914Z   AIè©ä¾¡ä¸­ (ç«¶åWebæ¤ç´¢ + ã¿ã¤ã ãã·ã³äºæ¥­å¤å®)...
+2026-09-21T22:11:53.7936120Z   -> å¤å®çµæ: ãã©ã³ã¯ Aã (ã¹ã³ã¢: 82)
+2026-09-21T22:11:53.7936514Z   -> ä¸è¨ãµããªã¼: ãB2B SaaSå¶æ¥­ã»ãã¼ã±ãã£ã³ã°åããChromeæ¡å¼µã§æ¢å­Webã¢ããªã®ã¢ãã¯ç»é¢ãå³åº§ã«ã­ã£ããã£ããæ¥æ¬èªã®ã¤ã³ã¿ã©ã¯ãã£ããã¢ãææ¡è³æ(PPTX)ãèªåçæããSaaS
+2026-09-21T22:11:53.7936745Z 
+2026-09-21T22:11:53.7936825Z --- [3/3] AppGrowthKit ---
+2026-09-21T22:11:53.7937076Z   ã¿ã°ã©ã¤ã³: Automate your App Store Screenshots and print money...
+2026-09-21T22:11:53.7937544Z   å¬å¼ãµã¤ããã¯ã­ã¼ã«ä¸­: https://www.producthunt.com/r/p/1256103?app_id=339
+2026-09-21T22:11:53.7937813Z   -> LPãã­ã¹ãæ½åºæå: 450æå­
+2026-09-21T22:11:53.7938008Z   AIè©ä¾¡ä¸­ (ç«¶åWebæ¤ç´¢ + ã¿ã¤ã ãã·ã³äºæ¥­å¤å®)...
+2026-09-21T22:11:53.7938216Z   -> å¤å®çµæ: ãã©ã³ã¯ Aã (ã¹ã³ã¢: 82)
+2026-09-21T22:11:53.7938550Z   -> ä¸è¨ãµããªã¼: ãã¹ããã¢ããªéçºã»éå¶ä¼æ¥­åããUIç»é¢ã¨è¨´æ±ã³ãã¼ãå¥ããã ãã§App Store/Google Playç¨ã®å¤è¨èªå¯¾å¿ããã¼ãèªåçæãASOãæé©åããSaaS
+2026-09-21T22:11:53.7938762Z 
+2026-09-21T22:11:53.7938867Z [Step 5/5] ã¬ãã¼ãããã³ããã·ã¥ãã¼ãçæä¸­...
+2026-09-21T22:11:53.7939243Z   -> Markdown ã¬ãã¼ãåºå: /home/runner/work/ph-dashboard/ph-dashboard/reports/2026-09-21_ProductHuntæ¥æ¬¡åæã¬ãã¼ã.md
+2026-09-21T22:11:53.7939695Z   -> HTML ããã·ã¥ãã¼ãæ´æ°: /home/runner/work/ph-dashboard/ph-dashboard/dashboard.html
+2026-09-21T22:11:53.7940161Z   -> GitHub Pagesç¨ãã¡ã¤ã«æ´æ°: /home/runner/work/ph-dashboard/ph-dashboard/docs/index.html
+2026-09-21T22:11:53.7940377Z 
+2026-09-21T22:11:53.7940462Z ==================================================
+2026-09-21T22:11:53.7940688Z ð æ¥æ¬¡ãã¤ãã©ã¤ã³å®äºï¼
+2026-09-21T22:11:53.7940905Z Obsidianãã¼ã: 2026-09-21_ProductHuntæ¥æ¬¡åæã¬ãã¼ã.md
+2026-09-21T22:11:53.7941144Z ããã·ã¥ãã¼ã: dashboard.html
+2026-09-21T22:11:53.7941357Z ==================================================
+2026-09-21T22:11:53.8877541Z ##[group]Run mkdir -p public
+2026-09-21T22:11:53.8877797Z [36;1mmkdir -p public[0m
+2026-09-21T22:11:53.8878009Z [36;1mcp dashboard.html public/index.html[0m
+2026-09-21T22:11:53.8898628Z shell: /usr/bin/bash -e {0}
+2026-09-21T22:11:53.8898837Z env:
+2026-09-21T22:11:53.8899042Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:53.8899362Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:11:53.8899661Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:53.8899972Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:53.8900239Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:53.8900521Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:11:53.8900756Z ##[endgroup]
+2026-09-21T22:11:53.8988380Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-21T22:11:53.8989262Z ##[group]Run actions/configure-pages@v5
+2026-09-21T22:11:53.8989466Z with:
+2026-09-21T22:11:53.8991053Z   token: ***
+2026-09-21T22:11:53.8991216Z   enablement: false
+2026-09-21T22:11:53.8991410Z env:
+2026-09-21T22:11:53.8991621Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:53.8991963Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:11:53.8992292Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:53.8992820Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:53.8993217Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:53.8993516Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:11:53.8993773Z ##[endgroup]
+2026-09-21T22:11:54.2046685Z ##[group]Run actions/upload-pages-artifact@v3
+2026-09-21T22:11:54.2046959Z with:
+2026-09-21T22:11:54.2047127Z   path: public
+2026-09-21T22:11:54.2047294Z   name: github-pages
+2026-09-21T22:11:54.2047481Z   retention-days: 1
+2026-09-21T22:11:54.2047640Z env:
+2026-09-21T22:11:54.2047855Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2048185Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:11:54.2048528Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2048841Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2049140Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2049451Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:11:54.2049714Z   GITHUB_PAGES: true
+2026-09-21T22:11:54.2049948Z ##[endgroup]
+2026-09-21T22:11:54.2101902Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run]
+2026-09-21T22:11:54.2119968Z ##[group]Run echo ::group::Archive artifact
+2026-09-21T22:11:54.2120241Z [36;1mecho ::group::Archive artifact[0m
+2026-09-21T22:11:54.2120434Z [36;1mtar \[0m
+2026-09-21T22:11:54.2120630Z [36;1m  --dereference --hard-dereference \[0m
+2026-09-21T22:11:54.2120852Z [36;1m  --directory "$INPUT_PATH" \[0m
+2026-09-21T22:11:54.2121064Z [36;1m  -cvf "$RUNNER_TEMP/artifact.tar" \[0m
+2026-09-21T22:11:54.2121281Z [36;1m  --exclude=.git \[0m
+2026-09-21T22:11:54.2121570Z [36;1m  --exclude=.github \[0m
+2026-09-21T22:11:54.2121750Z [36;1m  .[0m
+2026-09-21T22:11:54.2121901Z [36;1mecho ::endgroup::[0m
+2026-09-21T22:11:54.2149138Z shell: /usr/bin/sh -e {0}
+2026-09-21T22:11:54.2149331Z env:
+2026-09-21T22:11:54.2149542Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2149841Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:11:54.2150142Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2150423Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2150697Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2150970Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:11:54.2151204Z   GITHUB_PAGES: true
+2026-09-21T22:11:54.2151376Z   INPUT_PATH: public
+2026-09-21T22:11:54.2151534Z ##[endgroup]
+2026-09-21T22:11:54.2186972Z ##[group]Archive artifact
+2026-09-21T22:11:54.2199066Z ./
+2026-09-21T22:11:54.2199317Z ./index.html
+2026-09-21T22:11:54.2201328Z ##[endgroup]
+2026-09-21T22:11:54.2209408Z ##[end-action id=__actions_upload-pages-artifact.__run;outcome=success;conclusion=success;duration_ms=10]
+2026-09-21T22:11:54.2211710Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run_2]
+2026-09-21T22:11:54.2216024Z ##[end-action id=__actions_upload-pages-artifact.__run_2;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-09-21T22:11:54.2217916Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run_3]
+2026-09-21T22:11:54.2220474Z ##[end-action id=__actions_upload-pages-artifact.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-09-21T22:11:54.2221722Z ##[start-action display=Upload artifact;id=__actions_upload-pages-artifact.upload-artifact]
+2026-09-21T22:11:54.2469082Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-21T22:11:54.2470117Z ##[group]Run actions/upload-artifact@v4
+2026-09-21T22:11:54.2470361Z with:
+2026-09-21T22:11:54.2470535Z   name: github-pages
+2026-09-21T22:11:54.2470731Z   path: /home/runner/work/_temp/artifact.tar
+2026-09-21T22:11:54.2470948Z   retention-days: 1
+2026-09-21T22:11:54.2471121Z   if-no-files-found: error
+2026-09-21T22:11:54.2471471Z   compression-level: 6
+2026-09-21T22:11:54.2471654Z   overwrite: false
+2026-09-21T22:11:54.2471816Z   include-hidden-files: false
+2026-09-21T22:11:54.2471998Z env:
+2026-09-21T22:11:54.2472186Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2472491Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:11:54.2472930Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2473206Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2473480Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:54.2473746Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:11:54.2473981Z   GITHUB_PAGES: true
+2026-09-21T22:11:54.2474137Z ##[endgroup]
+2026-09-21T22:11:54.3618416Z (node:2128) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-21T22:11:54.3618958Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-21T22:11:54.3651694Z With the provided path, there will be 1 file uploaded
+2026-09-21T22:11:54.3663397Z Artifact name is valid!
+2026-09-21T22:11:54.3663903Z Root directory input is valid!
+2026-09-21T22:11:54.6607736Z Beginning upload of artifact content to blob storage
+2026-09-21T22:11:54.6777734Z (node:2128) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-09-21T22:11:54.9128291Z Uploaded bytes 58821
+2026-09-21T22:11:54.9662490Z Finished uploading artifact content to blob storage!
+2026-09-21T22:11:54.9663732Z SHA256 digest of uploaded artifact zip is d956a93a40639a76f714fc0589dda92454f0c85c242d15d73a08c77575456396
+2026-09-21T22:11:54.9664773Z Finalizing artifact upload
+2026-09-21T22:11:55.1816813Z Artifact github-pages.zip successfully finalized. Artifact ID 10666982501
+2026-09-21T22:11:55.1817476Z Artifact github-pages has been successfully uploaded! Final size is 58821 bytes. Artifact ID is 10666982501
+2026-09-21T22:11:55.1822993Z Artifact download URL: https://github.com/yugom2o/ph-dashboard/actions/runs/35661315827/artifacts/10666982501
+2026-09-21T22:11:55.1904837Z ##[end-action id=__actions_upload-pages-artifact.upload-artifact;outcome=success;conclusion=success;duration_ms=968]
+2026-09-21T22:11:55.1965211Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-21T22:11:55.1966213Z ##[group]Run actions/deploy-pages@v4
+2026-09-21T22:11:55.1966518Z with:
+2026-09-21T22:11:55.1968304Z   token: ***
+2026-09-21T22:11:55.1968526Z   timeout: 600000
+2026-09-21T22:11:55.1968810Z   error_count: 10
+2026-09-21T22:11:55.1969044Z   reporting_interval: 5000
+2026-09-21T22:11:55.1969349Z   artifact_name: github-pages
+2026-09-21T22:11:55.1969625Z   preview: false
+2026-09-21T22:11:55.1969889Z env:
+2026-09-21T22:11:55.1970185Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:55.1970578Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:11:55.1971302Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:55.1971675Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:55.1972112Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:11:55.1972468Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:11:55.1973041Z   GITHUB_PAGES: true
+2026-09-21T22:11:55.1973320Z ##[endgroup]
+2026-09-21T22:11:55.3288470Z (node:2141) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-21T22:11:55.3289317Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-21T22:11:55.4630628Z Fetching artifact metadata for "github-pages" in this workflow run
+2026-09-21T22:11:55.6236705Z Found 1 artifact(s)
+2026-09-21T22:11:55.6246341Z Creating Pages deployment with payload:
+2026-09-21T22:11:55.6246861Z {
+2026-09-21T22:11:55.6247571Z 	"artifact_id": 10666982501,
+2026-09-21T22:11:55.6248056Z 	"pages_build_version": "b48204556cc7c84abdc051b8017277abc14ed667",
+2026-09-21T22:11:55.6270695Z 	"oidc_token": "***"
+2026-09-21T22:11:55.6270965Z }
+2026-09-21T22:11:56.3685437Z Created deployment for b48204556cc7c84abdc051b8017277abc14ed667, ID: b48204556cc7c84abdc051b8017277abc14ed667
+2026-09-21T22:12:01.3706830Z Getting Pages deployment status...
+2026-09-21T22:12:01.6135909Z Reported success!
+2026-09-21T22:12:01.6329134Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-21T22:12:01.6330795Z ##[group]Run stefanzweifel/git-auto-commit-action@v5
+2026-09-21T22:12:01.6331287Z with:
+2026-09-21T22:12:01.6331783Z   commit_message: Automated daily analysis: update reports and history
+2026-09-21T22:12:01.6332381Z   file_pattern: reports/*.md data/*.db dashboard.html docs/index.html
+2026-09-21T22:12:01.6333172Z   repository: .
+2026-09-21T22:12:01.6333620Z   commit_user_name: github-actions[bot]
+2026-09-21T22:12:01.6334389Z   commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+2026-09-21T22:12:01.6335016Z   commit_author: yugom2o <325564063+yugom2o@users.noreply.github.com>
+2026-09-21T22:12:01.6335661Z   skip_dirty_check: false
+2026-09-21T22:12:01.6336006Z   skip_fetch: false
+2026-09-21T22:12:01.6336391Z   skip_checkout: false
+2026-09-21T22:12:01.6336741Z   disable_globbing: false
+2026-09-21T22:12:01.6337130Z   create_branch: false
+2026-09-21T22:12:01.6337540Z   create_git_tag_only: false
+2026-09-21T22:12:01.6337912Z   internal_git_binary: git
+2026-09-21T22:12:01.6338324Z env:
+2026-09-21T22:12:01.6338731Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:12:01.6339363Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib/pkgconfig
+2026-09-21T22:12:01.6339929Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:12:01.6340506Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:12:01.6341078Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.14/x64
+2026-09-21T22:12:01.6341705Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.14/x64/lib
+2026-09-21T22:12:01.6342222Z   GITHUB_PAGES: true
+2026-09-21T22:12:01.6342799Z ##[endgroup]
+2026-09-21T22:12:01.6583232Z Started: bash /home/runner/work/_actions/stefanzweifel/git-auto-commit-action/v5/entrypoint.sh
+2026-09-21T22:12:01.6615204Z INPUT_REPOSITORY value: .
+2026-09-21T22:12:01.6615667Z INPUT_STATUS_OPTIONS: 
+2026-09-21T22:12:01.6616433Z INPUT_FILE_PATTERN: reports/*.md data/*.db dashboard.html docs/index.html
+2026-09-21T22:12:01.6663571Z INPUT_BRANCH value: 
+2026-09-21T22:12:02.1283894Z M	dashboard.html
+2026-09-21T22:12:02.1284234Z M	data/history.db
+2026-09-21T22:12:02.1284622Z M	docs/index.html
+2026-09-21T22:12:02.1285127Z M	"reports/2026-09-21_ProductHunt\346\227\245\346\254\241\345\210\206\346\236\220\343\203\254\343\203\235\343\203\274\343\203\210.md"
+2026-09-21T22:12:02.1285740Z Your branch is up to date with 'origin/main'.
+2026-09-21T22:12:02.1286106Z INPUT_ADD_OPTIONS: 
+2026-09-21T22:12:02.1286901Z INPUT_FILE_PATTERN: reports/*.md data/*.db dashboard.html docs/index.html
+2026-09-21T22:12:02.1549436Z INPUT_COMMIT_OPTIONS: 
+2026-09-21T22:12:02.1550197Z INPUT_COMMIT_USER_NAME: github-actions[bot]
+2026-09-21T22:12:02.1550727Z INPUT_COMMIT_USER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+2026-09-21T22:12:02.1551435Z INPUT_COMMIT_MESSAGE: Automated daily analysis: update reports and history
+2026-09-21T22:12:02.1551943Z INPUT_COMMIT_AUTHOR: yugom2o <325564063+yugom2o@users.noreply.github.com>
+2026-09-21T22:12:02.1595990Z [main 76c5a02] Automated daily analysis: update reports and history
+2026-09-21T22:12:02.1596473Z  Author: yugom2o <325564063+yugom2o@users.noreply.github.com>
+2026-09-21T22:12:02.1596932Z  4 files changed, 1693 insertions(+), 1609 deletions(-)
+2026-09-21T22:12:02.1610658Z INPUT_TAGGING_MESSAGE: 
+2026-09-21T22:12:02.1611275Z No tagging message supplied. No tag will be added.
+2026-09-21T22:12:02.1611747Z INPUT_PUSH_OPTIONS: 
+2026-09-21T22:12:03.6091928Z To https://github.com/yugom2o/ph-dashboard
+2026-09-21T22:12:03.6092518Z    b482045..76c5a02  main -> main
+2026-09-21T22:12:03.6230218Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-21T22:12:03.6231151Z Post job cleanup.
+2026-09-21T22:12:03.7097289Z Cache hit occurred on the primary key setup-python-Linux-x64-24.04-Ubuntu-python-3.12.14-pip-1470d1713fb5bb5b305aef9a3538d3b163342a0fb64eeeac907ebc0306ba41ca, not saving cache.
+2026-09-21T22:12:03.7098332Z (node:2186) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-21T22:12:03.7099031Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-21T22:12:03.7190940Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-21T22:12:03.7192005Z Post job cleanup.
+2026-09-21T22:12:03.7778900Z [command]/usr/bin/git version
+2026-09-21T22:12:03.7812046Z git version 2.55.0
+2026-09-21T22:12:03.7842055Z Temporarily overriding HOME='/home/runner/work/_temp/7a6a52aa-f0cb-4580-a7c1-2200ff599a17' before making global git config changes
+2026-09-21T22:12:03.7842933Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-21T22:12:03.7847289Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ph-dashboard/ph-dashboard
+2026-09-21T22:12:03.7875869Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-21T22:12:03.7900016Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-21T22:12:03.8068242Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-21T22:12:03.8087793Z http.https://github.com/.extraheader
+2026-09-21T22:12:03.8098411Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-09-21T22:12:03.8123717Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-21T22:12:03.8334355Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-21T22:12:03.8385416Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-21T22:12:03.8646576Z Cleaning up orphan processes
+2026-09-21T22:12:03.8820262Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/configure-pages@v5, actions/deploy-pages@v4, actions/setup-python@v5, actions/upload-artifact@v4, stefanzweifel/git-auto-commit-action@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
