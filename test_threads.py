@@ -22,6 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description="Threads API 疎通確認＆テスト投稿")
     parser.add_argument("--post", action="store_true", help="実際にテスト投稿を実行する")
     parser.add_argument("--image", nargs="?", const="default", help="画像付きでテスト投稿する（URL指定可能）")
+    parser.add_argument("--thread", action="store_true", help="2通目のリプライ（ツリー投稿）も同時にテストする")
     args = parser.parse_args()
 
     print("==================================================")
@@ -55,8 +56,9 @@ def main():
     if not args.post:
         print("\n💡 接続確認は完了です！")
         print("実際にテスト投稿を行うには、以下のコマンドを実行してください:")
-        print("  python test_threads.py --post                (テキストのみテスト)")
-        print("  python test_threads.py --post --image        (画像付きテスト)")
+        print("  python test_threads.py --post                         (テキストのみテスト)")
+        print("  python test_threads.py --post --image                 (画像付きテスト)")
+        print("  python test_threads.py --post --image --thread        (画像＋ツリーリプライ2段階テスト)")
         print("==================================================")
         return
 
@@ -76,11 +78,27 @@ def main():
         "#GlobalTech #AIツール"
     )
 
-    post_id = publisher.publish(text=test_text, image_url=image_url)
+    post2_text = None
+    if args.thread:
+        print("  -> 2段階ツリー投稿モード（リプライあり）")
+        post2_text = (
+            "🧵 (ツリー2通目テスト)\n\n"
+            "このように親ポストの直下に自動でリプライがぶら下がります。\n"
+            "日本市場向けのローカライズ考察や公式直通リンクをここに配置することで、1通目のリーチを最大化できます！\n\n"
+            "🔗 公式: https://wattmateapp.com/"
+        )
 
-    if post_id:
+    parent_id, reply_id = publisher.publish_thread(
+        post1_text=test_text,
+        post2_text=post2_text,
+        image_url=image_url,
+    )
+
+    if parent_id:
         print("\n🎉 テスト投稿が成功しました！")
-        print(f"投稿ID: {post_id}")
+        print(f"親投稿ID: {parent_id}")
+        if reply_id:
+            print(f"リプライID: {reply_id}")
         print(f"Threadsアプリまたはブラウザで @{username} のプロフィールを確認してください。")
     else:
         print("\n❌ 投稿に失敗しました。エラーログを確認してください。")
