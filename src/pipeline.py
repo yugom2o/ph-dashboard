@@ -6,6 +6,7 @@ from config import (
     DAILY_FETCH_LIMIT,
     PRODUCTHUNT_TOKEN,
     THREADS_AUTO_PUBLISH,
+    THREADS_ENABLE_THREAD_REPLY,
     THREADS_MAX_DAILY_POSTS,
 )
 from src.collectors import ProductHuntAPICollector, ProductHuntRSSCollector
@@ -271,17 +272,52 @@ class DailyPipeline:
 
             official_url = item.get("official_url")
             image_url = item.get("image_url")
-            post_text = draft
-            if official_url and official_url not in post_text:
-                post_text += f"\n\n🔗 公式: {official_url}"
 
-            print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} (画像: {'あり' if image_url else 'なし'}) ...")
-            post_id = self.threads_publisher.publish(text=post_text, image_url=image_url)
+            # 1通目（親ポスト）: フック＋ツールの核心＋画像
+            post1_text = draft
+            if "🔗" in post1_text:
+                post1_text = post1_text.split("🔗")[0].strip()
+            elif official_url and official_url in post1_text:
+                post1_text = post1_text.replace(official_url, "").strip()
 
-            if post_id:
-                self.db.record_threads_post(p_id, post_id, post_text, image_url=image_url)
+            # 2通目（リプライ）: 日本市場での勝機＋ターゲット＋公式リンク
+            post2_text = None
+            if THREADS_ENABLE_THREAD_REPLY:
+                reply_draft = item.get("sns_reply_draft")
+                if reply_draft:
+                    post2_text = reply_draft
+                else:
+                    one_line = item.get("one_line_summary", "")
+                    target = item.get("target_market", "")
+                    adaptation = item.get("jp_adaptation", "")
+                    post2_text = (
+                        f"🇯🇵 日本市場でのタイムマシン事業チャンス\n\n"
+                        f"💡 コンセプト: {one_line}\n"
+                        f"🎯 ターゲット: {target}\n"
+                        f"🚀 勝機: {adaptation[:110]}..."
+                    )
+
+                if official_url and official_url not in post2_text:
+                    post2_text += f"\n\n🔗 公式サイト: {official_url}"
+
+            print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} (画像: {'あり' if image_url else 'なし'} / ツリーリプライ: {'有効' if post2_text else '無効'}) ...")
+            parent_id, reply_id = self.threads_publisher.publish_thread(
+                post1_text=post1_text,
+                post2_text=post2_text,
+                image_url=image_url,
+            )
+
+            if parent_id:
+                self.db.record_threads_post(
+                    product_id=p_id,
+                    post_id=parent_id,
+                    text=post1_text,
+                    image_url=image_url,
+                    reply_post_id=reply_id,
+                    reply_text=post2_text,
+                )
                 posted_count += 1
-                print(f"  -> 🎉 Threads投稿成功！ (Post ID: {post_id})")
+                print(f"  -> 🎉 Threads投稿成功！ (親Post ID: {parent_id}, リプライID: {reply_id or 'なし'})")
 
         if posted_count == 0:
             print("  [Info] 本日は新規投稿対象（未投稿のS/Aランクプロダクト）がありませんでした。")
