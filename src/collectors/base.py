@@ -13,6 +13,7 @@ class ProductItem(BaseModel):
     votes_count: int = Field(0, description="Upvote数")
     category: str = Field("", description="トピック・カテゴリ")
     lp_content: Optional[str] = Field(None, description="公式LPから抽出したテキスト")
+    image_url: Optional[str] = Field(None, description="アイキャッチ・OGP画像URL")
 
 
 class BaseCollector(ABC):
