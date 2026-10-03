@@ -59,10 +59,24 @@ class Database:
                 )
                 """
             )
+            # Threads投稿履歴テーブル
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS threads_posts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    product_id TEXT NOT NULL,
+                    post_id TEXT NOT NULL,
+                    text TEXT,
+                    posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (product_id) REFERENCES products(id)
+                )
+                """
+            )
             # インデックス
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_products_ph_url ON products(ph_url)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_eval_analyzed_date ON evaluations(analyzed_date)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_eval_rank ON evaluations(rank)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_threads_product_id ON threads_posts(product_id)")
             conn.commit()
 
     def is_already_analyzed(self, ph_url: str) -> bool:
@@ -84,6 +98,35 @@ class Database:
         """プロダクト基本情報を保存（Upsert）"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
+            # 既に同じURLのプロダクトが存在するか確認
+            cursor.execute("SELECT id FROM products WHERE ph_url = ?", (product_data["ph_url"],))
+            existing = cursor.fetchone()
+            if existing:
+                actual_id = existing[0]
+                cursor.execute(
+                    """
+                    UPDATE products SET
+                        name = ?,
+                        tagline = ?,
+                        description = ?,
+                        official_url = coalesce(?, official_url),
+                        votes_count = ?,
+                        category = ?
+                    WHERE id = ?
+                    """,
+                    (
+                        product_data["name"],
+                        product_data.get("tagline", ""),
+                        product_data.get("description", ""),
+                        product_data.get("official_url"),
+                        product_data.get("votes_count", 0),
+                        product_data.get("category", ""),
+                        actual_id,
+                    ),
+                )
+                conn.commit()
+                return actual_id
+
             cursor.execute(
                 """
                 INSERT INTO products (
@@ -198,3 +241,43 @@ class Database:
                 (limit,),
             )
             return [self._parse_row(row) for row in cursor.fetchall()]
+
+    def get_evaluations_by_date_range(self, start_date: str, end_date: str) -> List[Dict[str, Any]]:
+        """指定期間の評価結果一覧を取得"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT p.*, e.*
+                FROM evaluations e
+                JOIN products p ON e.product_id = p.id
+                WHERE e.analyzed_date BETWEEN ? AND ?
+                ORDER BY e.score DESC
+                """,
+                (start_date, end_date),
+            )
+            return [self._parse_row(row) for row in cursor.fetchall()]
+
+    def is_already_posted_to_threads(self, product_id: str) -> bool:
+        """指定されたプロダクトが既にThreadsに投稿済みか確認"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT COUNT(*) FROM threads_posts WHERE product_id = ?",
+                (product_id,),
+            )
+            return cursor.fetchone()[0] > 0
+
+    def record_threads_post(self, product_id: str, post_id: str, text: str) -> int:
+        """Threadsへの投稿実績を記録"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO threads_posts (product_id, post_id, text)
+                VALUES (?, ?, ?)
+                """,
+                (product_id, post_id, text),
+            )
+            conn.commit()
+            return cursor.lastrowid
