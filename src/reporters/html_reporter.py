@@ -143,6 +143,7 @@ class HTMLReporter:
                     "adapt": adapt_points[:3],
                     "signals": signals,
                     "snsDraft": it.get("sns_post_draft") or "",
+                    "image": it.get("image_url") or "",
                 }
             )
 
