@@ -32,3 +32,15 @@ DASHBOARD_PASSWORD = os.getenv("DASHBOARD_PASSWORD", "")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 GITHUB_REPO = os.getenv("GITHUB_REPO", "")
 
+# 通知設定 (Discord / Slack Webhook)
+WEBHOOK_URL = os.getenv("WEBHOOK_URL") or os.getenv("DISCORD_WEBHOOK_URL") or os.getenv("SLACK_WEBHOOK_URL", "")
+
+# Threads API 設定
+THREADS_ACCESS_TOKEN = os.getenv("THREADS_ACCESS_TOKEN", "")
+THREADS_USER_ID = os.getenv("THREADS_USER_ID", "")
+THREADS_AUTO_PUBLISH = os.getenv("THREADS_AUTO_PUBLISH", "false").lower() in ("true", "1", "yes")
+THREADS_MAX_DAILY_POSTS = int(os.getenv("THREADS_MAX_DAILY_POSTS", "1"))
+
+
+
+
