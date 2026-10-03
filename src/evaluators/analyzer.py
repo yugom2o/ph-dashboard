@@ -122,6 +122,7 @@ class GeminiEvaluator:
                     "Sansan・Salesforce・HubSpot等の国内主要CRM/SFAとの連携",
                 ],
                 recommendation="即参入検討。バーティカルB2B営業SaaSとして国内PMFの確度が高く、ARR化しやすい。",
+                sns_post_draft=f"💡 海外で話題の営業AIツール「{product_name}」が面白い。\n\n企業のURLを入れるだけで、IRや最新ニュースをAIが自動解析して3分で提案スライドを作ってくれる。\n\nこれを日本でやるなら、PR TIMESや有報の解析と連携させて「商談直前の10分で提案PPTXを作る特化型SaaS」にすれば法人営業で爆売れしそう。国内競合は情報提供止まりなので勝機あり。\n\n#AIツール #新規事業 #SaaS",
             )
         elif any(w in name_lower for w in ["video", "edit", "clip", "media", "transcribe"]):
             return EvaluationResult(
@@ -147,10 +148,11 @@ class GeminiEvaluator:
                     "Adobe Premiere Pro / Final Cut Pro向けXMLタイムライン書き出し",
                 ],
                 recommendation="有望。採用広報や導入事例動画などユースケースを絞り込むことで即座に導入が進みやすい。",
+                sns_post_draft=f"🎬 海外の最新動画AI「{product_name}」の着眼点がいい。\n\nインタビューの生動画を投げると、文脈から重要発言だけを抜き出してラフカットを自動生成するツール。\n\n日本で採用動画や顧客事例インタビューを作る際、外注すると高いし自社では編集に数日かかる。設問アジェンダに沿って見どころを抽出する日本語特化型なら、中小の採用広報にめちゃくちゃ刺さりそう。\n\n#動画編集 #AI活用 #スタートアップ",
             )
         else:
             return EvaluationResult(
-                original_summary_ja=f"Product Huntで注目を集める「{product_name}」は、{tagline}を実現する最新ツール。直感的なインターフェースとAIによる自動化により、従来の煩雑な作業フローを効率化しユーザー体験を向上させる。",
+                original_summary_ja=f"海外で急速に注目を集める最新ツール「{product_name}」は、{tagline}を実現するプロダクト。直感的なインターフェースとAIによる自動化により、従来の煩雑な作業フローを効率化しユーザー体験を向上させる。",
                 rank="A",
                 score=76,
                 one_line_summary=f"【国内中小・チーム向け】{tagline}を日本語業務フローに直結させる業務自動化SaaS",
@@ -172,4 +174,5 @@ class GeminiEvaluator:
                     "導入時の設定を5分で終わらせる日本語テンプレートプリセット",
                 ],
                 recommendation="要検証・要アレンジ。ターゲット業界を特定し、国内特有のSaaSエコシステムに組み込むことで勝算あり。",
+                sns_post_draft=f"海外の最新ツール「{product_name}」をリサーチ。\n\n{tagline}\n\n国内向けに展開するなら、日本の業務フロー（Slack/LINE WORKS連携や請求書対応）に特化させたローカライズ版に勝機あり。スモールビジネスの業務効率化として面白い切り口。\n\n#海外テック #AIツール #個人開発",
             )
