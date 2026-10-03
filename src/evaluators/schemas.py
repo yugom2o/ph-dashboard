@@ -41,5 +41,9 @@ class EvaluationResult(BaseModel):
     recommendation: str = Field(..., description="結論と推奨アクション（個人開発/スタートアップ/大企業新規事業としての参入是非）")
     sns_post_draft: Optional[str] = Field(
         default=None,
-        description="SNS（X / Threads）発信用ポスト案（140〜250字程度。フック・概要・日本市場での勝機・考察・ハッシュタグを含む。※情報源としてProduct Hunt等の特定媒体名は伏せ『海外で話題の最新ツール』等と表現すること）",
+        description="SNS（X / Threads）発信用親ポスト案（120〜180字程度。強力なフック・ツールの核心価値・ハッシュタグを含む。アルゴリズム対策のため外部リンクは含めない。※特定媒体名は伏せ『海外で話題の最新ツール』等と表現すること）",
+    )
+    sns_reply_draft: Optional[str] = Field(
+        default=None,
+        description="SNSツリー2通目用リプライ案（120〜220字程度。日本市場での具体的なタイムマシン事業の勝機・想定ターゲット・アレンジ案・国内連携ツールを提示。※外部リンク導線はシステム側で自動付与）",
     )
