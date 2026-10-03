@@ -83,7 +83,10 @@ class ProductHuntRSSCollector(BaseCollector):
                     # 公式直通リンク (例: <a href=".../r/p/...">Link</a>)
                     link_a = soup.find("a", string=re.compile(r"Link", re.I))
                     if link_a and link_a.get("href"):
-                        official_url = link_a["href"]
+                        raw_link = link_a["href"]
+                        from src.enrichers import LPScraper
+                        official_url = LPScraper.resolve_official_url(raw_link)
+
 
                     if not clean_desc:
                         clean_desc = soup.get_text(separator=" ").strip()
