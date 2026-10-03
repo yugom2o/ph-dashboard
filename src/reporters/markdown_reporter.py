@@ -82,13 +82,29 @@ class MarkdownReporter:
             orig_ja = it.get("original_summary_ja")
             image_url = it.get("image_url")
             sns_draft = it.get("sns_post_draft")
+            reply_draft = it.get("sns_reply_draft")
+            if not reply_draft and it.get("one_line_summary"):
+                reply_draft = (
+                    f"🇯🇵 日本市場でのタイムマシン事業チャンス\n\n"
+                    f"💡 コンセプト: {it.get('one_line_summary')}\n"
+                    f"🎯 ターゲット: {it.get('target_market', '国内法人')}\n"
+                    f"🚀 勝機: {it.get('jp_adaptation', '')[:120]}..."
+                )
 
             if sns_draft:
+                # 親ポストからはURL表記を除去してアルゴリズム最適化
+                clean_p1 = sns_draft
+                if "🔗" in clean_p1:
+                    clean_p1 = clean_p1.split("🔗")[0].strip()
+                elif official_url and official_url in clean_p1:
+                    clean_p1 = clean_p1.replace(official_url, "").strip()
+
                 sns_drafts.append({
                     "name": name,
                     "rank": rank,
                     "score": score,
-                    "draft": sns_draft,
+                    "draft": clean_p1,
+                    "reply_draft": reply_draft,
                     "url": official_url,
                     "image_url": image_url,
                 })
@@ -152,16 +168,23 @@ class MarkdownReporter:
             md.append("")
             for s in sns_drafts:
                 md.append(f"### 投稿案: 【ランク {s['rank']}】{s['name']} (スコア: {s['score']})")
+                md.append("#### 🧵 1通目（親ポスト / 画像添付 / リンクなし）")
                 md.append("```text")
                 md.append(s["draft"])
-                if s["url"]:
-                    md.append(f"\n🔗 公式サイト: {s['url']}")
                 md.append("```")
                 if s.get("image_url"):
-                    md.append(f"🖼️ **Threads添付画像**: [画像を開く]({s['image_url']})")
+                    md.append(f"🖼️ **添付画像**: [画像を開く]({s['image_url']})  ")
                 md.append("")
-            md.append("---")
-            md.append("")
+                if s.get("reply_draft"):
+                    md.append("#### ↪️ 2通目（ツリーリプライ / 事業化チャンス＆公式リンク）")
+                    md.append("```text")
+                    md.append(s["reply_draft"])
+                    if s["url"] and s["url"] not in s["reply_draft"]:
+                        md.append(f"\n\n🔗 公式サイト: {s['url']}")
+                    md.append("```")
+                    md.append("")
+                md.append("---")
+                md.append("")
 
         file_path = self.output_dir / f"{target_date}_GlobalTech日次分析レポート.md"
         file_path.write_text("\n".join(md), encoding="utf-8")
