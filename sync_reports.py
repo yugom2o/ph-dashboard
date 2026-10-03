@@ -69,7 +69,7 @@ def pull_from_github(today_str: str) -> bool:
         if not is_target:
             continue
 
-        if path_str == f"reports/{today_str}_ProductHunt日次分析レポート.md":
+        if path_str.startswith(f"reports/{today_str}_") and path_str.endswith(".md"):
             today_report_found = True
 
         file_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{path_str}"
