@@ -45,6 +45,8 @@ tags:
 ## 🔍 詳細分析カード (各プロダクトの深掘り)
 
 ### 1. 【ランク S (スコア: 91)】Lead Sparker
+![Lead Sparker アイキャッチ](https://ph-files.imgix.net/0f6cfaa5-0557-4e08-a5d1-ac7963dd2b58.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)  
+
 > **キャッチコピー**: Turn any brand URL into a ready-to-send insight deck  
 > **元プロダクト詳細 (日本語)**: 対象企業のWebサイトURLを入力するだけで、その企業の公開情報や事業内容をAIがクロール・解析し、商談ですぐに使える個別最適化された提案スライド（インサイトデッキ）を数分で自動作成する営業支援ツール。  
 > **公式リンク**: [Lead Sparker 公式サイト](https://leadsparker.com)  
@@ -72,6 +74,8 @@ tags:
 ---
 
 ### 2. 【ランク A (スコア: 85)】Singularity
+![Singularity アイキャッチ](https://singularity.meteorfactory.dev/blog/ade-kanban-singularity-board.webp)  
+
 > **キャッチコピー**: Run AI coding agents in parallel, one ticket at a time  
 > **元プロダクト詳細 (日本語)**: Singularityは、ソフトウェア開発におけるJiraやGitHub Issuesなどのチケットを起点として、複数のAIコーディングエージェントを並列稼働させ、タスクの自動消化やコード実装を効率化する開発支援ツールです。エンジニアが1枚ずつチケットを指定してエージェントに並列で処理を割り当てることで、バグ修正や定型的な機能実装のスピードを劇的に向上させます。  
 > **公式リンク**: [Singularity 公式サイト](https://www.producthunt.com/r/p/1266692?app_id=339)  
@@ -99,6 +103,8 @@ tags:
 ---
 
 ### 3. 【ランク A (スコア: 85)】Thanor AI
+![Thanor AI アイキャッチ](https://ph-files.imgix.net/60d63dc0-cf89-4176-a672-f58e4c010c37.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)  
+
 > **キャッチコピー**: Make your AI-built sites look expensive and not like slop  
 > **元プロダクト詳細 (日本語)**: Thanor AIは、ノーコードツールやAIビルダー（Bolt、v0、Cursorなど）で自動生成された安っぽく見えるWebサイトやランディングページのデザインを、一瞬で高級感のあるプロ仕様に洗練させるためのデザイン最適化ツールです。ユーザーはAIが生成したコードやURLを入力するだけで、チープなフォント、単調なカラーパレット、不自然な余白、安直なアイコン配置などを自動検出し、コンバージョン率が高く信頼感のあるUI/UXへと自動ブラッシュアップします。  
 > **公式リンク**: [Thanor AI 公式サイト](https://www.producthunt.com/r/p/1266098?app_id=339)  
@@ -126,6 +132,8 @@ tags:
 ---
 
 ### 4. 【ランク A (スコア: 82)】Yubi
+![Yubi アイキャッチ](https://ph-files.imgix.net/1f975c61-ac8f-43d7-87a1-1cc545cc78c3.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)  
+
 > **キャッチコピー**: Talk to your Mac and let Yubi do the typing  
 > **元プロダクト詳細 (日本語)**: Yubiは、Macユーザー向けの音声入力・タイピング自動化ツールです。マイクに向かって話しかけた内容をリアルタイムで高精度にテキスト化し、ユーザーが操作している任意のアプリケーション（Slack、メール、ドキュメント作成ツールなど）へシームレスに入力・タイピング代行します。単なる音声文字起こしにとどまらず、雑多な発話を文脈に合わせて自然な文章や構造化されたテキストに整えて出力する点が特徴で、キーボード入力の労力を大幅に削減し、日々のデスクワークの生産性を飛躍的に高めることを目的としたプロダクトです。  
 > **公式リンク**: [Yubi 公式サイト](https://www.producthunt.com/r/p/1267846?app_id=339)  
@@ -153,6 +161,8 @@ tags:
 ---
 
 ### 5. 【ランク A (スコア: 82)】Deskcord.chat
+![Deskcord.chat アイキャッチ](https://deskcord.chat/og-image.jpg)  
+
 > **キャッチコピー**: A widget to chat with customers from your Discord server  
 > **元プロダクト詳細 (日本語)**: Deskcord.chatは、企業のWebサイトに埋め込むウィジェットを通じて、顧客が使い慣れたDiscordサーバーと直接つながり、リアルタイムでチャットやサポート対応ができるカスタマーサポートツールです。Webサイト上の訪問者が専用フォームや複雑なアプリを通さず、普段ゲーミングやコミュニティで利用しているDiscordアカウントから直接企業のサポートチームに問い合わせを送信できる点が特徴です。企業の運用側も、Discordのチャンネルやスレッド機能を使ってチケット管理や顧客対応を行えるため、高額なZendeskやIntercomのような既存のカスタマーサポートSaaSを導入せずに、馴染みのあるDiscordのUI上で安価かつ効率的に顧客対応を完結させることができます。  
 > **公式リンク**: [Deskcord.chat 公式サイト](https://www.producthunt.com/r/p/1198913?app_id=339)  
@@ -180,6 +190,8 @@ tags:
 ---
 
 ### 6. 【ランク A (スコア: 76)】Jevtown
+![Jevtown アイキャッチ](https://ph-files.imgix.net/9df62921-822f-4bd4-b632-dbe206f46d76.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)  
+
 > **キャッチコピー**: 10,000 AI readers react to your post before you publish it  
 > **元プロダクト詳細 (日本語)**: 海外で急速に注目を集める最新ツール「Jevtown」は、10,000 AI readers react to your post before you publish itを実現するプロダクト。直感的なインターフェースとAIによる自動化により、従来の煩雑な作業フローを効率化しユーザー体験を向上させる。  
 > **公式リンク**: [Jevtown 公式サイト](https://jevtown.ai)  
@@ -206,6 +218,8 @@ tags:
 ---
 
 ### 7. 【ランク A (スコア: 76)】Supacut
+![Supacut アイキャッチ](https://ph-files.imgix.net/86498ed3-cf3a-4e79-a4d5-4d13dc970fa2.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)  
+
 > **キャッチコピー**: Quickly turn interview footage into a rough cut  
 > **元プロダクト詳細 (日本語)**: 海外で急速に注目を集める最新ツール「Supacut」は、Quickly turn interview footage into a rough cutを実現するプロダクト。直感的なインターフェースとAIによる自動化により、従来の煩雑な作業フローを効率化しユーザー体験を向上させる。  
 > **公式リンク**: [Supacut 公式サイト](https://supacut.video)  
@@ -232,6 +246,8 @@ tags:
 ---
 
 ### 8. 【ランク B (スコア: 62)】una mano
+![una mano アイキャッチ](https://unamanokeyboard.com/og.png)  
+
 > **キャッチコピー**: A familiar iPhone keyboard that moves to your thumb  
 > **元プロダクト詳細 (日本語)**: 「una mano」は、大画面化したiPhoneのキーボード操作を片手の親指の動きに合わせて自動的に追従・変形させるカスタムキーボードアプリです。親指が届きにくい画面の反対側の文字を打つ際、キーボード全体が親指の位置に向かってスライド・アーチ状に変形することで、片手操作時の指のストレッチやスマートフォンの落下リスクを劇的に軽減します。  
 > **公式リンク**: [una mano 公式サイト](https://www.producthunt.com/r/p/1262324?app_id=339)  
@@ -259,6 +275,8 @@ tags:
 ---
 
 ### 9. 【ランク B (スコア: 62)】ZooWork
+![ZooWork アイキャッチ](https://zoowork.ai/zoowork-home/assets/hero/supply-chain-agent-interface-v3.png)  
+
 > **キャッチコピー**: The AI agent delivery platform for FDEs and domain experts  
 > **元プロダクト詳細 (日本語)**: ZooWorkは、海外で注目を集めるFDE（Forward Deployed Engineer：前方展開エンジニア）や特定ドメインの専門家向けに特化したAIエージェントのデリバリー・運用プラットフォームです。複雑な社内業務や顧客向けのカスタムAIワークフローを構築し、ノーコード・ローコードでエージェントをデプロイ、管理するための機能を提供します。専門知識を持つプロフェッショナルが、自身のノウハウをAIエージェントとしてパッケージ化し、効率的に提供・展開できるように設計された最新のAI開発・運用支援ツールです。  
 > **公式リンク**: [ZooWork 公式サイト](https://www.producthunt.com/r/p/1259794?app_id=339)  
@@ -286,6 +304,8 @@ tags:
 ---
 
 ### 10. 【ランク B (スコア: 55)】OTPfill
+![OTPfill アイキャッチ](https://ph-files.imgix.net/92a8e298-3716-4bb2-a89f-580dc12f9edd.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)  
+
 > **キャッチコピー**: Autofill OTP codes from your email on Mac  
 > **元プロダクト詳細 (日本語)**: Macユーザー向けに、メール受信したワンタイムパスワード（OTP）や二段階認証コードを自動検知し、ブラウザやアプリの入力フォームへシームレスに自動入力（オートフィル）するデスクトップユーティリティツール。ユーザーはメールアプリを開いてコードを目視確認し手動でコピー＆ペーストする手間が一切なくなり、WebサービスやSaaSへのログイン時に発生する認証のストレスとタイムロスを劇的に削減する。  
 > **公式リンク**: [OTPfill 公式サイト](https://www.producthunt.com/r/p/1264362?app_id=339)  
@@ -313,6 +333,8 @@ tags:
 ---
 
 ### 11. 【ランク B (スコア: 55)】Crowny! 
+![Crowny!  アイキャッチ](https://www.crowny.lol/opengraph-image?95a1ec8db5cda1c1)  
+
 > **キャッチコピー**: Claude Code, Codex, music, your day & 20+ apps in your notch  
 > **元プロダクト詳細 (日本語)**: Crowny!は、Macの画面上部にあるカメラの切欠き（ノッチ）部分やメニューバーを活用し、Claude Code、Codex、音楽プレイヤー、本日のスケジュール、さらに20種類以上の外部アプリへのアクセスや通知を統合してコンパクトに表示・操作できるユーティリティツールです。開発時のAIコーディングアシスタントのステータス確認や音楽の再生コントロール、日々のタスク管理などを、専用アプリを開くことなくデスクトップのわずかなスペースでシームレスに行うことができます。  
 > **公式リンク**: [Crowny!  公式サイト](https://www.producthunt.com/r/p/1266347?app_id=339)  
@@ -340,6 +362,8 @@ tags:
 ---
 
 ### 12. 【ランク B (スコア: 55)】WattMate
+![WattMate アイキャッチ](https://wattmateapp.com/assets/og/index.png)  
+
 > **キャッチコピー**: Which app is draining your Mac, in watts and minutes saved  
 > **元プロダクト詳細 (日本語)**: WattMateは、Macのメニューバー常駐型ユーティリティツールであり、どのアプリケーションがMacのバッテリーをどのくらい消費しているかをリアルタイムでワット数（電力消費量）単位およびバッテリー駆動時間（分単位）に換算して可視化するツールです。ユーザーがどのソフトに電力を奪われているかを直感的に把握できるようにし、効率的な省電力対策やバッテリー寿命の温存をサポートします。  
 > **公式リンク**: [WattMate 公式サイト](https://www.producthunt.com/r/p/1260956?app_id=339)  
@@ -367,6 +391,8 @@ tags:
 ---
 
 ### 13. 【ランク B (スコア: 55)】miso.com
+![miso.com アイキャッチ](https://miso.com/assets/link-card-v3.jpg)  
+
 > **キャッチコピー**: Book flights and hotels through iMessage  
 > **元プロダクト詳細 (日本語)**: miso.comは、メッセージアプリ（iMessage等）のチャットインターフェース上で、自然言語での対話を通じて航空券やホテルの検索から予約・決済までを完結させることができる旅行予約アシスタントツールです。ユーザーが専用の旅行予約サイトやアプリを開いて条件を絞り込む手間を省き、日常のメッセージングの延長線上でシームレスに旅程の計画や手配ができるよう設計されています。  
 > **公式リンク**: [miso.com 公式サイト](https://www.producthunt.com/r/p/1254817?app_id=339)  
@@ -394,6 +420,8 @@ tags:
 ---
 
 ### 14. 【ランク C (スコア: 35)】FoundrRadio
+![FoundrRadio アイキャッチ](https://radio.willoscreens.pro/og-image.jpg)  
+
 > **キャッチコピー**: Pick a frequency, launch your radio station and go on air  
 > **元プロダクト詳細 (日本語)**: FoundrRadioは、ユーザーが独自のオンラインラジオ局（あるいは音声配信チャンネル）を簡単かつ迅速に立ち上げ、放送を開始できるオーディオストリーミングプラットフォームです。利用者は好みの周波数やチャンネルを設定し、音声コンテンツをリアルタイムまたはオンデマンドでリスナーに向けて配信することができます。インターネット経由で誰でも手軽に「自分だけのラジオ局」のオーナーになれるツールとして設計されており、クリエイターやコミュニティ運営者が音声メディアを通じて独自のブランディングやリスナー獲得を行える仕組みを提供しています。  
 > **公式リンク**: [FoundrRadio 公式サイト](https://www.producthunt.com/r/p/1266483?app_id=339)  
@@ -420,6 +448,8 @@ tags:
 ---
 
 ### 15. 【ランク C (スコア: 25)】FeelMyMac
+![FeelMyMac アイキャッチ](https://feelmymac.thehighjack.it/og-card-v2.png)  
+
 > **キャッチコピー**: Lets you feel different textures through your Mac’s trackpad  
 > **元プロダクト詳細 (日本語)**: Macのトラックパッドの振動制御や触覚フィードバック（感圧タッチ）技術を高度にハックし、画面上のテクスチャや材質（ザラザラした紙、ツルツルしたガラス、でこぼこした布など）の触感を指先でリアルに感じ取れるようにするデスクトップ向けアプリケーション。視覚や聴覚だけでなく、触覚をデジタル体験に統合することで、Webデザインの質感確認や新しいUI/UXのプロトタイピング、没入感のあるデジタルアート鑑賞を可能にする。特別な外部デバイスを必要とせず、MacBookの標準ハードウェアのみで高度な触覚表現を実現する点が特徴である。  
 > **公式リンク**: [FeelMyMac 公式サイト](https://www.producthunt.com/r/p/1263873?app_id=339)  
@@ -460,6 +490,7 @@ tags:
 
 🔗 公式サイト: https://leadsparker.com
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://ph-files.imgix.net/0f6cfaa5-0557-4e08-a5d1-ac7963dd2b58.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)
 
 ### 投稿案: 【ランク A】Singularity (スコア: 85)
 ```text
@@ -467,6 +498,7 @@ tags:
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1266692?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://singularity.meteorfactory.dev/blog/ade-kanban-singularity-board.webp)
 
 ### 投稿案: 【ランク A】Thanor AI (スコア: 85)
 ```text
@@ -474,6 +506,7 @@ tags:
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1266098?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://ph-files.imgix.net/60d63dc0-cf89-4176-a672-f58e4c010c37.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)
 
 ### 投稿案: 【ランク A】Yubi (スコア: 82)
 ```text
@@ -481,6 +514,7 @@ tags:
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1267846?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://ph-files.imgix.net/1f975c61-ac8f-43d7-87a1-1cc545cc78c3.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)
 
 ### 投稿案: 【ランク A】Deskcord.chat (スコア: 82)
 ```text
@@ -488,6 +522,7 @@ tags:
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1198913?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://deskcord.chat/og-image.jpg)
 
 ### 投稿案: 【ランク A】Jevtown (スコア: 76)
 ```text
@@ -501,6 +536,7 @@ tags:
 
 🔗 公式サイト: https://jevtown.ai
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://ph-files.imgix.net/9df62921-822f-4bd4-b632-dbe206f46d76.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)
 
 ### 投稿案: 【ランク A】Supacut (スコア: 76)
 ```text
@@ -514,6 +550,7 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://supacut.video
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://ph-files.imgix.net/86498ed3-cf3a-4e79-a4d5-4d13dc970fa2.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)
 
 ### 投稿案: 【ランク B】una mano (スコア: 62)
 ```text
@@ -521,6 +558,7 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1262324?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://unamanokeyboard.com/og.png)
 
 ### 投稿案: 【ランク B】ZooWork (スコア: 62)
 ```text
@@ -528,6 +566,7 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1259794?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://zoowork.ai/zoowork-home/assets/hero/supply-chain-agent-interface-v3.png)
 
 ### 投稿案: 【ランク B】OTPfill (スコア: 55)
 ```text
@@ -535,6 +574,7 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1264362?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://ph-files.imgix.net/92a8e298-3716-4bb2-a89f-580dc12f9edd.png?auto=format&format=jpeg&fit=crop&frame=1&h=512&w=1024)
 
 ### 投稿案: 【ランク B】Crowny!  (スコア: 55)
 ```text
@@ -542,6 +582,7 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1266347?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://www.crowny.lol/opengraph-image?95a1ec8db5cda1c1)
 
 ### 投稿案: 【ランク B】WattMate (スコア: 55)
 ```text
@@ -549,6 +590,7 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1260956?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://wattmateapp.com/assets/og/index.png)
 
 ### 投稿案: 【ランク B】miso.com (スコア: 55)
 ```text
@@ -556,6 +598,7 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1254817?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://miso.com/assets/link-card-v3.jpg)
 
 ### 投稿案: 【ランク C】FoundrRadio (スコア: 35)
 ```text
@@ -563,6 +606,7 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1266483?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://radio.willoscreens.pro/og-image.jpg)
 
 ### 投稿案: 【ランク C】FeelMyMac (スコア: 25)
 ```text
@@ -570,5 +614,6 @@ Quickly turn interview footage into a rough cut
 
 🔗 公式サイト: https://www.producthunt.com/r/p/1263873?app_id=339
 ```
+🖼️ **Threads添付画像**: [画像を開く](https://feelmymac.thehighjack.it/og-card-v2.png)
 
 ---
