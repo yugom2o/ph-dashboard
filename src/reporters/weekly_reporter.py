@@ -87,41 +87,97 @@ class WeeklyReporter:
                 f"  日本市場向け: {it.get('one_line_summary')} (ターゲット: {it.get('target_market')})\n"
                 f"  機能概要: {it.get('original_summary_ja', it.get('description', ''))[:150]}"
             )
-        products_context = "\n".join(summary_list)
+        # スコア順にソート（降順）
+        sorted_items = sorted(items, key=lambda x: x.get("score", 0), reverse=True)
+        # 上位アイテム（有料枠候補）と 下位3アイテム（無料枠公開用）
+        # ピックアップ対象（通常上位5〜7件）のうち、下位3件を無料、それより上位を有料にする
+        top_candidates = [it for it in sorted_items if it.get("score", 0) >= 70]
+        if len(top_candidates) < 5:
+            top_candidates = sorted_items[:5]
+        
+        # 無料枠＝ピックアップ中の下位3件、有料枠＝それより上位（Sランク含む）
+        free_items = top_candidates[-3:] if len(top_candidates) >= 3 else top_candidates
+        paid_items = top_candidates[:-3] if len(top_candidates) >= 3 else []
+
+        def format_product_info(item_list):
+            lines = []
+            for it in item_list:
+                img_info = f" (画像URL: {it.get('image_url')})" if it.get('image_url') else ""
+                url_info = f" (公式URL: {it.get('official_url')})" if it.get('official_url') else ""
+                lines.append(
+                    f"- 【{it.get('rank')}ランク / {it.get('score')}点】{it.get('name')}: {it.get('tagline')}{url_info}{img_info}\n"
+                    f"  概要: {it.get('original_summary_ja', it.get('description', ''))[:150]}\n"
+                    f"  タイムマシン事業化案: {it.get('one_line_summary')}\n"
+                    f"  想定ターゲット: {it.get('target_market')}\n"
+                    f"  ビジネスモデル: {it.get('pricing_model')}"
+                )
+            return "\n".join(lines)
+
+        paid_context = format_product_info(paid_items)
+        free_context = format_product_info(free_items)
 
         prompt = f"""あなたは海外テック・スタートアップの動向と日本市場（タイムマシン経営・ローカライズ事業）の専門リサーチャーです。
-以下の【過去1週間に独自リサーチした海外注目テック・AIプロダクト一覧】を分析し、
-noteや週刊ニュースレター（Substack等）にそのまま掲載できる、解像度の高い週刊トレンドレポート（Markdown）を作成してください。
+以下の【独自リサーチした海外注目テックプロダクト】を分析し、
+note（メンバーシップ / 有料記事）にそのまま掲載できる、**無料公開エリア**と**有料会員限定エリア**が明確に分かれた完成原稿（Markdown）を作成してください。
 
-### 【リサーチ対象期間】: {start_date} 〜 {end_date} (計{len(items)}プロダクト、Sランク: {len(s_items)}件、Aランク: {len(a_items)}件)
-
-### 【収集プロダクト一覧（抜粋）】:
-{products_context}
+### 【リサーチ対象期間】: {start_date} 〜 {end_date} (計{len(items)}プロダクト)
 
 ---
 
-### 【構成と出力ルール】:
+### 【記事全体の構成ルール】:
+
+#### ■ 1. 無料公開エリア（誰でも読めるパート）
 1. **メディア紹介ヘッダー**: 
    > 🌐 **Global Tech Radar Japan**：海外でローンチ・急成長中の最新AIツールおよびTechプロダクトを毎朝自動収集し、「日本市場でのタイムマシン事業（ローカライズビジネス）が成立するか」を分析する独自メディアです。毎朝の速報は [Threads (@get_globaltechinfo)](https://www.threads.net/@get_globaltechinfo) にて配信中。
 2. **メインタイトル**: 読者が読みたくなる魅力的で専門性の高いタイトル（例: 『【週刊】海外AIスタートアップ定点観測：〇〇領域の急成長と日本市場での勝機』）
-3. **今週のマクロトレンド総括**: 今週ローンチされた海外プロダクトから見える共通の潮流・変化（3〜5行で鋭く考察）
-4. **今週の注目カテゴリ＆キーワードTOP3**: どんな領域（例: 営業DX、自律型Agent、動画ローコード等）が熱かったか
-5. **編集部厳選！日本上陸・ローカライズ期待のプロダクトTOP3〜5**:
-   各プロダクトについて以下を記述してください：
+3. **今週のマクロトレンド総括**: 今週の海外プロダクトから見える共通潮流・変化（3〜5行で鋭く考察）
+4. **今週の注目カテゴリ＆キーワードTOP3**: どんな領域が熱かったか
+5. **今週リサーチした全{len(items)}プロダクトの一覧**: 
+   ※noteは表（Table記法）非対応のため、必ず以下の「番号付きリスト形式」で出力してください：
+   1. **プロダクト名** 【ランク X / YY点】
+      - 一言概要
+   *(ほか上位・中位プロダクト計○件はメンバーシップ限定エリア・ダッシュボードにて解析)*
+6. **🆓 【無料公開枠】厳選ピックアップ（下位3ツール）**:
+   以下の無料枠プロダクト（下位3件）について詳細を記載してください：
+{free_context}
+   ※重要: **各ツールの「日本市場でのタイムマシン事業化プラン」は必ず具体的に記載してください！**
    - 見出し（H3）: 🏆 【ランク X / YY点】プロダクト名
-   - 画像（もし画像URLがあれば Markdown形式 `![プロダクト名](画像URL)` で必ず掲載）
+   - 画像（画像URLがあれば Markdown形式 `![プロダクト名](画像URL)` で掲載）
    - 公式サイトリンク: `🔗 公式サイト: [URL](URL)`
-   - ツール概要（何ができるのか日本語で分かりやすく）
-   - 🇯🇵 日本市場での勝機・想定ターゲット・アレンジ案
-   - 想定マネタイズ・価格帯
-6. **日本市場でのタイムマシン事業チャンス（今週のインサイト）**: 日本の起業家・個人開発者・新規事業担当者が今すぐ仕掛けるべき論点
-7. **読者アクション・編集後記**:
-   - 毎朝の速報: Threads（@get_globaltechinfo）の案内
-   - Webダッシュボードの案内
-   - 新規事業・リサーチ相談の案内
-8. **X（Twitter）発信用ツリー投稿案**: この週報を要約した140字×3〜4連ツイート案
+   - ツール概要
+   - 🇯🇵 **日本市場でのタイムマシン事業化プラン**: （具体的な事業アイデア・想定ターゲット・ビジネスモデル）
 
-※注意: 情報源として「Product Hunt」などの外部収集元媒体名は伏せ、「海外最新テック動向」「独自リサーチ」というスタンスで執筆してください。Markdown形式で出力してください。
+---
+
+#### ■ 2. 有料ライン（Paywallの境界線）
+以下のような読者の購買意欲をそそる境界線ブロックを挿入してください：
+```markdown
+---
+
+## 🔒 ここから先は「Global Tech Lab」メンバー限定エリア
+> ※本号は創刊記念のため、特別に全文無料公開中！次回以降はメンバーシップ会員限定となります。
+
+**【有料エリアに含まれるコンテンツ】**
+- 🏆 **今週の最上位・Sランク案件の徹底解剖＆日本版MVP仕様**
+- 💰 **高評価プロダクトのタイムマシン事業化プラン（ターゲット・収益シミュレーション）**
+- 💡 **国内既存SaaSの隙間を突くポジショニング戦略・参入の落とし穴**
+- 💬 **メンバー限定ディスカッション・アイデア壁打ち**
+
+---
+```
+
+---
+
+#### ■ 3. 有料会員限定エリア
+7. **🔒 【メンバー限定】最上位・Sランク＆上位プロダクト徹底解剖**:
+   以下の有料枠プロダクト（最上位・Sランク等）について、深い解像度で詳細を記載してください：
+{paid_context}
+   ※重要: **有料枠の各プロダクトについても「日本市場でのタイムマシン事業化プラン（詳細なMVP仕様・想定ARR・推奨プライシング）」をすべて明記してください！**
+8. **💡 日本市場でのタイムマシン事業チャンス（今週の戦略インサイト）**: 日本の起業家・開発者が仕掛けるべき論点
+9. **💬 メンバー限定ディスカッション**: 「今週のツールの中で、日本のどの業界向けなら勝てると思いますか？コメント欄でぜひご意見をお聞かせください。」
+10. **編集後記 & 導線案内**: Threadsの案内、Webダッシュボード案内
+
+※注意: 「Product Hunt」等の外部媒体名は伏せ、「独自リサーチ」として執筆してください。Markdown形式で出力してください。
 """
         try:
             from google.genai import types
@@ -146,26 +202,36 @@ noteや週刊ニュースレター（Substack等）にそのまま掲載でき�
         start_date: str,
         end_date: str,
     ) -> str:
-        """モック用の高品質な週報テキスト"""
-        featured = s_items + a_items
-        if not featured:
-            featured = items[:3]
+        """モック用の高品質な週報テキスト（下位3つ無料、上位有料、タイムマシン事業化プラン全記載）"""
+        sorted_items = sorted(items, key=lambda x: x.get("score", 0), reverse=True)
+        top_candidates = [it for it in sorted_items if it.get("score", 0) >= 70]
+        if len(top_candidates) < 5:
+            top_candidates = sorted_items[:5]
 
-        top_cards = []
-        for it in featured[:5]:
-            img_md = f"![{it.get('name')} 製品ビジュアル]({it.get('image_url')})\n\n" if it.get("image_url") else ""
-            off_md = f"- **🔗 公式サイト**: [{it.get('official_url')}]({it.get('official_url')})\n" if it.get("official_url") else ""
-            top_cards.append(
-                f"### 🏆 【ランク {it.get('rank', 'A')} / {it.get('score', 80)}点】{it.get('name')}\n"
-                f"{img_md}"
-                f"{off_md}"
-                f"- **海外公式キャッチコピー**: {it.get('tagline', '')}\n"
-                f"- **ツール概要**: {it.get('original_summary_ja', it.get('description', ''))[:200]}...\n"
-                f"- **🇯🇵 日本市場での勝機**: **{it.get('one_line_summary', '')}**\n"
-                f"- **想定ターゲット**: {it.get('target_market', '中小企業・B2B')}\n"
-                f"- **ビジネスモデル**: {it.get('pricing_model', '月額サブスクリプション')}\n"
-            )
-        cards_md = "\n".join(top_cards)
+        # 無料枠＝ピックアップ中の下位3件、有料枠＝それより上位
+        free_items = top_candidates[-3:] if len(top_candidates) >= 3 else top_candidates
+        paid_items = top_candidates[:-3] if len(top_candidates) >= 3 else []
+
+        def build_cards(target_list, is_premium=False):
+            cards = []
+            for it in target_list:
+                img_md = f"![{it.get('name')} 製品ビジュアル]({it.get('image_url')})\n\n" if it.get("image_url") else ""
+                off_md = f"- **🔗 公式サイト**: [{it.get('official_url')}]({it.get('official_url')})\n" if it.get("official_url") else ""
+                badge = "🔒 【メンバー限定】" if is_premium else "🆓 【無料公開】"
+                cards.append(
+                    f"### {badge} 🏆 【ランク {it.get('rank', 'A')} / {it.get('score', 80)}点】{it.get('name')}\n"
+                    f"{img_md}"
+                    f"{off_md}"
+                    f"- **海外公式キャッチコピー**: {it.get('tagline', '')}\n"
+                    f"- **ツール概要**: {it.get('original_summary_ja', it.get('description', ''))[:200]}...\n"
+                    f"- **🇯🇵 日本市場でのタイムマシン事業化プラン**: **{it.get('one_line_summary', '')}**\n"
+                    f"- **想定ターゲット顧客**: {it.get('target_market', '中小企業・B2B')}\n"
+                    f"- **推奨マネタイズモデル**: {it.get('pricing_model', '月額サブスクリプション')}\n"
+                )
+            return "\n".join(cards)
+
+        free_cards_md = build_cards(free_items, is_premium=False)
+        paid_cards_md = build_cards(paid_items, is_premium=True)
 
         return f"""> 🌐 **Global Tech Radar Japan**：海外でローンチ・急成長中の最新AIツールおよびTechプロダクトを毎朝自動収集し、**「日本市場でのタイムマシン事業（ローカライズビジネス）が成立するか」** を分析する独自リサーチメディアです。  
 > 毎朝の速報・高画質ビジュアル付きポストは **[Threads (@get_globaltechinfo)](https://www.threads.net/@get_globaltechinfo)** にて完全自動配信中。
@@ -189,9 +255,27 @@ noteや週刊ニュースレター（Substack等）にそのまま掲載でき�
 
 ---
 
-## 🚀 今週の厳選ピックアップ（日本市場での勝機大）
+## 🆓 【無料公開エリア】今週の注目ピックアップ3選
+今週ピックアップした有望株のうち、まずは**下位3ツールとその「日本市場でのタイムマシン事業化プラン」**を完全無料公開します！
 
-{cards_md}
+{free_cards_md}
+
+---
+
+## 🔒 ここから先は「Global Tech Lab」メンバー限定エリア
+> 💡 **【創刊記念】** 今号は特別に**全文無料公開中**です！次回以降はメンバーシップ限定配信となります。
+
+**【有料エリアに含まれるコンテンツ】**
+- 🏆 **最上位・Sランク案件の徹底解剖＆日本版MVP仕様**
+- 💰 **高評価ツールの日本市場タイムマシン事業化プラン（ターゲット・収益試算）**
+- 💡 **国内既存SaaSの隙間を突くポジショニング戦略**
+- 💬 **メンバー限定ディスカッション・アイデア募集**
+
+---
+
+## 🔒 【メンバー限定】最上位・Sランク＆上位プロダクト徹底解剖
+
+{paid_cards_md}
 
 ---
 
@@ -203,23 +287,13 @@ noteや週刊ニュースレター（Substack等）にそのまま掲載でき�
 
 ---
 
-## 📣 編集後記 & 読者限定リンク
-* ⚡ **毎朝の速報（Threads）**: [@get_globaltechinfo](https://www.threads.net/@get_globaltechinfo) をフォローして最新AIツールを毎朝チェック
-* 📊 **Webダッシュボード**: [直近の分析データベースを閲覧する](https://yugom2o.github.io/ph-dashboard/)
-* 💼 **新規事業・競合リサーチのご相談**: 海外SaaSの徹底調査や、特定領域のタイムマシン事業化のご相談はお気軽にお寄せください。
+## 💬 メンバー限定ディスカッション（意見募集中！）
+今週取り上げたプロダクトの中で、**「日本のこの業界向けに特化したら勝てるのでは？」「自分ならこういうアレンジで作る」** というアイデアやご意見があれば、ぜひコメント欄で教えてください！メンバーの皆さんの知見をお待ちしています。
 
 ---
 
-## 📱 X（Twitter）発信用ツリー投稿ドラフト案
-
-```text
-【今週の海外AIスタートアップ動向まとめ】
-今週リサーチした{len(items)}ツールの中から、特に「日本でやったら絶対伸びる」有望モデルを3つ厳選しました。
-
-1. 【Lead Sparker】企業URLから商談スライドを自動生成
-2. 【Supacut】インタビュー生動画から要点を自動ラフカット
-3. 【Jevtown】投稿前にAIペルソナ1万人が事前レビュー
-
-深掘り考察をツリーで解説👇 (1/4)
-```
+## 📣 編集後記 & リンク
+* ⚡ **毎朝の速報（Threads）**: [@get_globaltechinfo](https://www.threads.net/@get_globaltechinfo) をフォローして最新AIツールを毎朝チェック
+* 📊 **Webダッシュボード**: [直近の分析データベースを閲覧する](https://yugom2o.github.io/ph-dashboard/)
+* 💼 **新規事業・競合リサーチのご相談**: 海外SaaSの徹底調査や、特定領域のタイムマシン事業化のご相談はお気軽にお寄せください。
 """
