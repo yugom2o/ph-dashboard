@@ -15,7 +15,8 @@
 
 | 項目 | 設定内容 / ステータス |
 | :--- | :--- |
-| **公式アカウント** | **[@get_globaltechinfo](https://www.threads.net/@get_globaltechinfo)** |
+| **Threads アカウント** | **[@get_globaltechinfo](https://www.threads.net/@get_globaltechinfo)** |
+| **note 公式ページ** | **[note.com/globaltechinfo](https://note.com/globaltechinfo)** |
 | **実行環境** | **GitHub Actions (クラウドサーバー)** ※PCの電源オフでも確実に稼働 |
 | **実行スケジュール** | **毎日 朝 06:35 (日本時間)** |
 | **投稿対象** | 本日分析された中で最も有望なプロダクト（**SまたはAランクのTop 1件**） |
