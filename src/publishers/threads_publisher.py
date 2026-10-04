@@ -1,7 +1,18 @@
+import io
+import sys
 import time
 from typing import Any, Dict, Optional, Tuple
+
+if sys.platform == "win32" and sys.stdout is not None:
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 import requests
 from config import THREADS_ACCESS_TOKEN, THREADS_USER_ID
+
 
 
 class ThreadsPublisher:
