@@ -34,80 +34,83 @@ class ProductHuntRSSCollector(BaseCollector):
                 entries = root.findall(".//item")
 
             for entry in entries[:limit]:
-                title_elem = entry.find("atom:title", ns)
-                if title_elem is None:
-                    title_elem = entry.find("title")
-                title_raw = title_elem.text if title_elem is not None and title_elem.text else ""
+                try:
+                    title_elem = entry.find("atom:title", ns)
+                    if title_elem is None:
+                        title_elem = entry.find("title")
+                    title_raw = title_elem.text if title_elem is not None and title_elem.text else ""
 
-                # タイトルとタグラインの分割 (例: "Product Name - Tagline description")
-                name = title_raw
-                tagline = ""
-                if " - " in title_raw:
-                    parts = title_raw.split(" - ", 1)
-                    name = parts[0].strip()
-                    tagline = parts[1].strip()
+                    # タイトルとタグラインの分割 (例: "Product Name - Tagline description")
+                    name = title_raw
+                    tagline = ""
+                    if " - " in title_raw:
+                        parts = title_raw.split(" - ", 1)
+                        name = parts[0].strip()
+                        tagline = parts[1].strip()
 
-                # リンク取得
-                link_elem = entry.find("atom:link", ns)
-                if link_elem is not None:
-                    link = link_elem.attrib.get("href", "")
-                else:
-                    item_link = entry.find("link")
-                    link = item_link.text if item_link is not None and item_link.text else ""
+                    # リンク取得
+                    link_elem = entry.find("atom:link", ns)
+                    if link_elem is not None:
+                        link = link_elem.attrib.get("href", "")
+                    else:
+                        item_link = entry.find("link")
+                        link = item_link.text if item_link is not None and item_link.text else ""
 
-                # クエリパラメータ等の除去 (clean URL)
-                clean_url = link.split("?")[0] if link else ""
+                    # クエリパラメータ等の除去 (clean URL)
+                    clean_url = link.split("?")[0] if link else ""
 
-                # ID抽出 (URLの末尾スラッグ)
-                slug_match = re.search(r"/posts/([^/?#]+)", clean_url)
-                product_id = slug_match.group(1) if slug_match else re.sub(r"[^a-zA-Z0-9_-]", "", name.lower())
+                    # ID抽出 (URLの末尾スラッグ)
+                    slug_match = re.search(r"/posts/([^/?#]+)", clean_url)
+                    product_id = slug_match.group(1) if slug_match else re.sub(r"[^a-zA-Z0-9_-]", "", name.lower())
 
-                # 詳細説明・タグライン・外部リンクの抽出
-                content_elem = entry.find("atom:content", ns)
-                if content_elem is None:
-                    content_elem = entry.find("atom:summary", ns) or entry.find("description")
+                    # 詳細説明・タグライン・外部リンクの抽出
+                    content_elem = entry.find("atom:content", ns)
+                    if content_elem is None:
+                        content_elem = entry.find("atom:summary", ns) or entry.find("description")
 
-                raw_content = content_elem.text if content_elem is not None and content_elem.text else ""
-                official_url = None
-
-                if raw_content:
-                    soup = BeautifulSoup(raw_content, "html.parser")
-                    # 各パラグラフ
-                    p_tags = soup.find_all("p")
-                    if p_tags:
-                        first_p = p_tags[0].get_text(separator=" ").strip()
-                        if first_p:
-                            tagline = first_p
-                            clean_desc = first_p
-
-                    # 公式直通リンク (例: <a href=".../r/p/...">Link</a>)
-                    link_a = soup.find("a", string=re.compile(r"Link", re.I))
-                    if link_a and link_a.get("href"):
-                        raw_link = link_a["href"]
-                        from src.enrichers import LPScraper
-                        official_url = LPScraper.resolve_official_url(raw_link)
-
-
-                    if not clean_desc:
-                        clean_desc = soup.get_text(separator=" ").strip()
-                else:
+                    raw_content = content_elem.text if content_elem is not None and content_elem.text else ""
                     clean_desc = ""
+                    official_url = None
 
-                if not tagline and clean_desc:
-                    tagline = clean_desc[:120]
+                    if raw_content:
+                        soup = BeautifulSoup(raw_content, "html.parser")
+                        # 各パラグラフ
+                        p_tags = soup.find_all("p")
+                        if p_tags:
+                            first_p = p_tags[0].get_text(separator=" ").strip()
+                            if first_p:
+                                if not tagline:
+                                    tagline = first_p
+                                clean_desc = first_p
 
-                products.append(
-                    ProductItem(
-                        id=product_id,
-                        name=name,
-                        tagline=tagline,
-                        description=clean_desc,
-                        ph_url=clean_url or link,
-                        official_url=official_url,
-                        votes_count=0,
-                        category="Tech / Web / AI",
+                        # 公式直通リンク (例: <a href=".../r/p/...">Link</a>)
+                        link_a = soup.find("a", string=re.compile(r"Link", re.I))
+                        if link_a and link_a.get("href"):
+                            raw_link = link_a["href"]
+                            from src.enrichers import LPScraper
+                            official_url = LPScraper.resolve_official_url(raw_link)
+
+                        if not clean_desc:
+                            clean_desc = soup.get_text(separator=" ").strip()
+
+                    if not tagline and clean_desc:
+                        tagline = clean_desc[:120]
+
+                    products.append(
+                        ProductItem(
+                            id=product_id,
+                            name=name,
+                            tagline=tagline,
+                            description=clean_desc,
+                            ph_url=clean_url or link,
+                            official_url=official_url,
+                            votes_count=0,
+                            category="Tech / Web / AI",
+                        )
                     )
-                )
+                except Exception as entry_err:
+                    print(f"[Warning] Failed to parse RSS entry: {entry_err}")
+                    continue
 
         except Exception as e:
             print(f"[Warning] Failed to fetch PH RSS feed: {e}")
