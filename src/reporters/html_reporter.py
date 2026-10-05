@@ -84,10 +84,31 @@ class HTMLReporter:
         report_date: str,
         password: Optional[str] = None,
         member_password: Optional[str] = None,
+        allow_unencrypted: bool = False,
     ) -> Path:
         """インタラクティブHTMLダッシュボードを生成（マルチロールパスワード暗号化対応）"""
-        admin_pass = password if password is not None else DASHBOARD_PASSWORD
-        member_pass = member_password if member_password is not None else DASHBOARD_MEMBER_PASSWORD
+        admin_pass = (password if password is not None else DASHBOARD_PASSWORD) or ""
+        member_pass = (member_password if member_password is not None else DASHBOARD_MEMBER_PASSWORD) or ""
+
+        if not allow_unencrypted:
+            if not admin_pass:
+                raise ValueError(
+                    "[Security Error] DASHBOARD_PASSWORD（管理者用合言葉）が未設定です。"
+                    "平文でのデータ公開を防止するためダッシュボード生成を中断します。"
+                    "環境変数または引数で合言葉を設定してください。"
+                )
+            if not member_pass:
+                raise ValueError(
+                    "[Security Error] DASHBOARD_MEMBER_PASSWORD（会員用合言葉）が未設定です。"
+                    "会員向け暗号化パケットを生成できないためダッシュボード生成を中断します。"
+                    "環境変数または引数で会員用合言葉を設定してください。"
+                )
+            if admin_pass == member_pass:
+                raise ValueError(
+                    "[Security Error] 管理者合言葉と会員合言葉に同一の文字列が設定されています。"
+                    "ロール権限の分離が無効化されるため、異なる合言葉を設定してください。"
+                )
+
         products_data = []
 
         for it in items:
@@ -194,10 +215,12 @@ class HTMLReporter:
 
         products_json_str = json.dumps(products_data, ensure_ascii=False, indent=2)
 
-        is_encrypted = bool(admin_pass or member_pass)
+        is_encrypted = bool(admin_pass and member_pass)
         encrypted_payload = None
         if is_encrypted:
             encrypted_payload = self.encrypt_data_multirole(products_json_str, admin_pass, member_pass)
+        elif not allow_unencrypted:
+            raise ValueError("[Security Error] 暗号化キーが不足しているためダッシュボード出力を拒否しました。")
 
         # テンプレートレンダリング
         template_text = self.template_path.read_text(encoding="utf-8")
@@ -206,7 +229,7 @@ class HTMLReporter:
             report_date=report_date,
             is_encrypted=is_encrypted,
             encrypted_payload=json.dumps(encrypted_payload, ensure_ascii=False) if encrypted_payload else "null",
-            products_json=products_json_str if not is_encrypted else "[]",
+            products_json=products_json_str if allow_unencrypted else "[]",
         )
 
         # ローカル用とGitHub Pages (docs/index.html) の両方に出力
