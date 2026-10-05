@@ -168,9 +168,11 @@
     transition: border-color .2s;
   }
   .card:hover { border-color: var(--line-strong); }
-  @media (min-width: 640px) { .card { padding: 28px; --gap: 22px; } }
+  @media (min-width: 640px) { .card { padding: 24px; --gap: 18px; } }
 
-  .card-head { display: flex; align-items: center; gap: 14px; }
+  .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .card-head-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+  .head-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-top: 2px; }
   .tile {
     width: 44px; height: 44px; border-radius: 12px; flex: none;
     background: var(--c-bg); color: var(--c);
@@ -179,39 +181,52 @@
   }
   .ident { min-width: 0; }
   .name { font-size: 17px; line-height: 1.35; font-weight: 700; letter-spacing: -.005em; font-feature-settings: "palt"; overflow-wrap: anywhere; }
-  .cat { font-size: 14px; color: var(--muted); line-height: 1.5; }
+  .cat { font-size: 13px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
 
-  /* 元のプロダクト → 日本版 → ターゲット */
-  .brief { display: flex; flex-direction: column; gap: 20px; }
-  .lbl { display: block; font-size: 13px; line-height: 1.5; color: var(--faint); margin-bottom: 4px; }
-  .lbl-note { margin-left: 8px; }
-  .orig { padding-left: 14px; border-left: 2px solid var(--line-strong); }
-  .orig p { font-size: 15px; line-height: 1.7; color: var(--muted); }
-  .jp .lbl { color: var(--c); font-weight: 600; }
-  .idea {
-    font-size: 18px; line-height: 1.6; font-weight: 700; letter-spacing: .005em;
-    font-feature-settings: "palt"; text-wrap: balance;
-  }
-  @media (min-width: 640px) { .idea { font-size: 20px; } }
-  .card.pass .idea { color: var(--muted); }
-  .jp-body { font-size: 15px; line-height: 1.8; color: #cbd3de; margin-top: 8px; }
-  .target { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-  .target .lbl { margin: 0; }
-  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-  .tag {
-    padding: 3px 12px; border-radius: 999px;
+  /* サムネイル画像（一覧では高さを抑えてコンパクト化） */
+  .thumb {
+    overflow: hidden; border-radius: 12px;
     background: var(--surface-2); border: 1px solid var(--line);
-    font-size: 14px; line-height: 1.6; color: var(--text);
+    aspect-ratio: 16/9; max-height: 140px; width: 100%;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* 一覧カード要約（コンパクト化: 1〜2行の着眼点、概要、ターゲット） */
+  .brief { display: flex; flex-direction: column; gap: 12px; }
+  .lbl { display: block; font-size: 13px; line-height: 1.5; color: var(--faint); margin-bottom: 4px; }
+  .lbl-note { margin-left: 8px; font-weight: normal; color: var(--faint); }
+  .lbl-badge {
+    display: inline-block; font-size: 11.5px; font-weight: 700; color: var(--c);
+    background: var(--c-bg); border: 1px solid rgba(255,255,255,.08);
+    padding: 2px 8px; border-radius: 6px; margin-bottom: 4px;
+  }
+  .lbl-inline { font-size: 12px; color: var(--faint); margin-right: 6px; flex-shrink: 0; }
+  .jp-summary { display: flex; flex-direction: column; }
+  .idea {
+    font-size: 16px; line-height: 1.55; font-weight: 700; letter-spacing: .005em;
+    font-feature-settings: "palt"; text-wrap: balance; color: var(--text);
+  }
+  @media (min-width: 640px) { .idea { font-size: 17.5px; } }
+  .card.pass .idea { color: var(--muted); }
+  .orig-summary { display: flex; align-items: baseline; gap: 4px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .orig-summary p { margin: 0; overflow-wrap: anywhere; }
+  .target-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .tag {
+    padding: 2px 10px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    font-size: 12px; line-height: 1.5; color: var(--text);
   }
 
   .signals {
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 20px;
+    gap: 12px 16px;
   }
-  @media (min-width: 640px) { .signals { gap: 18px 24px; } }
+  @media (min-width: 640px) { .signals { gap: 14px 20px; } }
   @media (max-width: 339px) { .signals { grid-template-columns: minmax(0, 1fr); } }
-  .sig dt { font-size: 13px; color: var(--faint); line-height: 1.5; }
-  .sig dd { font-size: 15px; font-weight: 600; line-height: 1.5; margin-top: 2px; }
+  .sig dt { font-size: 12px; color: var(--faint); line-height: 1.4; }
+  .sig dd { font-size: 13.5px; font-weight: 600; line-height: 1.5; margin-top: 2px; word-break: break-word; }
+  .sig.sig-wide { grid-column: 1 / -1; }
   .sig dd.good { color: var(--good); }
   .sig dd.mid { color: var(--mid); }
   .sig dd.low { color: var(--low); }
@@ -222,18 +237,19 @@
     margin-top: -4px;
   }
   .more-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    min-height: 40px; padding: 0 10px 0 4px; margin-left: -4px;
-    border: 0; border-radius: 10px; background: transparent;
-    color: var(--muted); font-size: 14px; font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 38px; padding: 0 14px;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2);
+    color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
   }
-  .more-btn:hover { color: var(--text); }
-  .more-btn .ic { width: 18px; height: 18px; transition: transform .25s ease; }
+  .more-btn:hover { background: var(--line); border-color: var(--line-strong); }
+  .more-btn .ic { width: 16px; height: 16px; transition: transform .25s ease; }
   .card.open .more-btn .ic { transform: rotate(180deg); }
 
-  .icons { display: flex; align-items: center; gap: 2px; margin-right: -8px; }
+  .icons { display: flex; align-items: center; gap: 4px; }
   .icon-btn {
-    width: 40px; height: 40px; border: 0; border-radius: 12px; background: transparent;
+    width: 38px; height: 38px; border: 0; border-radius: 10px; background: transparent;
     color: var(--muted); cursor: pointer;
     display: grid; place-items: center; text-decoration: none;
     transition: color .15s, background .15s;
@@ -242,19 +258,43 @@
   .icon-btn.on { color: var(--saved); }
   .icon-btn.on .ic { fill: currentColor; }
 
-  /* 詳細（開閉） */
+  /* 詳細（開閉エリア） */
   .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; margin-top: calc(-1 * var(--gap)); }
   .more-in { overflow: hidden; min-height: 0; visibility: hidden; transition: visibility 0s .28s; }
   .card.open .more { grid-template-rows: 1fr; }
   .card.open .more-in { visibility: visible; transition-delay: 0s; }
-  .more-pad { display: flex; flex-direction: column; gap: 20px; padding-top: var(--gap); }
+  .more-pad { display: flex; flex-direction: column; gap: 18px; padding-top: var(--gap); border-top: 1px dashed var(--line); }
+  
+  .detail-sec { display: flex; flex-direction: column; gap: 6px; }
+  .detail-orig { font-size: 14px; line-height: 1.75; color: var(--muted); padding-left: 12px; border-left: 2px solid var(--line-strong); margin: 0; }
+  .detail-jp-body { font-size: 14px; line-height: 1.8; color: #cbd3de; margin: 0; }
   .adapt { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .adapt li { position: relative; padding-left: 18px; font-size: 15px; line-height: 1.75; color: #cbd3de; }
+  .adapt li { position: relative; padding-left: 18px; font-size: 14px; line-height: 1.75; color: #cbd3de; }
   .adapt li::before { content: ""; position: absolute; left: 0; top: .8em; width: 6px; height: 6px; border-radius: 2px; background: var(--c); }
-  .notes { display: flex; flex-direction: column; gap: 12px; }
-  .notes dt { font-size: 13px; color: var(--faint); line-height: 1.5; }
-  .notes dd { font-size: 14px; color: var(--muted); line-height: 1.7; }
-  .src { font-size: 13px; color: var(--faint); line-height: 1.6; overflow-wrap: anywhere; }
+  .notes { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+  .notes dt { font-size: 12.5px; color: var(--faint); line-height: 1.4; font-weight: 600; }
+  .notes dd { font-size: 13.5px; color: var(--muted); line-height: 1.65; margin: 2px 0 0; word-break: break-word; }
+  .src { font-size: 12.5px; color: var(--faint); line-height: 1.6; overflow-wrap: anywhere; margin: 0; }
+
+  /* SNS原稿スタイル */
+  .sns-head-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .sns-notice { font-size: 11.5px; color: var(--good); margin: 0 0 8px; line-height: 1.5; }
+  .sns-box { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+  .sns-box-head { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .sns-text { white-space: pre-wrap; font-size: 13px; line-height: 1.65; color: var(--text); font-family: inherit; word-break: break-word; overflow-wrap: anywhere; }
+  .btn-copy-post {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 34px; padding: 4px 12px; font-size: 12px; font-weight: 600;
+    color: var(--text); background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: 6px; cursor: pointer; transition: background .15s, border-color .15s;
+  }
+  .btn-copy-post:hover { background: var(--line); color: #fff; }
+  .btn-copy-full {
+    font-size: 12px; padding: 4px 12px; min-height: 32px;
+    border: 1px solid var(--line); border-radius: 6px;
+    background: var(--surface-2); color: var(--text); cursor: pointer;
+  }
+  .btn-copy-full:hover { background: var(--line); }
 
   /* ───────── 空状態 / トースト ───────── */
   .empty { padding: 72px 16px; text-align: center; }
@@ -426,17 +466,24 @@
       gap: 16px;
     }
 
+    .rank-badge-item {
+      flex-direction: column;
+      gap: 4px;
+    }
+
     #lockModal {
-      padding: 14px;
+      padding: 16px 12px;
       align-items: center;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      min-height: 100dvh;
     }
     .lock-card {
-      padding: 24px 18px;
+      padding: 24px 16px;
       border-radius: 16px;
-      max-height: calc(100vh - 28px);
-      overflow-y: auto;
+      max-height: none;
+      overflow-y: visible;
+      margin: auto 0;
     }
     .lock-card h2 {
       font-size: 19px;
@@ -515,6 +562,9 @@
     -webkit-backdrop-filter: blur(20px);
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
+    min-height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .lock-card {
     background: var(--surface);
@@ -525,6 +575,7 @@
     box-shadow: 0 24px 60px rgba(0, 0, 0, .75);
     text-align: center;
     animation: modalIn .25s ease-out;
+    margin: auto;
   }
   @keyframes modalIn {
     from { opacity: 0; transform: scale(.96) translateY(8px); }
@@ -792,10 +843,29 @@
 <div id="lockModal">
   <div class="lock-card">
     <div class="lock-badge">🔒 MEMBER ONLY</div>
-    <h2>Global Tech Lab 会員専用</h2>
-    <p class="lock-sub">本ダッシュボードは会員限定データベースです。<br>閲覧用の合言葉（パスワード）を入力してください。</p>
+    <h2>Global Tech Radar 会員専用</h2>
+    <p class="lock-sub">Global Tech Lab が提供する会員限定データベースです。<br>閲覧用の合言葉（パスワード）を入力してください。</p>
 
-    <div class="lock-features">
+    <!-- 1. 入力フォームを最優先配置（U5対応: 320px/390pxでもスクロール不要で初期表示） -->
+    <form id="lockForm" onsubmit="event.preventDefault(); handleUnlock();">
+      <label for="lockInput" style="display:block; font-size:12px; font-weight:600; color:var(--faint); text-align:left; margin-bottom:6px;">合言葉（パスワード）</label>
+      <input type="password" id="lockInput" class="lock-input" placeholder="合言葉（パスワード）を入力" autofocus required autocomplete="current-password" aria-describedby="lockError">
+      <label class="lock-save-row">
+        <input type="checkbox" id="lockRemember">
+        この端末に合言葉を保存する
+      </label>
+      <button type="submit" class="lock-btn">アンロックして開く</button>
+      <div id="lockError" role="alert" aria-live="polite">合言葉（パスワード）が正しくありません</div>
+    </form>
+
+    <!-- 2. 合言葉の入手案内 -->
+    <div class="lock-cta-divider">合言葉をお持ちでない方</div>
+    <a href="https://note.com/globaltechinfo" target="_blank" rel="noopener noreferrer" class="lock-note-btn">
+      <span>📝 noteメンバーシップで合言葉を取得</span>
+    </a>
+
+    <!-- 3. 特典一覧 -->
+    <div class="lock-features" style="margin-top:20px; margin-bottom:0;">
       <strong>✨ 会員アンロック特典:</strong>
       <ul>
         <li><strong>S / Aランク全件検索</strong>（日本市場での勝機・想定ARR試算）</li>
@@ -803,27 +873,12 @@
         <li><strong>SNS発信用ツリー原稿</strong>の1クリックコピー</li>
       </ul>
     </div>
-
-    <form id="lockForm" onsubmit="event.preventDefault(); handleUnlock();">
-      <input type="password" id="lockInput" class="lock-input" placeholder="合言葉（パスワード）を入力" autofocus required autocomplete="current-password">
-      <label class="lock-save-row">
-        <input type="checkbox" id="lockRemember" checked>
-        この端末に合言葉を記憶する
-      </label>
-      <button type="submit" class="lock-btn">アンロックして開く</button>
-      <div id="lockError">合言葉（パスワード）が正しくありません</div>
-    </form>
-
-    <div class="lock-cta-divider">合言葉をお持ちでない方</div>
-    <a href="https://note.com/globaltechinfo" target="_blank" rel="noopener noreferrer" class="lock-note-btn">
-      <span>📝 noteメンバーシップで合言葉を取得</span>
-    </a>
   </div>
 </div>
 {% endif %}
 
 <div class="member-banner">
-  <span>💡 <strong>Global Tech Lab 会員専用ダッシュボード</strong>：毎週の深掘りレポートは</span>
+  <span>💡 <strong>Global Tech Lab が提供する Global Tech Radar 会員専用ダッシュボード</strong>：毎週の深掘りレポートは</span>
   <a href="https://note.com/globaltechinfo" target="_blank" rel="noopener noreferrer">note公式ページへ ↗</a>
 </div>
 
@@ -889,7 +944,7 @@
 
 <!-- 利用マニュアル ドロワー -->
 <div id="manualBackdrop" onclick="closeManual()"></div>
-<aside id="manualDrawer" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
+<aside id="manualDrawer" role="dialog" aria-modal="true" aria-labelledby="manualTitle" inert>
   <div class="drawer-head">
     <h2 class="drawer-title" id="manualTitle">📖 利用マニュアル & ガイド</h2>
     <button class="drawer-close" type="button" onclick="closeManual()" aria-label="閉じる">✕</button>
@@ -897,7 +952,7 @@
   <div class="drawer-body">
     <div class="guide-sec" style="border-left: 3px solid var(--accent);">
       <h3>🌐 Global Tech Radar とは</h3>
-      <p>米国・海外でローンチされた最先端AI・SaaSプロダクトを毎日定点観測し、「日本市場でのローカライズ可能性（タイムマシン事業チャンス）」を独自分析・スコアリングした会員専用データベースです。</p>
+      <p>Global Tech Lab が運営する、米国・海外でローンチされた最先端AI・SaaSプロダクトの定点観測データベースです。「日本市場でのローカライズ可能性（タイムマシン事業チャンス）」を独自分析・スコアリングしています。</p>
     </div>
 
     <div class="guide-sec">
@@ -924,8 +979,8 @@
       <h3>🔍 主な機能と活用方法</h3>
       <ul>
         <li><strong>ランクチップ & 検索</strong>：上のチップでランク別絞り込みや、「営業」「自動化」「Notion」などの単語で全文検索が可能。</li>
-        <li><strong>しおり（保存）機能</strong>：カードのしおりアイコンで気になるプロダクトを個人保存可能（閲覧ブラウザごとに安全保持）。</li>
-        <li><strong>詳細の展開</strong>：各カードの「詳細」を押すと、日本版設計ポイント・競合分析・想定価格・SNSツリー原稿が展開されます。</li>
+        <li><strong>しおり（保存）機能</strong>：カード右上のしおりアイコンで気になるプロダクトを個人保存可能（閲覧ブラウザごとに安全保持）。</li>
+        <li><strong>詳細の展開</strong>：各カードの「詳細を見る」を押すと、海外製品詳細・日本版設計ポイント・競合分析・想定価格・SNSツリー原稿が展開されます。</li>
         <li><strong>SNS発信ツリー原稿</strong>：カード内の「全文コピー」「1通目をコピー」ボタンを活用し、ご自身のXやThreadsでの情報発信・一次情報シェアに活用できます。</li>
       </ul>
     </div>
@@ -934,7 +989,8 @@
       <h3 style="color: #f87171;">🛡️ コンテンツ保護・利用規約</h3>
       <p>本ダッシュボードの分析データ・仕様考察・想定ARR試算は、会員専用の限定公開コンテンツです。</p>
       <ul>
-        <li><strong>転載・複製の禁止</strong>：テキストの丸コピー転載、全文の外部公開、スクリーンショット撮影によるSNS投稿、商用再配布は禁止されています。</li>
+        <li><strong>SNS発信での利用</strong>：各カード内の「SNS発信ツリー原稿」は、ご自身のSNS（X / Threads等）での情報発信・一次情報シェアに自由にご利用いただけます。</li>
+        <li><strong>転載・複製の禁止</strong>：データベース全体の無断複製、分析本文・仕様考察の丸コピー外部公開、商用再配布は禁止されています。</li>
         <li><strong>免責事項</strong>：本分析は公開情報をもとにAIと独自基準で算出した参考情報であり、事業や投資の成果を保証するものではありません。</li>
       </ul>
     </div>
@@ -1059,7 +1115,7 @@ function renderChips() {
 
   $('#chips').innerHTML =
     chip('all', `すべて <span class="n">${PRODUCTS.length}</span>`) +
-    (todayCount > 0 ? chip('today', `✨ 本日新着 <span class="n">${todayCount}</span>`) : '') +
+    (todayCount > 0 ? chip('today', `✨ 最新掲載 <span class="n">${todayCount}</span>`) : '') +
     Object.keys(RANKS).map((r) => chip(r, `<span class="dot"></span>${r} <span class="n">${count(r)}</span>`)).join('') +
     chip('saved', `${ico('bookmark')}保存 <span class="n" id="savedN">0</span>`);
 }
@@ -1067,44 +1123,49 @@ function renderChips() {
 function cardHTML(p) {
   const sigList = Array.isArray(p.signals) ? p.signals : [];
   const sigs = sigList.map((s) =>
-    `<div class="sig"><dt>${esc(s && s.k ? s.k : '')}</dt><dd class="${(s && s.t) || ''}">${esc(s && s.v ? s.v : '')}</dd></div>`).join('');
+    `<div class="sig${s && s.wide ? ' sig-wide' : ''}"><dt>${esc(s && s.k ? s.k : '')}</dt><dd class="${(s && s.t) || ''}">${esc(s && s.v ? s.v : '')}</dd></div>`).join('');
   const notes = sigList.filter((s) => s && s.n).map((s) =>
-    `<div><dt>${esc(s.k || '')}</dt><dd>${esc(s.n || '')}</dd></div>`).join('');
+    `<div class="note-item"><dt>${esc(s.k || '')}</dt><dd>${esc(s.n || '')}</dd></div>`).join('');
   const tags = (Array.isArray(p.target) ? p.target : []).map((t) => `<li class="tag">${esc(t)}</li>`).join('');
   const adapt = (Array.isArray(p.adapt) ? p.adapt : []).map((a) => `<li>${esc(a)}</li>`).join('');
 
   const isToday = p.date === REPORT_DATE;
   const dateBadge = isToday
-    ? `<span class="new-chip">本日新着</span>`
+    ? `<span class="new-chip">最新掲載</span>`
     : (p.date ? `<span class="date-chip">📅 ${esc(p.date)}</span>` : '');
 
   return `
   <article class="card r-${p.rank}${p.pass ? ' pass' : ''}" data-id="${esc(p.id)}">
     <div class="card-head">
-      <div class="tile"><span class="sr">${p.rank}ランク</span><span aria-hidden="true">${p.rank}</span></div>
-      <div class="ident">
-        <h3 class="name">${esc(p.name)}</h3>
-        <p class="cat">${esc(p.cat)}${dateBadge}</p>
+      <div class="card-head-left">
+        <div class="tile"><span class="sr">${p.rank}ランク</span><span aria-hidden="true">${p.rank}</span></div>
+        <div class="ident">
+          <h3 class="name">${esc(p.name)}</h3>
+          <p class="cat">${esc(p.cat)}${dateBadge}</p>
+        </div>
+      </div>
+      <div class="head-actions">
+        <button class="icon-btn" type="button" data-act="bookmark" aria-pressed="false" aria-label="${esc(p.name)}を保存">${ico('bookmark')}</button>
+        ${p.url && (p.url.startsWith('http://') || p.url.startsWith('https://')) ? `<a class="icon-btn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="公式サイトを開く">${ico('link')}</a>` : ''}
       </div>
     </div>
 
     ${p.image && (p.image.startsWith('http://') || p.image.startsWith('https://')) ? `
-    <div class="thumb" style="overflow:hidden; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); aspect-ratio:2/1; max-height:220px;">
-      <img src="${esc(p.image)}" alt="${esc(p.name)}" style="width:100%; height:100%; object-fit:cover; display:block;" loading="lazy" onerror="this.parentElement.style.display='none'">
+    <div class="thumb">
+      <img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy" onerror="this.parentElement.style.display='none'">
     </div>` : ''}
 
     <div class="brief">
-      <div class="orig">
-        <span class="lbl">元のプロダクト${p.origNote ? `<span class="lbl-note">${esc(p.origNote)}</span>` : ''}</span>
-        <p>${esc(p.orig)}</p>
-      </div>
-      <div class="jp">
-        <span class="lbl">${esc(p.jpLabel || '日本版')}</span>
+      <div class="jp-summary">
+        <span class="lbl-badge">💡 日本向け着眼点（AI仮説）</span>
         <p class="idea">${esc(p.idea)}</p>
-        <p class="jp-body">${esc(p.body)}</p>
       </div>
-      <div class="target">
-        <span class="lbl">ターゲット</span>
+      <div class="orig-summary">
+        <span class="lbl-inline">海外製品概要:</span>
+        <p>“${esc(p.tagline || (p.orig.length > 80 ? p.orig.slice(0, 80) + '…' : p.orig))}”</p>
+      </div>
+      <div class="target-summary">
+        <span class="lbl-inline">ターゲット:</span>
         <ul class="tags">${tags}</ul>
       </div>
     </div>
@@ -1113,44 +1174,64 @@ function cardHTML(p) {
 
     <div class="card-actions">
       <button class="more-btn" type="button" data-act="toggle" aria-expanded="false" aria-controls="more-${esc(p.id)}">
-        詳細${ico('chevron')}
+        <span class="more-btn-label">詳細を見る</span>${ico('chevron')}
       </button>
       <div class="icons">
-        <button class="icon-btn" type="button" data-act="bookmark" aria-pressed="false" aria-label="${esc(p.name)}を保存">${ico('bookmark')}</button>
         <button class="icon-btn" type="button" data-act="copy" aria-label="内容をコピー">${ico('copy')}</button>
-        ${p.url && (p.url.startsWith('http://') || p.url.startsWith('https://')) ? `<a class="icon-btn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="公式サイトを開く">${ico('link')}</a>` : ''}
       </div>
     </div>
 
     <div class="more" id="more-${esc(p.id)}">
       <div class="more-in">
         <div class="more-pad">
-          ${adapt ? `<div><span class="lbl">日本版の設計ポイント</span><ul class="adapt">${adapt}</ul></div>` : ''}
-          ${notes ? `<div><span class="lbl">判定メモ</span><dl class="notes">${notes}</dl></div>` : ''}
+          <div class="detail-sec">
+            <span class="lbl">🌐 海外製品の概要（詳細解説）${p.origNote ? `<span class="lbl-note">${esc(p.origNote)}</span>` : ''}</span>
+            <p class="detail-orig">${esc(p.orig)}</p>
+          </div>
+
+          <div class="detail-sec">
+            <span class="lbl">🇯🇵 日本向け事業アイデア（AI分析・仮説）</span>
+            <p class="detail-jp-body">${esc(p.body)}</p>
+          </div>
+
+          ${adapt ? `
+          <div class="detail-sec">
+            <span class="lbl">🛠️ 日本版の設計・アレンジポイント</span>
+            <ul class="adapt">${adapt}</ul>
+          </div>` : ''}
+
+          ${notes ? `
+          <div class="detail-sec">
+            <span class="lbl">📊 判定メモ & 想定価格・評価根拠（全文）</span>
+            <dl class="notes">${notes}</dl>
+          </div>` : ''}
+
           ${p.snsDraft ? `
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+          <div class="detail-sec">
+            <div class="sns-head-row">
               <span class="lbl">📱 SNS発信ツリー原稿 (X / Threads用)</span>
-              <button class="btn plain" style="font-size:12px; padding:2px 10px; min-height:28px; border:1px solid var(--line); border-radius:6px;" type="button" data-act="copy-tree">全文コピー</button>
+              <button class="btn-copy-full" type="button" data-act="copy-tree">全文コピー</button>
             </div>
+            <p class="sns-notice">💡 この原稿はご自身のSNS（X / Threads等）での発信・共有に自由にご利用いただけます。</p>
             
-            <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px;">
-              <div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+            <div class="sns-box">
+              <div class="sns-box-head">
                 <span>🧵 1通目（親ポスト・画像添付）</span>
-                <button type="button" data-act="copy-post1" style="background:none; border:none; color:var(--text); cursor:pointer; font-size:11px; padding:0; text-decoration:underline;">1通目をコピー</button>
+                <button type="button" class="btn-copy-post" data-act="copy-post1">1通目をコピー</button>
               </div>
-              <div style="white-space:pre-wrap; font-size:13px; line-height:1.65; color:var(--text); font-family:inherit; word-break:break-word; overflow-wrap:anywhere;">${esc(p.snsDraft)}</div>
+              <div class="sns-text">${esc(p.snsDraft)}</div>
             </div>
 
             ${p.snsReplyDraft ? `
-            <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px;">
-              <div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+            <div class="sns-box">
+              <div class="sns-box-head">
                 <span>↪️ 2通目（リプライ・事業化考察＆リンク）</span>
-                <button type="button" data-act="copy-post2" style="background:none; border:none; color:var(--text); cursor:pointer; font-size:11px; padding:0; text-decoration:underline;">2通目をコピー</button>
+                <button type="button" class="btn-copy-post" data-act="copy-post2">2通目をコピー</button>
               </div>
-              <div style="white-space:pre-wrap; font-size:13px; line-height:1.65; color:var(--text); font-family:inherit; word-break:break-word; overflow-wrap:anywhere;">${esc(p.snsReplyDraft)}</div>
+              <div class="sns-text">${esc(p.snsReplyDraft)}</div>
             </div>` : ''}
           </div>` : ''}
+
           <p class="src">海外公式発表: “${esc(p.tagline)}”</p>
         </div>
       </div>
@@ -1207,13 +1288,13 @@ function apply() {
   if (rank === 'all') {
     h.textContent = 'すべて';
     if (todayCount > 0) {
-      $('#listDesc').textContent = `本日(${REPORT_DATE})新着: ${todayCount}件 ／ 蓄積データ: 全${PRODUCTS.length}件`;
+      $('#listDesc').textContent = `最新掲載(${REPORT_DATE}): ${todayCount}件 ／ 蓄積データ: 全${PRODUCTS.length}件`;
     } else {
       $('#listDesc').textContent = `最新分析日: ${REPORT_DATE} ／ 蓄積データ: 全${PRODUCTS.length}件`;
     }
   } else if (rank === 'today') {
-    h.textContent = '本日新着';
-    $('#listDesc').textContent = `${REPORT_DATE} 日次レポート掲載プロダクト（全${todayCount}件）`;
+    h.textContent = '最新掲載プロダクト';
+    $('#listDesc').textContent = `${REPORT_DATE} レポート掲載プロダクト（全${todayCount}件）`;
   } else if (rank === 'saved') {
     h.textContent = '保存済み';
     $('#listDesc').textContent = 'しおりを付けたプロダクト';
@@ -1222,7 +1303,12 @@ function apply() {
     const rankTotal = PRODUCTS.filter((p) => p.rank === rank).length;
     $('#listDesc').textContent = `${RANKS[rank].desc}（全${rankTotal}件）`;
   }
-  $('#count').textContent = `${shown}件`;
+  
+  if (query.trim()) {
+    $('#count').textContent = `検索結果 ${shown}件 ／ 全${PRODUCTS.length}件`;
+  } else {
+    $('#count').textContent = `${shown}件`;
+  }
 
   // 空状態
   const empty = $('#empty');
@@ -1239,15 +1325,22 @@ function apply() {
 /* ---------- 詳細の開閉 ---------- */
 function setOpen(card, open) {
   card.classList.toggle('open', open);
-  card.querySelector('.more-btn').setAttribute('aria-expanded', String(open));
+  const btn = card.querySelector('.more-btn');
+  if (btn) {
+    btn.setAttribute('aria-expanded', String(open));
+    const lbl = btn.querySelector('.more-btn-label');
+    if (lbl) lbl.textContent = open ? '詳細を閉じる' : '詳細を見る';
+  }
 }
 function visibleCards() { return [...document.querySelectorAll('.card:not([hidden])')]; }
 function syncToggleAll() {
   const cards = visibleCards();
   const allOpen = cards.length > 0 && cards.every((c) => c.classList.contains('open'));
   const btn = $('#toggleAll');
-  btn.textContent = allOpen ? 'すべて閉じる' : 'すべて開く';
-  btn.hidden = cards.length === 0;
+  if (btn) {
+    btn.textContent = allOpen ? 'すべて閉じる' : 'すべて開く';
+    btn.hidden = cards.length === 0;
+  }
 }
 
 /* ---------- ブックマーク ---------- */
@@ -1338,27 +1431,86 @@ function copySnsPost2(id) {
 /* =========================================================
    利用マニュアル (ドロワー)
    ========================================================= */
+let _lastManualFocusedEl = null;
+
+function handleManualKeydown(e) {
+  if (e.key === 'Escape') {
+    closeManual();
+    return;
+  }
+  if (e.key === 'Tab') {
+    const drawer = $('#manualDrawer');
+    if (!drawer) return;
+    const focusable = drawer.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusable.length === 0) return;
+    const firstEl = focusable[0];
+    const lastEl = focusable[focusable.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === firstEl) {
+        lastEl.focus();
+        e.preventDefault();
+      }
+    } else {
+      if (document.activeElement === lastEl) {
+        firstEl.focus();
+        e.preventDefault();
+      }
+    }
+  }
+}
+
 function openManual() {
   const d = $('#manualDrawer');
   const b = $('#manualBackdrop');
   if (d && b) {
+    _lastManualFocusedEl = document.activeElement;
     d.classList.add('open');
     b.classList.add('open');
+    d.removeAttribute('inert');
+    d.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
+
+    // 背景要素にinertを設定してTabキー漏れを防止 (U3対応)
+    const mainWrap = document.querySelector('main');
+    const headerEl = document.querySelector('.site-header');
+    const bannerEl = document.querySelector('.member-banner');
+    if (mainWrap) mainWrap.setAttribute('inert', '');
+    if (headerEl) headerEl.setAttribute('inert', '');
+    if (bannerEl) bannerEl.setAttribute('inert', '');
+
+    const closeBtn = d.querySelector('.drawer-close');
+    if (closeBtn) closeBtn.focus();
+
+    window.addEventListener('keydown', handleManualKeydown);
   }
 }
+
 function closeManual() {
   const d = $('#manualDrawer');
   const b = $('#manualBackdrop');
   if (d && b) {
     d.classList.remove('open');
     b.classList.remove('open');
+    d.setAttribute('inert', '');
     document.body.style.overflow = '';
+
+    // 背景要素のinertを解除
+    const mainWrap = document.querySelector('main');
+    const headerEl = document.querySelector('.site-header');
+    const bannerEl = document.querySelector('.member-banner');
+    if (mainWrap) mainWrap.removeAttribute('inert');
+    if (headerEl) headerEl.removeAttribute('inert');
+    if (bannerEl) bannerEl.removeAttribute('inert');
+
+    window.removeEventListener('keydown', handleManualKeydown);
+
+    // 元のボタンへフォーカスを復帰 (U3対応)
+    if (_lastManualFocusedEl && typeof _lastManualFocusedEl.focus === 'function') {
+      _lastManualFocusedEl.focus();
+    }
   }
 }
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeManual();
-});
 
 /* =========================================================
    情報盗難防止対策 (DRM-Lite / スクショ・コピー防止)
@@ -1374,26 +1526,25 @@ function initProtection() {
   if (_protectionInitialized) return;
   _protectionInitialized = true;
 
-  // 画面切り替え・Windows切り取りツール（Win+Shift+S / Snipping Tool / Game Bar）対策
-  const handleBlur = () => {
+  // 画面保護対策 (U6対応: 調査・メモ取りを阻害しないようwindow.blurによるブラーは廃止)
+  const handleHide = () => {
     if (!PROTECTION_CONFIG.enabled) return;
     const shield = document.getElementById('screenShield');
     if (shield) shield.classList.add('active');
     document.body.classList.add('screen-blurred');
   };
 
-  const handleFocus = () => {
+  const handleShow = () => {
     if (!PROTECTION_CONFIG.enabled) return;
     const shield = document.getElementById('screenShield');
     if (shield) shield.classList.remove('active');
     document.body.classList.remove('screen-blurred');
   };
 
-  window.addEventListener('blur', handleBlur);
-  window.addEventListener('focus', handleFocus);
+  // タブ自体の切り替え時のみシールドを適用
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') handleBlur();
-    else handleFocus();
+    if (document.visibilityState === 'hidden') handleHide();
+    else handleShow();
   });
 
   // 右クリック禁止 (Capture phase)
@@ -1544,7 +1695,17 @@ $('#cards').addEventListener('click', (e) => {
   const card = b.closest('.card');
   if (!card) return;
   const id = card.dataset.id;
-  if (b.dataset.act === 'toggle')     { setOpen(card, !card.classList.contains('open')); syncToggleAll(); }
+  if (b.dataset.act === 'toggle') {
+    const willOpen = !card.classList.contains('open');
+    setOpen(card, willOpen);
+    syncToggleAll();
+    if (!willOpen) {
+      const rect = card.getBoundingClientRect();
+      if (rect.top < 0) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
   if (b.dataset.act === 'bookmark')   toggleSaved(id);
   if (b.dataset.act === 'copy')       copyIdea(id);
   if (b.dataset.act === 'copy-tree')  copySnsTree(id);
