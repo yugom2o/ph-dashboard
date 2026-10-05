@@ -510,6 +510,32 @@
     }
   }
 
+  /* 画面切り替え・Windows切り取りツール（Win+Shift+S等）対策のシールド */
+  .screen-shield {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 15, 29, .96);
+    backdrop-filter: blur(24px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .12s ease;
+  }
+  .screen-shield.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body.protected-mode.screen-blurred > *:not(.screen-shield):not(.screenshot-warn) {
+    filter: blur(28px) !important;
+    user-select: none !important;
+  }
+
   /* スクリーンショット警告オーバーレイ */
   .screenshot-warn {
     position: fixed;
@@ -635,6 +661,15 @@
     </div>
   </div>
 </header>
+
+<!-- キャプチャ防止シールド（Win+Shift+S / 画面切り替え時に即時遮断） -->
+<div class="screen-shield" id="screenShield" aria-hidden="true" onclick="this.classList.remove('active'); document.body.classList.remove('screen-blurred');">
+  <div style="font-size:48px; margin-bottom:12px;">🛡️</div>
+  <h3 style="font-size:20px; font-weight:700; color:var(--text); margin-bottom:8px;">会員様限定コンテンツ保護中</h3>
+  <p style="font-size:14px; color:var(--muted); max-width:420px; margin:0;">
+    画面キャプチャ防止のためコンテンツを非表示にしています。<br>画面をクリックすると表示が戻ります。
+  </p>
+</div>
 
 <!-- スクリーンショット警告オーバーレイ -->
 <div class="screenshot-warn" id="screenshotWarn">
@@ -1125,17 +1160,39 @@ function initProtection() {
   if (_protectionInitialized) return;
   _protectionInitialized = true;
 
+  // 画面切り替え・Windows切り取りツール（Win+Shift+S / Snipping Tool / Game Bar）対策
+  const handleBlur = () => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    const shield = document.getElementById('screenShield');
+    if (shield) shield.classList.add('active');
+    document.body.classList.add('screen-blurred');
+  };
+
+  const handleFocus = () => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    const shield = document.getElementById('screenShield');
+    if (shield) shield.classList.remove('active');
+    document.body.classList.remove('screen-blurred');
+  };
+
+  window.addEventListener('blur', handleBlur);
+  window.addEventListener('focus', handleFocus);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') handleBlur();
+    else handleFocus();
+  });
+
   // 右クリック禁止 (Capture phase)
   window.addEventListener('contextmenu', (e) => {
     if (!PROTECTION_CONFIG.enabled) return;
     if (!e.target.closest('input, textarea')) {
       e.preventDefault();
       e.stopPropagation();
-      toast('⚠️ 会員限定コンテンツのため右クリックは禁止されています');
+      toast('⚠️ 会員様限定コンテンツのため右クリックは禁止されています');
     }
   }, { capture: true });
 
-  // キーボードショートカットブロック (Capture phase でEdge等のWebキャプチャも遮断)
+  // キーボードショートカットブロック (Capture phase で全キャプチャショートカットを奪取)
   const blockShortcuts = (e) => {
     if (!PROTECTION_CONFIG.enabled) return;
     const isInput = e.target.closest && e.target.closest('input, textarea');
@@ -1143,12 +1200,33 @@ function initProtection() {
     const code = e.code || '';
     const isCtrlOrMeta = e.ctrlKey || e.metaKey;
 
+    // Windowsキー（Meta）を使用した切り取り・キャプチャショートカット
+    // Win+Shift+S, Win+PrtScn, Win+Alt+PrtScn, Win+G, MacのCmd+Shift+3/4/5
+    if (e.metaKey) {
+      if (e.shiftKey || e.altKey || key === 's' || code === 'KeyS' || key === 'printscreen' || code === 'PrintScreen' || ['3', '4', '5'].includes(key)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        showScreenshotWarn();
+        return false;
+      }
+    }
+
     // Edge Web Capture / Chrome スクショ (Ctrl+Shift+S / Cmd+Shift+S / Ctrl+Shift+X)
     if (isCtrlOrMeta && e.shiftKey && (key === 's' || code === 'KeyS' || key === 'x' || code === 'KeyX')) {
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
       toast('⚠️ スクリーンショット（Webキャプチャ）は禁止されています');
+      showScreenshotWarn();
+      return false;
+    }
+
+    // PrintScreen（単体、Alt+PrintScreen、Ctrl+PrintScreen等）
+    if (key === 'printscreen' || code === 'PrintScreen' || e.keyCode === 44) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       showScreenshotWarn();
       return false;
     }
@@ -1197,20 +1275,14 @@ function initProtection() {
       e.stopPropagation();
       return false;
     }
-
-    // PrintScreen キー
-    if (e.key === 'PrintScreen' || e.keyCode === 44) {
-      e.preventDefault();
-      e.stopPropagation();
-      showScreenshotWarn();
-      return false;
-    }
   };
 
   window.addEventListener('keydown', blockShortcuts, { capture: true });
   window.addEventListener('keyup', (e) => {
     if (!PROTECTION_CONFIG.enabled) return;
-    if (e.key === 'PrintScreen' || e.keyCode === 44) {
+    const key = (e.key || '').toLowerCase();
+    const code = e.code || '';
+    if (key === 'printscreen' || code === 'PrintScreen' || e.keyCode === 44 || (e.metaKey && e.shiftKey)) {
       e.preventDefault();
       showScreenshotWarn();
     }
@@ -1230,7 +1302,7 @@ function initProtection() {
 function showScreenshotWarn() {
   try {
     if (navigator.clipboard) {
-      navigator.clipboard.writeText('【警告】Global Tech Radar 会員限定コンテンツの無断キャプチャ・転載は禁止されています。');
+      navigator.clipboard.writeText('【警告】会員様限定コンテンツの無断キャプチャ・転載は固く禁止されています。');
     }
   } catch(e) {}
   const warn = $('#screenshotWarn');
@@ -1407,12 +1479,12 @@ function initDashboard() {
       if (IS_ENCRYPTED) {
         badge.style.display = 'inline-flex';
         if (CURRENT_ROLE === 'admin') {
-          badge.innerHTML = '<span class="dot" style="background:#38bdf8;"></span>👑 管理者（保護解除中）';
+          badge.innerHTML = '<span class="dot" style="background:#38bdf8;"></span>👑 管理者';
           badge.style.background = 'rgba(56, 189, 248, 0.12)';
           badge.style.borderColor = 'rgba(56, 189, 248, 0.28)';
           badge.style.color = '#38bdf8';
         } else {
-          badge.innerHTML = '<span class="dot"></span>🔒 会員（保護モード有効）';
+          badge.innerHTML = '<span class="dot"></span>🔒 会員様';
           badge.style.background = 'rgba(110, 231, 183, 0.12)';
           badge.style.borderColor = 'rgba(110, 231, 183, 0.25)';
           badge.style.color = 'var(--good)';
