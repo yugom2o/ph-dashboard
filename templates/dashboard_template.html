@@ -502,39 +502,12 @@
     user-select: auto;
   }
 
-  /* 印刷・PDF保存の完全遮断 */
+  /* 会員モード時の印刷・PDF保存の遮断 */
   @media print {
-    body {
+    body.protected-mode {
       display: none !important;
       visibility: hidden !important;
     }
-  }
-
-  /* ウォーターマーク（透かし）オーバーレイ */
-  .watermark-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 800;
-    opacity: 0.038;
-    overflow: hidden;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 120px 80px;
-    padding: 40px;
-    transform: rotate(-16deg) scale(1.4);
-    user-select: none;
-  }
-  .watermark-item {
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    color: var(--text);
-    white-space: nowrap;
-    user-select: none;
   }
 
   /* スクリーンショット警告オーバーレイ */
@@ -662,9 +635,6 @@
     </div>
   </div>
 </header>
-
-<!-- ウォーターマーク (透かし) -->
-<div class="watermark-overlay" id="watermarkOverlay" aria-hidden="true"></div>
 
 <!-- スクリーンショット警告オーバーレイ -->
 <div class="screenshot-warn" id="screenshotWarn">
@@ -1144,71 +1114,111 @@ window.addEventListener('keydown', (e) => {
 /* =========================================================
    情報盗難防止対策 (DRM-Lite / スクショ・コピー防止)
    ========================================================= */
+let CURRENT_ROLE = 'member'; // 'admin' (保護解除) または 'member' (保護有効)
 const PROTECTION_CONFIG = {
-  enabled: true, // 基本は保護有効（将来のPro/Dev会員はランクに応じてfalse切り替え可能）
-  watermarkText: 'Global Tech Radar ｜ 会員限定 ｜ 無断転載禁止'
+  enabled: true,
 };
 
+let _protectionInitialized = false;
+
 function initProtection() {
-  if (!PROTECTION_CONFIG.enabled) return;
-  document.body.classList.add('protected-mode');
+  if (_protectionInitialized) return;
+  _protectionInitialized = true;
 
-  // ウォーターマーク生成
-  const wm = $('#watermarkOverlay');
-  if (wm && !wm.hasChildNodes()) {
-    let wmHTML = '';
-    for (let i = 0; i < 48; i++) {
-      wmHTML += `<span class="watermark-item">${PROTECTION_CONFIG.watermarkText}</span>`;
-    }
-    wm.innerHTML = wmHTML;
-  }
-
-  // 右クリック禁止
-  document.addEventListener('contextmenu', (e) => {
+  // 右クリック禁止 (Capture phase)
+  window.addEventListener('contextmenu', (e) => {
+    if (!PROTECTION_CONFIG.enabled) return;
     if (!e.target.closest('input, textarea')) {
       e.preventDefault();
+      e.stopPropagation();
       toast('⚠️ 会員限定コンテンツのため右クリックは禁止されています');
     }
-  });
+  }, { capture: true });
 
-  // キーボードショートカットブロック
-  document.addEventListener('keydown', (e) => {
-    const isInput = e.target.closest('input, textarea');
+  // キーボードショートカットブロック (Capture phase でEdge等のWebキャプチャも遮断)
+  const blockShortcuts = (e) => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    const isInput = e.target.closest && e.target.closest('input, textarea');
+    const key = (e.key || '').toLowerCase();
+    const code = e.code || '';
+    const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+
+    // Edge Web Capture / Chrome スクショ (Ctrl+Shift+S / Cmd+Shift+S / Ctrl+Shift+X)
+    if (isCtrlOrMeta && e.shiftKey && (key === 's' || code === 'KeyS' || key === 'x' || code === 'KeyX')) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      toast('⚠️ スクリーンショット（Webキャプチャ）は禁止されています');
+      showScreenshotWarn();
+      return false;
+    }
+
     // Ctrl+C / Cmd+C (入力欄以外)
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C') && !isInput) {
+    if (isCtrlOrMeta && (key === 'c' || code === 'KeyC') && !isInput) {
       e.preventDefault();
+      e.stopPropagation();
       toast('⚠️ 本文の無断コピーは禁止されています');
+      return false;
     }
-    // Ctrl+A / Cmd+A
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A') && !isInput) {
+
+    // Ctrl+A / Cmd+A (入力欄以外)
+    if (isCtrlOrMeta && (key === 'a' || code === 'KeyA') && !isInput) {
       e.preventDefault();
+      e.stopPropagation();
+      return false;
     }
+
     // Ctrl+P / Cmd+P (印刷・PDF化)
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+    if (isCtrlOrMeta && (key === 'p' || code === 'KeyP')) {
       e.preventDefault();
+      e.stopPropagation();
       toast('⚠️ PDF保存・印刷は禁止されています');
+      return false;
     }
-    // Ctrl+S / Cmd+S (HTML保存)
-    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+
+    // Ctrl+S / Cmd+S (HTML保存 - Shift無しの単独S)
+    if (isCtrlOrMeta && !e.shiftKey && (key === 's' || code === 'KeyS')) {
       e.preventDefault();
+      e.stopPropagation();
       toast('⚠️ ページの保存は禁止されています');
+      return false;
     }
+
     // Ctrl+U / Cmd+U (ソース表示)
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
+    if (isCtrlOrMeta && (key === 'u' || code === 'KeyU')) {
       e.preventDefault();
+      e.stopPropagation();
+      return false;
     }
-    // F12 (DevTools)
-    if (e.key === 'F12') {
+
+    // F12 / デベロッパーツール
+    if (e.key === 'F12' || e.keyCode === 123) {
       e.preventDefault();
+      e.stopPropagation();
+      return false;
     }
-    // PrintScreen キー検知
-    if (e.key === 'PrintScreen') {
+
+    // PrintScreen キー
+    if (e.key === 'PrintScreen' || e.keyCode === 44) {
+      e.preventDefault();
+      e.stopPropagation();
+      showScreenshotWarn();
+      return false;
+    }
+  };
+
+  window.addEventListener('keydown', blockShortcuts, { capture: true });
+  window.addEventListener('keyup', (e) => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    if (e.key === 'PrintScreen' || e.keyCode === 44) {
+      e.preventDefault();
       showScreenshotWarn();
     }
-  });
+  }, { capture: true });
 
   // コピーイベントフック（ドラッグ選択によるコピーを遮断）
   document.addEventListener('copy', (e) => {
+    if (!PROTECTION_CONFIG.enabled) return;
     if (_allowCopyOperation) return; // カード内正規コピーボタンは許可
     if (!e.target.closest('input, textarea')) {
       e.preventDefault();
@@ -1272,6 +1282,57 @@ const PASS_KEY = 'ph_dash_password';
 
 async function decryptPayload(password, payload) {
   const enc = new TextEncoder();
+  const dec = new TextDecoder();
+
+  // Version 2 (マルチロール対応エンベロープ暗号化)
+  if (payload.version === "2" && Array.isArray(payload.packets)) {
+    const dataIv = Uint8Array.from(atob(payload.iv), (c) => c.charCodeAt(0));
+    const encryptedData = Uint8Array.from(atob(payload.data), (c) => c.charCodeAt(0));
+
+    // パケット（admin / member）を順に試行
+    for (const packet of payload.packets) {
+      try {
+        const salt = Uint8Array.from(atob(packet.salt), (c) => c.charCodeAt(0));
+        const iv = Uint8Array.from(atob(packet.iv), (c) => c.charCodeAt(0));
+        const encryptedKey = Uint8Array.from(atob(packet.key), (c) => c.charCodeAt(0));
+
+        const baseKey = await window.crypto.subtle.importKey(
+          'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+        );
+        const kek = await window.crypto.subtle.deriveKey(
+          { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+          baseKey,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['decrypt']
+        );
+
+        // DEK (データ暗号化キー) の復号
+        const decryptedDekRaw = await window.crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: iv }, kek, encryptedKey
+        );
+
+        // DEKを使って本体データを復号
+        const dek = await window.crypto.subtle.importKey(
+          'raw', decryptedDekRaw, { name: 'AES-GCM' }, false, ['decrypt']
+        );
+        const decryptedData = await window.crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: dataIv }, dek, encryptedData
+        );
+
+        return {
+          products: JSON.parse(dec.decode(decryptedData)),
+          role: packet.role || 'member'
+        };
+      } catch (err) {
+        // パスワード不一致のパケットはスキップして次のロールを試す
+        continue;
+      }
+    }
+    throw new Error('合言葉が正しくありません');
+  }
+
+  // Version 1 (互換性維持)
   const salt = Uint8Array.from(atob(payload.salt), (c) => c.charCodeAt(0));
   const iv = Uint8Array.from(atob(payload.iv), (c) => c.charCodeAt(0));
   const data = Uint8Array.from(atob(payload.data), (c) => c.charCodeAt(0));
@@ -1289,8 +1350,10 @@ async function decryptPayload(password, payload) {
   const decrypted = await window.crypto.subtle.decrypt(
     { name: 'AES-GCM', iv: iv }, key, data
   );
-  const dec = new TextDecoder();
-  return JSON.parse(dec.decode(decrypted));
+  return {
+    products: JSON.parse(dec.decode(decrypted)),
+    role: 'admin'
+  };
 }
 
 async function handleUnlock() {
@@ -1302,8 +1365,9 @@ async function handleUnlock() {
   if (!input || !input.value) return;
 
   try {
-    const products = await decryptPayload(input.value, ENCRYPTED_PAYLOAD);
-    PRODUCTS = products;
+    const res = await decryptPayload(input.value, ENCRYPTED_PAYLOAD);
+    PRODUCTS = res.products;
+    CURRENT_ROLE = res.role;
     if (remember) {
       localStorage.setItem(PASS_KEY, input.value);
     }
@@ -1326,10 +1390,37 @@ function handleLogout() {
 function initDashboard() {
   try {
     buildIndex();
+
+    // ロールに応じた保護モードの切り替え
+    if (CURRENT_ROLE === 'admin') {
+      PROTECTION_CONFIG.enabled = false;
+      document.body.classList.remove('protected-mode');
+    } else {
+      PROTECTION_CONFIG.enabled = true;
+      document.body.classList.add('protected-mode');
+    }
     initProtection();
-    // 認証バッジの表示
+
+    // 認証バッジの表示 (管理者 vs 会員)
     const badge = document.getElementById('authBadge');
-    if (badge) badge.style.display = IS_ENCRYPTED ? 'inline-flex' : 'none';
+    if (badge) {
+      if (IS_ENCRYPTED) {
+        badge.style.display = 'inline-flex';
+        if (CURRENT_ROLE === 'admin') {
+          badge.innerHTML = '<span class="dot" style="background:#38bdf8;"></span>👑 管理者（保護解除中）';
+          badge.style.background = 'rgba(56, 189, 248, 0.12)';
+          badge.style.borderColor = 'rgba(56, 189, 248, 0.28)';
+          badge.style.color = '#38bdf8';
+        } else {
+          badge.innerHTML = '<span class="dot"></span>🔒 会員（保護モード有効）';
+          badge.style.background = 'rgba(110, 231, 183, 0.12)';
+          badge.style.borderColor = 'rgba(110, 231, 183, 0.25)';
+          badge.style.color = 'var(--good)';
+        }
+      } else {
+        badge.style.display = 'none';
+      }
+    }
 
     // 本日新着データが存在する場合は初期表示を「本日新着」にする
     const hasToday = PRODUCTS.some((p) => p.date === REPORT_DATE);
@@ -1350,8 +1441,9 @@ function initDashboard() {
     const savedPass = localStorage.getItem(PASS_KEY);
     if (savedPass) {
       try {
-        const products = await decryptPayload(savedPass, ENCRYPTED_PAYLOAD);
-        PRODUCTS = products;
+        const res = await decryptPayload(savedPass, ENCRYPTED_PAYLOAD);
+        PRODUCTS = res.products;
+        CURRENT_ROLE = res.role;
         const modal = document.getElementById('lockModal');
         if (modal) modal.style.display = 'none';
         initDashboard();
