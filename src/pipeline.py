@@ -149,6 +149,10 @@ class DailyPipeline:
                 is_mock=self.is_mock,
             )
 
+            if not eval_result:
+                print(f"  -> [Warning] '{p.name}' のAI評価に失敗したためスキップします。")
+                continue
+
             print(f"  -> 判定結果: 【ランク {eval_result.rank}】 (スコア: {eval_result.score})")
             print(f"  -> 一言サマリー: {eval_result.one_line_summary}")
 
@@ -165,8 +169,9 @@ class DailyPipeline:
                 "image_url": p.image_url,
                 "first_seen_date": today_str,
             }
-            self.db.save_product(product_dict)
-            self.db.save_evaluation(p.id, eval_result.model_dump(), today_str)
+            actual_product_id = self.db.save_product(product_dict)
+            product_dict["id"] = actual_product_id
+            self.db.save_evaluation(actual_product_id, eval_result.model_dump(), today_str)
 
             # Sランクまたはスコア85以上の場合は即時アラート送信
             if eval_result.rank == "S" or eval_result.score >= 85:
@@ -178,8 +183,6 @@ class DailyPipeline:
         # 5. レポート生成
         print("\n[Step 5/5] レポートおよびダッシュボード生成中...")
         today_evaluations = self.db.get_evaluations_by_date(today_str)
-        if not today_evaluations:
-            today_evaluations = self.db.get_all_recent_evaluations(limit=20)
 
         # Markdown レポート
         md_file = self.md_reporter.generate_daily_report(today_evaluations, today_str)
@@ -237,7 +240,7 @@ class DailyPipeline:
             elif self.is_mock:
                 print("  [Mock] モックモードのためThreads投稿をシミュレート（API呼び出しはスキップ）")
             else:
-                self._publish_top_product_to_threads(today_evaluations)
+                self._publish_top_product_to_threads(today_evaluations, today_str)
 
         print("\n==================================================")
         print(f"🎉 日次パイプライン完了！")
@@ -245,8 +248,13 @@ class DailyPipeline:
         print(f"ダッシュボード: {html_file.name}")
         print("==================================================")
 
-    def _publish_top_product_to_threads(self, evaluations: List[Dict[str, Any]]):
-        """本日最も有望なプロダクトをThreadsに自動投稿"""
+    def _publish_top_product_to_threads(self, evaluations: List[Dict[str, Any]], target_date: str):
+        """本日最も有望なプロダクトをThreadsに自動投稿（上限チェック＆新着0件時は未投稿の過去有望案件にフォールバック）"""
+        today_posted = self.db.get_threads_posts_count_by_date(target_date)
+        if today_posted >= THREADS_MAX_DAILY_POSTS:
+            print(f"  [Skip] 本日のThreads投稿上限（{THREADS_MAX_DAILY_POSTS}件/日、本日投稿実績: {today_posted}件）に達しているためスキップします。")
+            return
+
         # Sランク優先、次にAランク、スコア降順
         rank_order = {"S": 1, "A": 2, "B": 3, "C": 4}
         candidates = sorted(
@@ -254,16 +262,32 @@ class DailyPipeline:
             key=lambda x: (rank_order.get(x.get("rank", "C"), 5), -x.get("score", 0)),
         )
 
+        # 本日の未投稿・S/Aランク案件を抽出
+        eligible_candidates = [
+            item for item in candidates
+            if item.get("rank") in ["S", "A"]
+            and not self.db.is_already_posted_to_threads(item.get("product_id") or item.get("id", ""))
+        ]
+
+        # 本日の対象案件がない場合、過去の未投稿・高スコア案件からフォールバック選定（ユーザー承認仕様）
+        if not eligible_candidates:
+            print("  [Info] 本日の新規評価に対象案件（未投稿のS/Aランク）がないため、過去の未投稿・高スコア案件から選定します...")
+            eligible_candidates = self.db.get_unposted_high_scoring_evaluations(limit=5)
+
+        if not eligible_candidates:
+            print("  [Info] 投稿対象となる未投稿のS/Aランクプロダクトがありませんでした。")
+            return
+
         posted_count = 0
-        for item in candidates:
-            if posted_count >= THREADS_MAX_DAILY_POSTS:
+        for item in eligible_candidates:
+            if posted_count >= (THREADS_MAX_DAILY_POSTS - today_posted):
                 break
 
             p_id = item.get("product_id") or item.get("id")
             if not p_id:
                 continue
 
-            # 既に投稿済みならスキップ
+            # 既に投稿済みならスキップ（念のための二重確認）
             if self.db.is_already_posted_to_threads(p_id):
                 continue
 
@@ -317,7 +341,7 @@ class DailyPipeline:
                 posted_count += 1
                 print(f"  -> 🎉 Threads投稿成功！ (親Post ID: {parent_id}, リプライID: {reply_id or 'なし'})")
 
-        if posted_count == 0:
+        if posted_count == 0 and today_posted == 0:
             print("  [Info] 本日は新規投稿対象（未投稿のS/Aランクプロダクト）がありませんでした。")
 
 
