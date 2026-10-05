@@ -622,9 +622,10 @@ function renderChips() {
 }
 
 function cardHTML(p) {
-  const sigs = p.signals.map((s) =>
+  const sigList = p.signals || [];
+  const sigs = sigList.map((s) =>
     `<div class="sig"><dt>${esc(s.k)}</dt><dd class="${s.t || ''}">${esc(s.v)}</dd></div>`).join('');
-  const notes = p.signals.filter((s) => s.n).map((s) =>
+  const notes = sigList.filter((s) => s.n).map((s) =>
     `<div><dt>${esc(s.k)}</dt><dd>${esc(s.n)}</dd></div>`).join('');
   const tags = (p.target || []).map((t) => `<li class="tag">${esc(t)}</li>`).join('');
   const adapt = (p.adapt || []).map((a) => `<li>${esc(a)}</li>`).join('');
