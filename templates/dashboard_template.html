@@ -622,13 +622,13 @@ function renderChips() {
 }
 
 function cardHTML(p) {
-  const sigList = p.signals || [];
+  const sigList = Array.isArray(p.signals) ? p.signals : [];
   const sigs = sigList.map((s) =>
-    `<div class="sig"><dt>${esc(s.k)}</dt><dd class="${s.t || ''}">${esc(s.v)}</dd></div>`).join('');
-  const notes = sigList.filter((s) => s.n).map((s) =>
-    `<div><dt>${esc(s.k)}</dt><dd>${esc(s.n)}</dd></div>`).join('');
-  const tags = (p.target || []).map((t) => `<li class="tag">${esc(t)}</li>`).join('');
-  const adapt = (p.adapt || []).map((a) => `<li>${esc(a)}</li>`).join('');
+    `<div class="sig"><dt>${esc(s && s.k ? s.k : '')}</dt><dd class="${(s && s.t) || ''}">${esc(s && s.v ? s.v : '')}</dd></div>`).join('');
+  const notes = sigList.filter((s) => s && s.n).map((s) =>
+    `<div><dt>${esc(s.k || '')}</dt><dd>${esc(s.n || '')}</dd></div>`).join('');
+  const tags = (Array.isArray(p.target) ? p.target : []).map((t) => `<li class="tag">${esc(t)}</li>`).join('');
+  const adapt = (Array.isArray(p.adapt) ? p.adapt : []).map((a) => `<li>${esc(a)}</li>`).join('');
 
   const isToday = p.date === REPORT_DATE;
   const dateBadge = isToday
@@ -688,13 +688,13 @@ function cardHTML(p) {
           <div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <span class="lbl">📱 SNS発信ツリー原稿 (X / Threads用)</span>
-              <button class="btn plain" style="font-size:12px; padding:2px 10px; min-height:28px; border:1px solid var(--line); border-radius:6px;" type="button" onclick="navigator.clipboard.writeText(${JSON.stringify(p.snsDraft + (p.snsReplyDraft ? '\n\n---\n\n' + p.snsReplyDraft : ''))}); showToast('ツリー原稿をコピーしました');">全文コピー</button>
+              <button class="btn plain" style="font-size:12px; padding:2px 10px; min-height:28px; border:1px solid var(--line); border-radius:6px;" type="button" data-act="copy-tree">全文コピー</button>
             </div>
             
             <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px;">
               <div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; display:flex; justify-content:space-between;">
                 <span>🧵 1通目（親ポスト・画像添付）</span>
-                <a href="#" style="color:var(--text); text-decoration:none;" onclick="event.preventDefault(); navigator.clipboard.writeText(${JSON.stringify(p.snsDraft)}); showToast('1通目をコピーしました');">1通目をコピー</a>
+                <button type="button" data-act="copy-post1" style="background:none; border:none; color:var(--text); cursor:pointer; font-size:11px; padding:0; text-decoration:underline;">1通目をコピー</button>
               </div>
               <div style="white-space:pre-wrap; font-size:13px; line-height:1.65; color:var(--text); font-family:inherit;">${esc(p.snsDraft)}</div>
             </div>
@@ -703,7 +703,7 @@ function cardHTML(p) {
             <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px;">
               <div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; display:flex; justify-content:space-between;">
                 <span>↪️ 2通目（リプライ・事業化考察＆リンク）</span>
-                <a href="#" style="color:var(--text); text-decoration:none;" onclick="event.preventDefault(); navigator.clipboard.writeText(${JSON.stringify(p.snsReplyDraft)}); showToast('2通目をコピーしました');">2通目をコピー</a>
+                <button type="button" data-act="copy-post2" style="background:none; border:none; color:var(--text); cursor:pointer; font-size:11px; padding:0; text-decoration:underline;">2通目をコピー</button>
               </div>
               <div style="white-space:pre-wrap; font-size:13px; line-height:1.65; color:var(--text); font-family:inherit;">${esc(p.snsReplyDraft)}</div>
             </div>` : ''}
@@ -716,8 +716,19 @@ function cardHTML(p) {
 }
 
 function renderCards() {
-  $('#cards').innerHTML = PRODUCTS.map(cardHTML).join('');
-  document.querySelectorAll('.card').forEach((el) => els.set(el.dataset.id, el));
+  els.clear();
+  const htmls = [];
+  PRODUCTS.forEach((p) => {
+    try {
+      htmls.push(cardHTML(p));
+    } catch (e) {
+      console.error('Failed to render card for', p.id, e);
+    }
+  });
+  $('#cards').innerHTML = htmls.join('');
+  document.querySelectorAll('.card').forEach((el) => {
+    if (el.dataset.id) els.set(el.dataset.id, el);
+  });
 }
 
 /* ---------- 絞り込み ---------- */
@@ -729,9 +740,12 @@ function apply() {
     const okRank = rank === 'all' || 
                    (rank === 'today' ? p.date === REPORT_DATE : 
                    (rank === 'saved' ? saved.includes(p.id) : p.rank === rank));
-    const okText = terms.every((t) => p._idx.includes(t));
+    const okText = terms.every((t) => (p._idx || '').includes(t));
     const show = okRank && okText;
-    els.get(p.id).hidden = !show;
+    const el = els.get(p.id);
+    if (el) {
+      el.hidden = !show;
+    }
     if (show) shown++;
   });
 
@@ -797,7 +811,10 @@ function syncToggleAll() {
 function refreshSaved() {
   $('#savedN').textContent = saved.length;
   PRODUCTS.forEach((p) => {
-    const b = els.get(p.id).querySelector('[data-act="bookmark"]');
+    const el = els.get(p.id);
+    if (!el) return;
+    const b = el.querySelector('[data-act="bookmark"]');
+    if (!b) return;
     const on = saved.includes(p.id);
     b.classList.toggle('on', on);
     b.setAttribute('aria-pressed', String(on));
@@ -832,14 +849,43 @@ function fallbackCopy(text) {
   document.body.removeChild(ta);
   toast(ok ? 'コピーしました' : 'コピーできませんでした');
 }
-function copyIdea(id) {
-  const p = PRODUCTS.find((x) => x.id === id);
-  const text = `${p.name}（元: ${p.orig}）\n日本版: ${p.idea}\n${p.body}\nターゲット: ${(p.target || []).join('、')}`;
+
+function copyText(text, successMsg = 'コピーしました') {
+  if (!text) return;
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(() => toast('コピーしました'), () => fallbackCopy(text));
+    navigator.clipboard.writeText(text).then(
+      () => toast(successMsg),
+      () => fallbackCopy(text)
+    );
   } else {
     fallbackCopy(text);
   }
+}
+
+function copyIdea(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  const text = `${p.name}（元: ${p.orig}）\n日本版: ${p.idea}\n${p.body}\nターゲット: ${(p.target || []).join('、')}`;
+  copyText(text, '内容をコピーしました');
+}
+
+function copySnsTree(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  const text = (p.snsDraft || '') + (p.snsReplyDraft ? '\n\n---\n\n' + p.snsReplyDraft : '');
+  copyText(text, 'ツリー原稿をコピーしました');
+}
+
+function copySnsPost1(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  copyText(p.snsDraft, '1通目をコピーしました');
+}
+
+function copySnsPost2(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  copyText(p.snsReplyDraft, '2通目をコピーしました');
 }
 
 /* ---------- イベント ---------- */
@@ -857,10 +903,14 @@ $('#cards').addEventListener('click', (e) => {
   const b = e.target.closest('[data-act]');
   if (!b) return;
   const card = b.closest('.card');
+  if (!card) return;
   const id = card.dataset.id;
-  if (b.dataset.act === 'toggle')   { setOpen(card, !card.classList.contains('open')); syncToggleAll(); }
-  if (b.dataset.act === 'bookmark') toggleSaved(id);
-  if (b.dataset.act === 'copy')     copyIdea(id);
+  if (b.dataset.act === 'toggle')     { setOpen(card, !card.classList.contains('open')); syncToggleAll(); }
+  if (b.dataset.act === 'bookmark')   toggleSaved(id);
+  if (b.dataset.act === 'copy')       copyIdea(id);
+  if (b.dataset.act === 'copy-tree')  copySnsTree(id);
+  if (b.dataset.act === 'copy-post1') copySnsPost1(id);
+  if (b.dataset.act === 'copy-post2') copySnsPost2(id);
 });
 
 $('#toggleAll').addEventListener('click', () => {
@@ -931,19 +981,24 @@ function handleLogout() {
 
 /* ---------- 初期化 ---------- */
 function initDashboard() {
-  buildIndex();
-  // 認証バッジの表示
-  const badge = document.getElementById('authBadge');
-  if (badge) badge.style.display = IS_ENCRYPTED ? 'inline-flex' : 'none';
+  try {
+    buildIndex();
+    // 認証バッジの表示
+    const badge = document.getElementById('authBadge');
+    if (badge) badge.style.display = IS_ENCRYPTED ? 'inline-flex' : 'none';
 
-  // 本日新着データが存在する場合は初期表示を「本日新着」にする
-  const hasToday = PRODUCTS.some((p) => p.date === REPORT_DATE);
-  rank = hasToday ? 'today' : 'all';
-  $('#reportDate').textContent = `最終更新: ${REPORT_DATE}`;
-  renderChips();
-  renderCards();
-  refreshSaved();
-  apply();
+    // 本日新着データが存在する場合は初期表示を「本日新着」にする
+    const hasToday = PRODUCTS.some((p) => p.date === REPORT_DATE);
+    rank = hasToday ? 'today' : 'all';
+    const rd = $('#reportDate');
+    if (rd) rd.textContent = `最終更新: ${REPORT_DATE}`;
+    renderChips();
+    renderCards();
+    refreshSaved();
+    apply();
+  } catch (err) {
+    console.error('initDashboard error:', err);
+  }
 }
 
 (async function() {
