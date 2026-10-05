@@ -85,12 +85,26 @@ def upload_project():
         git_sha = hashlib.sha1(b"blob " + str(len(content_bytes)).encode() + b"\0" + content_bytes).hexdigest()
 
         # 既存SHAの確認
-        get_res = requests.get(file_url, headers=headers)
-        if get_res.status_code == 200:
-            sha = get_res.json().get("sha")
-            if sha == git_sha:
-                print(f"  [{idx}/{len(files_to_upload)}] [SKIP] {rel_path} (変更なし)")
-                continue
+        sha = None
+        skip = False
+        for attempt in range(3):
+            try:
+                get_res = requests.get(file_url, headers=headers, timeout=30)
+                if get_res.status_code == 200:
+                    sha = get_res.json().get("sha")
+                    if sha == git_sha:
+                        print(f"  [{idx}/{len(files_to_upload)}] [SKIP] {rel_path} (変更なし)")
+                        skip = True
+                        break
+                elif get_res.status_code == 404:
+                    sha = None
+                break
+            except Exception:
+                import time
+                time.sleep(2)
+
+        if skip:
+            continue
 
         content_b64 = base64.b64encode(content_bytes).decode("utf-8")
 
@@ -101,11 +115,21 @@ def upload_project():
         if sha:
             payload["sha"] = sha
 
-        put_res = requests.put(file_url, headers=headers, json=payload)
-        if put_res.status_code in [200, 201]:
-            print(f"  [{idx}/{len(files_to_upload)}] [OK] {rel_path}")
-        else:
-            print(f"  [{idx}/{len(files_to_upload)}] [FAIL] {rel_path} (HTTP {put_res.status_code})")
+        for attempt in range(3):
+            try:
+                put_res = requests.put(file_url, headers=headers, json=payload, timeout=60)
+                if put_res.status_code in [200, 201]:
+                    print(f"  [{idx}/{len(files_to_upload)}] [OK] {rel_path}")
+                    break
+                else:
+                    print(f"  [{idx}/{len(files_to_upload)}] [FAIL] {rel_path} (HTTP {put_res.status_code})")
+                    break
+            except Exception as e:
+                if attempt < 2:
+                    import time
+                    time.sleep(3)
+                else:
+                    print(f"  [{idx}/{len(files_to_upload)}] [FAIL] {rel_path} ({e})")
 
     print("\n[Step] GitHub Pages デプロイワークフローをトリガー中...")
     try:
