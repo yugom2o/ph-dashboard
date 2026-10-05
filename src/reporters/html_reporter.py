@@ -7,7 +7,14 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from jinja2 import Template
-from config import BASE_DIR, DASHBOARD_FILE, DASHBOARD_PASSWORD, DOCS_INDEX_FILE, TEMPLATES_DIR
+from config import (
+    BASE_DIR,
+    DASHBOARD_FILE,
+    DASHBOARD_PASSWORD,
+    DASHBOARD_MEMBER_PASSWORD,
+    DOCS_INDEX_FILE,
+    TEMPLATES_DIR,
+)
 
 
 class HTMLReporter:
@@ -22,24 +29,53 @@ class HTMLReporter:
         self.docs_output_path = docs_output_path
 
     @staticmethod
-    def encrypt_data(plain_text: str, password: str) -> Dict[str, str]:
-        """PBKDF2 + AES-256-GCM でデータを暗号化 (ブラウザのWebCrypto APIと完全互換)"""
-        salt = os.urandom(16)
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=salt,
-            iterations=100000,
-        )
-        key = kdf.derive(password.encode("utf-8"))
-        aesgcm = AESGCM(key)
-        iv = os.urandom(12)
-        ciphertext = aesgcm.encrypt(iv, plain_text.encode("utf-8"), None)
+    def encrypt_data_multirole(
+        plain_text: str,
+        admin_password: str,
+        member_password: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """マルチロール対応エンベロープ暗号化 (PBKDF2 + AES-256-GCM)
+        データ本体はMaster DEK (32バイト) で暗号化し、
+        DEKを管理者用・メンバー用の各パスワードで個別に暗号化してパケット化する。
+        """
+        # 1. Master DEK (Data Encryption Key: 256bit) の生成
+        dek = AESGCM.generate_key(bit_length=256)
+        aesgcm_data = AESGCM(dek)
+        iv_data = os.urandom(12)
+        ciphertext_data = aesgcm_data.encrypt(iv_data, plain_text.encode("utf-8"), None)
+
+        packets = []
+        passwords = [("admin", admin_password)]
+        if member_password:
+            passwords.append(("member", member_password))
+
+        for role, pwd in passwords:
+            if not pwd:
+                continue
+            salt = os.urandom(16)
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=salt,
+                iterations=100000,
+            )
+            derived_key = kdf.derive(pwd.encode("utf-8"))
+            aesgcm_key = AESGCM(derived_key)
+            iv_key = os.urandom(12)
+            encrypted_dek = aesgcm_key.encrypt(iv_key, dek, None)
+
+            packets.append({
+                "role": role,
+                "salt": base64.b64encode(salt).decode("utf-8"),
+                "iv": base64.b64encode(iv_key).decode("utf-8"),
+                "key": base64.b64encode(encrypted_dek).decode("utf-8"),
+            })
 
         return {
-            "salt": base64.b64encode(salt).decode("utf-8"),
-            "iv": base64.b64encode(iv).decode("utf-8"),
-            "data": base64.b64encode(ciphertext).decode("utf-8"),
+            "version": "2",
+            "packets": packets,
+            "iv": base64.b64encode(iv_data).decode("utf-8"),
+            "data": base64.b64encode(ciphertext_data).decode("utf-8"),
         }
 
     def generate_dashboard(
@@ -47,9 +83,11 @@ class HTMLReporter:
         items: List[Dict[str, Any]],
         report_date: str,
         password: Optional[str] = None,
+        member_password: Optional[str] = None,
     ) -> Path:
-        """インタラクティブHTMLダッシュボードを生成（パスワード暗号化対応）"""
-        pass_to_use = password if password is not None else DASHBOARD_PASSWORD
+        """インタラクティブHTMLダッシュボードを生成（マルチロールパスワード暗号化対応）"""
+        admin_pass = password if password is not None else DASHBOARD_PASSWORD
+        member_pass = member_password if member_password is not None else DASHBOARD_MEMBER_PASSWORD
         products_data = []
 
         for it in items:
@@ -156,10 +194,10 @@ class HTMLReporter:
 
         products_json_str = json.dumps(products_data, ensure_ascii=False, indent=2)
 
-        is_encrypted = bool(pass_to_use)
+        is_encrypted = bool(admin_pass or member_pass)
         encrypted_payload = None
         if is_encrypted:
-            encrypted_payload = self.encrypt_data(products_json_str, pass_to_use)
+            encrypted_payload = self.encrypt_data_multirole(products_json_str, admin_pass, member_pass)
 
         # テンプレートレンダリング
         template_text = self.template_path.read_text(encoding="utf-8")
