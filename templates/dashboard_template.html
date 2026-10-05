@@ -92,26 +92,30 @@
     transition: color .15s, border-color .15s, background .15s;
   }
   .btn:hover { color: var(--text); border-color: var(--line-strong); }
-  .print-btn { white-space: nowrap; }
-  @media (max-width: 639px) {
-    .print-btn { width: 44px; min-height: 44px; padding: 0; }
-    .print-btn span { display: none; }
-  }
   .btn.plain { border-color: transparent; padding: 0 10px; }
   .btn.plain:hover { background: var(--surface); }
 
   /* ───────── 絞り込み ───────── */
-  .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .controls { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
   @media (min-width: 900px) {
-    .controls { flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; }
+    .controls { flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 24px; }
   }
+  .chips-container { position: relative; flex: 1; min-width: 0; }
   .chips {
     display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
     margin: 0 -16px; padding: 2px 16px;
+    -webkit-overflow-scrolling: touch;
   }
   .chips::-webkit-scrollbar { display: none; }
   @media (min-width: 640px) { .chips { margin: 0 -28px; padding: 2px 28px; } }
   @media (min-width: 900px) { .chips { margin: 0; padding: 2px 0; overflow: visible; } }
+  .chips-fade {
+    display: block; position: absolute; right: -16px; top: 0; bottom: 0; width: 36px;
+    background: linear-gradient(to right, transparent, var(--bg));
+    pointer-events: none; z-index: 2;
+  }
+  @media (min-width: 640px) { .chips-fade { right: -28px; } }
+  @media (min-width: 900px) { .chips-fade { display: none; } }
 
   .chip {
     display: inline-flex; align-items: center; gap: 8px; flex: none;
@@ -127,8 +131,10 @@
   .chip .n { font-variant-numeric: tabular-nums; font-weight: 600; opacity: .65; }
   .chip .ic { width: 16px; height: 16px; color: var(--saved); }
 
-  .search { position: relative; display: block; flex: none; }
-  @media (min-width: 900px) { .search { width: 300px; } }
+  .search-wrap { display: flex; flex-direction: column; flex: none; }
+  @media (min-width: 900px) { .search-wrap { width: 320px; } }
+
+  .search { position: relative; display: block; width: 100%; }
   .search .ic { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--faint); pointer-events: none; }
   .search input {
     width: 100%; height: 44px; padding: 0 44px 0 42px;
@@ -147,6 +153,26 @@
   }
   .search .clear:hover { color: var(--text); background: var(--surface-2); }
   .search .clear .ic { position: static; transform: none; width: 16px; height: 16px; color: inherit; }
+
+  /* おすすめ検索タグ */
+  .quick-tags {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .quick-tags-lbl {
+    font-size: 11.5px; color: var(--faint); margin-right: 2px;
+  }
+  .q-tag {
+    font-size: 11.5px; padding: 3px 10px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    color: var(--muted); cursor: pointer; transition: all .15s ease;
+    user-select: none;
+  }
+  .q-tag:hover {
+    background: var(--surface); border-color: var(--line-strong); color: var(--text);
+  }
+  .q-tag.active {
+    background: rgba(139, 156, 255, .18); border-color: var(--accent); color: var(--accent); font-weight: 600;
+  }
 
   /* ───────── リスト見出し ───────── */
   .list-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
@@ -533,26 +559,29 @@
     *, *::before, *::after { transition-duration: 0s !important; transition-delay: 0s !important; }
   }
 
-  /* ───────── 印刷（A4・明色・詳細を展開） ───────── */
+  /* ───────── 印刷廃止（コンテンツ流出防止のため印刷時は全非表示） ───────── */
   @media print {
-    :root {
-      --bg: #fff; --surface: #fff; --surface-2: #f3f4f6; --line: #d5dae1; --line-strong: #b8c0cc;
-      --text: #111827; --muted: #374151; --faint: #4b5563;
-      --good: #047857; --mid: #b45309; --low: #be123c;
-    }
-    .r-S { --c: #e11d48; --c-bg: #ffe4e9; }
-    .r-A { --c: #b45309; --c-bg: #fef3c7; }
-    .r-B { --c: #1d4ed8; --c-bg: #dbeafe; }
-    .r-C { --c: #475569; --c-bg: #e2e8f0; }
-    *, *::before, *::after { transition: none !important; }
-    body { padding-bottom: 0; font-size: 12pt; }
-    .site-header .print-btn, .controls, .list-tools, .card-actions, .toast { display: none !important; }
-    .cards { grid-template-columns: 1fr; gap: 12px; }
-    .card { break-inside: avoid; padding: 18px; }
-    .more { grid-template-rows: 1fr !important; }
-    .more-in { visibility: visible !important; }
-    .adapt li, .jp-body { color: #111827; }
-    .tile, .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { display: none !important; }
+  }
+
+  /* ───────── トップへ戻るボタン ───────── */
+  .scroll-top-btn {
+    position: fixed; right: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--line-strong);
+    color: var(--text); box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    display: grid; place-items: center; cursor: pointer;
+    z-index: 90; opacity: 0; pointer-events: none; transform: translateY(12px);
+    transition: opacity .25s ease, transform .25s ease, background .15s, border-color .15s, color .15s;
+  }
+  .scroll-top-btn.visible {
+    opacity: 1; pointer-events: auto; transform: translateY(0);
+  }
+  .scroll-top-btn:hover {
+    background: var(--surface-2); border-color: var(--accent); color: var(--accent);
+  }
+  @media (max-width: 639px) {
+    .scroll-top-btn { right: 16px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 40px; height: 40px; }
   }
   /* ロックモーダル用スタイル（会員制プレミアムUI） */
   #lockModal {
@@ -864,13 +893,14 @@
       <span>📝 noteメンバーシップで合言葉を取得</span>
     </a>
 
-    <!-- 3. 特典一覧 -->
+    <!-- 3. 特典一覧（提供範囲を正確に明記） -->
     <div class="lock-features" style="margin-top:20px; margin-bottom:0;">
       <strong>✨ 会員アンロック特典:</strong>
       <ul>
-        <li><strong>S / Aランク全件検索</strong>（日本市場での勝機・想定ARR試算）</li>
-        <li><strong>全プロダクト詳細・競合比較</strong>（過去リサーチDBすべて）</li>
-        <li><strong>SNS発信用ツリー原稿</strong>の1クリックコピー</li>
+        <li><strong>S / Aランク全件検索</strong>（日本市場での勝機・詳細解説）</li>
+        <li><strong>note週報連動</strong>（最上位Sランクの想定ARR試算・MVP仕様書）</li>
+        <li><strong>蓄積リサーチDB</strong>（過去アーカイブ全件の全文検索・しおり保存）</li>
+        <li><strong>SNS発信用ツリー原稿</strong>の1クリックコピー（発信利用フリー）</li>
       </ul>
     </div>
   </div>
@@ -1016,15 +1046,29 @@
 <main class="wrap">
 
   <section class="controls" aria-label="絞り込み">
-    <div class="chips" id="chips" role="group" aria-label="判定ランク"></div>
-    <label class="search">
-      <span class="sr">キーワード検索</span>
-      <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
-      <input id="q" type="search" placeholder="キーワードで検索" autocomplete="off" enterkeyhint="search">
-      <button id="clear" class="clear" type="button" aria-label="検索をクリア" hidden>
-        <svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>
-      </button>
-    </label>
+    <div class="chips-container">
+      <div class="chips" id="chips" role="group" aria-label="判定ランク"></div>
+      <div class="chips-fade" aria-hidden="true"></div>
+    </div>
+    <div class="search-wrap">
+      <label class="search">
+        <span class="sr">キーワード検索</span>
+        <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="q" type="search" placeholder="キーワードで検索" autocomplete="off" enterkeyhint="search">
+        <button id="clear" class="clear" type="button" aria-label="検索をクリア" hidden>
+          <svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
+      </label>
+      <div class="quick-tags" id="quickTags">
+        <span class="quick-tags-lbl">おすすめタグ:</span>
+        <button type="button" class="q-tag" data-tag="自動化">#自動化</button>
+        <button type="button" class="q-tag" data-tag="営業">#営業支援</button>
+        <button type="button" class="q-tag" data-tag="Notion">#Notion連携</button>
+        <button type="button" class="q-tag" data-tag="マーケティング">#マーケ</button>
+        <button type="button" class="q-tag" data-tag="採用">#人事・採用</button>
+        <button type="button" class="q-tag" data-tag="開発">#開発ツール</button>
+      </div>
+    </div>
   </section>
 
   <div class="list-head">
@@ -1686,8 +1730,50 @@ $('#chips').addEventListener('click', (e) => {
   apply();
 });
 
-$('#q').addEventListener('input', (e) => { query = e.target.value; apply(); });
-$('#clear').addEventListener('click', () => { $('#q').value = ''; query = ''; apply(); $('#q').focus(); });
+$('#q').addEventListener('input', (e) => {
+  query = e.target.value;
+  const activeQTag = document.querySelector('.q-tag.active');
+  if (activeQTag && activeQTag.dataset.tag !== query) activeQTag.classList.remove('active');
+  apply();
+});
+$('#clear').addEventListener('click', () => {
+  $('#q').value = ''; query = '';
+  document.querySelectorAll('.q-tag').forEach((b) => b.classList.remove('active'));
+  apply();
+  $('#q').focus();
+});
+
+const qTagsWrap = $('#quickTags');
+if (qTagsWrap) {
+  qTagsWrap.addEventListener('click', (e) => {
+    const btn = e.target.closest('.q-tag');
+    if (!btn) return;
+    const tag = btn.dataset.tag;
+    const isActive = btn.classList.contains('active');
+    qTagsWrap.querySelectorAll('.q-tag').forEach((b) => b.classList.remove('active'));
+    if (isActive) {
+      $('#q').value = '';
+      query = '';
+    } else {
+      btn.classList.add('active');
+      $('#q').value = tag;
+      query = tag;
+    }
+    apply();
+    $('#q').focus();
+  });
+}
+
+const scrollBtn = $('#scrollTopBtn');
+if (scrollBtn) {
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 350) scrollBtn.classList.add('visible');
+    else scrollBtn.classList.remove('visible');
+  }, { passive: true });
+  scrollBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
 
 $('#cards').addEventListener('click', (e) => {
   const b = e.target.closest('[data-act]');
@@ -1721,7 +1807,9 @@ $('#toggleAll').addEventListener('click', () => {
 });
 
 $('#emptyBtn').addEventListener('click', () => {
-  $('#q').value = ''; query = ''; rank = 'all'; apply();
+  $('#q').value = ''; query = ''; rank = 'all';
+  document.querySelectorAll('.q-tag').forEach((b) => b.classList.remove('active'));
+  apply();
 });
 
 /* ---------- 暗号化・復号処理 (WebCrypto API) ---------- */
@@ -1907,5 +1995,8 @@ function initDashboard() {
   }
 })();
 </script>
+<button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="ページ最上部へ戻る" title="トップへ戻る">
+  <svg class="ic" aria-hidden="true" style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+</button>
 </body>
 </html>
