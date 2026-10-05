@@ -92,6 +92,7 @@ def upload_project():
                 ".gitignore",
                 "requirements.txt",
                 ".env.example",
+                "CNAME",
             ]:
                 # プレビューやモック、一時ファイル名を含むものは除外
                 if "mock" in f.lower() or "preview" in f.lower() or "temp" in f.lower():
