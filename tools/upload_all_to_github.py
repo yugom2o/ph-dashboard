@@ -107,6 +107,14 @@ def upload_project():
         else:
             print(f"  [{idx}/{len(files_to_upload)}] [FAIL] {rel_path} (HTTP {put_res.status_code})")
 
+    print("\n[Step] GitHub Pages デプロイワークフローをトリガー中...")
+    try:
+        from src.reporters.github_uploader import GitHubUploader
+        uploader = GitHubUploader()
+        uploader.trigger_workflow_dispatch("deploy_pages.yml")
+    except Exception as e:
+        print(f"  [Warning] デプロイトリガー注意: {e}")
+
     print("\n==================================================")
     print("🎉 プロジェクトの一括アップロードが完了しました！")
     print("==================================================")
