@@ -153,29 +153,36 @@ class HTMLReporter:
                 except Exception:
                     comp_summary = competitors[:50]
 
-            # シグナル
+            # シグナル（U1 & U4対応: 全文を保持し、判定根拠・想定価格の文字欠落を完全解消）
+            jp_needs_full = (it.get("jp_needs") or "").strip()
+            jp_barriers_full = (it.get("jp_barriers") or "").strip()
+            pricing_full = (it.get("pricing_model") or "月額サブスクリプション").strip()
+
             signals = [
                 {
                     "k": "国内ペイン",
                     "v": "極めて高い" if score >= 85 else ("高い" if score >= 70 else "要検証"),
                     "t": "good" if score >= 70 else "mid",
-                    "n": it.get("jp_needs", "")[:120],
+                    "n": f"国内ペイン分析（AI仮説）: {jp_needs_full}" if jp_needs_full else "国内ペイン: 要追加調査",
+                },
+                {
+                    "k": "参入障壁",
+                    "v": "要商習慣適合" if "法規制" in jp_barriers_full else "中",
+                    "t": "good" if score >= 85 else "mid",
+                    "n": f"参入障壁・商習慣考察: {jp_barriers_full}" if jp_barriers_full else "参入障壁: 中",
                 },
                 {
                     "k": "国内競合",
                     "v": comp_summary if comp_summary else "直接競合は未確認 / 要追加調査",
                     "t": "mid",
                     "n": "競合状況: " + (comp_summary or "直接の類似SaaSは未確認（要追加調査）"),
+                    "wide": True,
                 },
                 {
-                    "k": "参入障壁",
-                    "v": "要商習慣適合" if "法規制" in it.get("jp_barriers", "") else "中",
-                    "t": "good" if score >= 85 else "mid",
-                    "n": it.get("jp_barriers", "")[:120],
-                },
-                {
-                    "k": "想定価格",
-                    "v": it.get("pricing_model", "月額サブスクリプション")[:25],
+                    "k": "想定価格(仮説)",
+                    "v": pricing_full,
+                    "n": f"日本版の事業化想定価格（仮説）: {pricing_full}",
+                    "wide": True,
                 },
             ]
 
@@ -208,6 +215,8 @@ class HTMLReporter:
                     "origNote": "海外最新ツールの機能概要 (日本語解説)" if it.get("original_summary_ja") else "海外公式発表より",
                     "idea": one_line or f"{name}の日本展開モデル",
                     "body": body,
+                    "jpLabel": "日本向け事業アイデア（AI分析・仮説）",
+                    "pricing": pricing_full,
                     "target": targets or ["法人営業チーム", "中小企業"],
                     "adapt": adapt_points[:3],
                     "snsDraft": it.get("sns_post_draft") or "",
