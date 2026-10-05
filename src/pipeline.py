@@ -27,11 +27,13 @@ class DailyPipeline:
             # モック実行時は専用の分離DB・出力先を使用（本番DB・成果物の汚染防止: R5対応）
             from config import BASE_DIR, DATA_DIR, REPORTS_DIR
             mock_db_path = DATA_DIR / "mock_history.db"
+            mock_scratch_dir = BASE_DIR / "scratch"
+            mock_scratch_dir.mkdir(parents=True, exist_ok=True)
             self.db = Database(db_path=mock_db_path)
             self.md_reporter = MarkdownReporter(output_dir=REPORTS_DIR / "mock")
             self.html_reporter = HTMLReporter(
-                output_path=BASE_DIR / "dashboard_mock.html",
-                docs_output_path=BASE_DIR / "docs" / "index_mock.html",
+                output_path=mock_scratch_dir / "dashboard_mock.html",
+                docs_output_path=mock_scratch_dir / "index_mock.html",
             )
         else:
             self.db = Database()
@@ -61,7 +63,7 @@ class DailyPipeline:
 
         print(f"==================================================")
         print(f"🌐 Global Tech Radar 日次分析パイプライン開始: {today_str}")
-        print(f"モード: {'モック (テスト)' if self.is_mock else '実動 (Gemini + Grounding)'} / 上限: {fetch_limit}件")
+        print(f"モード: {'モック (テスト)' if self.is_mock else '本番実行 (Gemini LP解析)'} / 上限: {fetch_limit}件")
         print(f"==================================================")
 
         # 1. プロダクト収集
@@ -338,25 +340,35 @@ class DailyPipeline:
                     post2_text += f"\n\n🔗 海外公式サイト: {official_url}"
 
             print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} (画像: {'あり' if image_url else 'なし'} / ツリーリプライ: {'有効' if post2_text else '無効'}) ...")
-            # Step 1: 親ポストの投稿
-            parent_id = self.threads_publisher.publish(text=post1_text, image_url=image_url)
-            if not parent_id:
-                print(f"  -> [Error] 親ポストの投稿に失敗したため、二重投稿防止のため中断します。")
-                break
-
-            # Step 2: 親投稿ID取得直後に即時DBコミット（中断・クラッシュ時の二重投稿を根絶: R2対応）
-            record_id = self.db.record_threads_post(
+            # Step 1: 外部API呼び出し前に原子的に予約・枠確保 (二重投稿・結果不明時の再送防止: 第3回指摘2対応)
+            record_id = self.db.reserve_threads_post(
                 product_id=p_id,
-                post_id=parent_id,
                 text=post1_text,
                 image_url=image_url,
-                reply_post_id=None,
-                reply_text=None,
             )
+
+            # Step 2: 親ポストの外部公開呼び出し
+            parent_id = None
+            try:
+                parent_id = self.threads_publisher.publish(text=post1_text, image_url=image_url)
+            except Exception as e:
+                print(f"  -> [Error] Threads親ポスト公開中に例外発生: {e}")
+                self.db.update_threads_post_unknown(record_id, error_msg=str(e))
+                print(f"  -> [Safety Guard] 結果不明（status='unknown'）として記録しました。二重投稿防止のため自動再送・別案件送信を停止します。")
+                break
+
+            if not parent_id:
+                print(f"  -> [Error] 親ポストの応答IDが得られませんでした（タイムアウトまたはAPIエラー）。")
+                self.db.update_threads_post_unknown(record_id, error_msg="Timeout or None response from API")
+                print(f"  -> [Safety Guard] 結果不明（status='unknown'）として記録しました。二重投稿防止のため自動再送・別案件送信を停止します。")
+                break
+
+            # Step 3: 親投稿成功を即時DB更新
+            self.db.update_threads_post_success(record_id=record_id, post_id=parent_id)
             posted_count += 1
             print(f"  -> 🎉 Threads親ポスト公開成功！ (親Post ID: {parent_id})")
 
-            # Step 3: リプライ（子ポスト）を投稿
+            # Step 4: リプライ（子ポスト）を投稿
             if post2_text:
                 import time
                 print("  -> 親ポスト反映待ち (4秒待機後、2通目リプライを自動投稿)...")
