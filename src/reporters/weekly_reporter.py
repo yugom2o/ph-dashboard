@@ -321,7 +321,7 @@ note（メンバーシップ / 有料記事）にそのまま掲載できる、*
 ## 🔑 【会員限定特典】Webダッシュボード合言葉のご案内
 当メディア公式の**暗号化Webダッシュボード**（過去すべての分析データベース、検索、しおり機能）へアクセスするための最新の合言葉は、メンバーシップ加入特典ページにてご案内しています。
 
-👉 **[Webダッシュボードを開く](https://yugom2o.github.io/ph-dashboard/)**
+👉 **[Webダッシュボードを開く](https://globaltechradar.com/)**
 
 ---
 
@@ -347,5 +347,5 @@ note（メンバーシップ / 有料記事）にそのまま掲載できる、*
 
 ## 📣 編集後記 & リンク
 * ⚡ **毎朝の速報（Threads）**: [@get_globaltechinfo](https://www.threads.net/@get_globaltechinfo) をフォローして最新AIツールを毎朝チェック
-* 📊 **Webダッシュボード**: [直近の分析データベースを閲覧する](https://yugom2o.github.io/ph-dashboard/)
+* 📊 **Webダッシュボード**: [直近の分析データベースを閲覧する](https://globaltechradar.com/)
 """
