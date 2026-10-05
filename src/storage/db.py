@@ -336,19 +336,68 @@ class Database:
         product_id: str,
         text: str,
         image_url: Optional[str] = None,
-    ) -> int:
-        """Threads投稿枠を事前に予約 (原子的に日次枠・プロダクトを確保: status='pending')"""
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(
+        *,
+        daily_limit: int,
+    ) -> Optional[int]:
+        """Threads投稿枠を事前に予約 (原子的に日次枠・プロダクトを確保: BEGIN IMMEDIATE 排他ロック)"""
+        from datetime import datetime, timezone, timedelta
+
+        if daily_limit <= 0:
+            return None
+        if not product_id:
+            raise ValueError("product_id is required")
+
+        conn = self.get_connection()
+        try:
+            # 日次枠の確認前に書き込み権を取得する。
+            # 別接続の予約処理は、ここで現在の予約処理の完了を待つ。
+            conn.execute("BEGIN IMMEDIATE")
+
+            # ロック取得後に日時を確定し、集計日と保存日時をそろえる。
+            now_utc = datetime.now(timezone.utc)
+            jst_date = now_utc.astimezone(
+                timezone(timedelta(hours=9))
+            ).strftime("%Y-%m-%d")
+            reserved_at_utc = now_utc.strftime("%Y-%m-%d %H:%M:%S")
+
+            existing = conn.execute(
+                "SELECT 1 FROM threads_posts WHERE product_id = ? LIMIT 1",
+                (product_id,),
+            ).fetchone()
+            if existing is not None:
+                conn.rollback()
+                return None
+
+            used = conn.execute(
                 """
-                INSERT INTO threads_posts (product_id, post_id, status, text, image_url, reply_post_id, reply_text)
-                VALUES (?, ?, 'pending', ?, ?, NULL, NULL)
+                SELECT COUNT(*) FROM threads_posts
+                WHERE date(posted_at, '+9 hours') = ?
                 """,
-                (product_id, "PENDING", text, image_url),
+                (jst_date,),
+            ).fetchone()[0]
+            # pending・unknownも枠を消費する。publishedだけに限定しない。
+            if used >= daily_limit:
+                conn.rollback()
+                return None
+
+            cursor = conn.execute(
+                """
+                INSERT INTO threads_posts (
+                    product_id, post_id, status, text, image_url,
+                    reply_post_id, reply_text, posted_at
+                ) VALUES (?, 'PENDING', 'pending', ?, ?, NULL, NULL, ?)
+                """,
+                (product_id, text, image_url, reserved_at_utc),
             )
+            record_id = cursor.lastrowid
             conn.commit()
-            return cursor.lastrowid
+            return record_id
+        except BaseException:
+            # DBエラー・中断時は未確定の予約を取り消す。
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
 
     def update_threads_post_success(
         self,
