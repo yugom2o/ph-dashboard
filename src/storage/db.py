@@ -284,15 +284,16 @@ class Database:
     def get_threads_posts_count_by_date(self, target_date: Optional[str] = None) -> int:
         """指定日（JST基準）のThreads投稿件数を取得"""
         if not target_date:
-            target_date = datetime.now().strftime("%Y-%m-%d")
+            from datetime import timezone, timedelta
+            target_date = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
                 """
                 SELECT COUNT(*) FROM threads_posts 
-                WHERE date(posted_at, '+9 hours') = ? OR date(posted_at) = ?
+                WHERE date(posted_at, '+9 hours') = ?
                 """,
-                (target_date, target_date),
+                (target_date,),
             )
             return cursor.fetchone()[0]
 
@@ -347,3 +348,15 @@ class Database:
             )
             conn.commit()
             return cursor.lastrowid
+
+    def update_threads_post_reply(self, record_id: int, reply_post_id: str, reply_text: str):
+        """Threads投稿実績にリプライ（子ポスト）情報を追記更新"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                UPDATE threads_posts SET reply_post_id = ?, reply_text = ? WHERE id = ?
+                """,
+                (reply_post_id, reply_text, record_id),
+            )
+            conn.commit()
