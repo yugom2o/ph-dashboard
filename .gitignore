@@ -1,0 +1,23 @@
+# Confidential analysis database & reports
+data/
+reports/
+logs/
+*.db
+*.log
+
+# Sensitive environment credentials
+.env
+.env.*
+!.env.example
+
+# Python runtime & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Scratch & temporary workspace
+scratch/
+.system_generated/
