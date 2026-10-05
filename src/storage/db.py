@@ -67,6 +67,7 @@ class Database:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     product_id TEXT NOT NULL,
                     post_id TEXT NOT NULL,
+                    status TEXT DEFAULT 'published',
                     text TEXT,
                     image_url TEXT,
                     reply_post_id TEXT,
@@ -84,6 +85,8 @@ class Database:
 
             cursor.execute("PRAGMA table_info(threads_posts)")
             tp_cols = [c[1] for c in cursor.fetchall()]
+            if "status" not in tp_cols:
+                cursor.execute("ALTER TABLE threads_posts ADD COLUMN status TEXT DEFAULT 'published'")
             if "image_url" not in tp_cols:
                 cursor.execute("ALTER TABLE threads_posts ADD COLUMN image_url TEXT")
             if "reply_post_id" not in tp_cols:
@@ -96,6 +99,7 @@ class Database:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_eval_analyzed_date ON evaluations(analyzed_date)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_eval_rank ON evaluations(rank)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_threads_product_id ON threads_posts(product_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_threads_status ON threads_posts(status)")
             conn.commit()
 
     def is_already_analyzed(self, ph_url: str) -> bool:
@@ -318,7 +322,7 @@ class Database:
             return [r for r in rows if r.get("sns_post_draft")]
 
     def is_already_posted_to_threads(self, product_id: str) -> bool:
-        """指定されたプロダクトが既にThreadsに投稿済みか確認"""
+        """指定されたプロダクトが既にThreadsに投稿（予約・不明含む）済みか確認"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -326,6 +330,61 @@ class Database:
                 (product_id,),
             )
             return cursor.fetchone()[0] > 0
+
+    def reserve_threads_post(
+        self,
+        product_id: str,
+        text: str,
+        image_url: Optional[str] = None,
+    ) -> int:
+        """Threads投稿枠を事前に予約 (原子的に日次枠・プロダクトを確保: status='pending')"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO threads_posts (product_id, post_id, status, text, image_url, reply_post_id, reply_text)
+                VALUES (?, ?, 'pending', ?, ?, NULL, NULL)
+                """,
+                (product_id, "PENDING", text, image_url),
+            )
+            conn.commit()
+            return cursor.lastrowid
+
+    def update_threads_post_success(
+        self,
+        record_id: int,
+        post_id: str,
+    ):
+        """Threads親ポスト成功を記録 (status='published')"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                UPDATE threads_posts 
+                SET post_id = ?, status = 'published'
+                WHERE id = ?
+                """,
+                (post_id, record_id),
+            )
+            conn.commit()
+
+    def update_threads_post_unknown(
+        self,
+        record_id: int,
+        error_msg: str = "",
+    ):
+        """Threads親ポスト結果不明を記録 (status='unknown'、自動再送を停止して手動確認待ち)"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                UPDATE threads_posts 
+                SET status = 'unknown', reply_text = ?
+                WHERE id = ?
+                """,
+                (f"ERROR: {error_msg}"[:200], record_id),
+            )
+            conn.commit()
 
     def record_threads_post(
         self,
@@ -341,8 +400,8 @@ class Database:
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO threads_posts (product_id, post_id, text, image_url, reply_post_id, reply_text)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO threads_posts (product_id, post_id, status, text, image_url, reply_post_id, reply_text)
+                VALUES (?, ?, 'published', ?, ?, ?, ?)
                 """,
                 (product_id, post_id, text, image_url, reply_post_id, reply_text),
             )
