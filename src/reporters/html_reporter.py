@@ -39,6 +39,38 @@ class HTMLReporter:
         return ""
 
     @staticmethod
+    def normalize_category(it: Dict[str, Any]) -> str:
+        """抽象的なTech/Web/AI分類を、実用的なビジネス・用途別カテゴリへ正規化"""
+        raw_cat = (it.get("category") or "").strip()
+        text = (
+            f"{it.get('name', '')} {it.get('tagline', '')} {it.get('one_line_summary', '')} "
+            f"{it.get('target_market', '')} {it.get('original_summary_ja', '')} {it.get('description', '')}"
+        ).lower()
+
+        if any(k in text for k in ["営業", "商談", "インサイドセールス", "sfa", "提案書", "テレアポ", "リード獲得", "セールス", "crm"]):
+            return "営業支援・SFA"
+        if any(k in text for k in ["マーケ", "sns", "広告", "seo", "threads", "x運用", "広報", "pr times", "メール配信"]):
+            return "マーケティング・SNS"
+        if any(k in text for k in ["開発", "コード", "github", "api", "プログラミング", "エンジニア", "デバッグ", "sdk", "mcp", "terminal", "cli"]):
+            return "開発者ツール"
+        if any(k in text for k in ["人事", "採用", "労務", "オンボーディング", "求人", "面接", "社員", "給与"]):
+            return "人事・採用・HR"
+        if any(k in text for k in ["デザイン", "動画", "画像生成", "スライド", "プレゼン", "バナー", "youtube", "イラスト", "3d"]):
+            return "デザイン・動画AI"
+        if any(k in text for k in ["議事録", "会議", "ミーティング", "slack", "teams", "文字起こし", "音声認識", "通訳"]):
+            return "会議・議事録AI"
+        if any(k in text for k in ["サポート", "問い合わせ", "ヘルプデスク", "カスタマーサクセス", "faq", "チャットボット"]):
+            return "カスタマーサポート"
+        if any(k in text for k in ["自動化", "ワークフロー", "rpa", "スクレイピング", "請求書", "経理", "稟議", "業務効率"]):
+            return "業務自動化・SaaS"
+        if any(k in text for k in ["メモ", "notion", "タスク", "習慣", "個人", "学習", "mac", "ブラウザ", "英語"]):
+            return "個人生産性・学習"
+
+        if raw_cat and not any(g in raw_cat.lower() for g in ["tech", "web", "ai", "artificial"]):
+            return raw_cat
+        return "B2B SaaS / 業務AI"
+
+    @staticmethod
     def encrypt_data_multirole(
         plain_text: str,
         admin_password: str,
@@ -128,7 +160,7 @@ class HTMLReporter:
             tagline = it.get("tagline", "")
             desc = it.get("description", "")
             ph_url = it.get("ph_url", "")
-            category = it.get("category", "Tech / Web")
+            category = self.normalize_category(it)
             one_line = it.get("one_line_summary", "")
             body = it.get("jp_adaptation", "")
             target_str = it.get("target_market", "国内法人 / 中小企業")
