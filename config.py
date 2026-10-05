@@ -28,7 +28,8 @@ GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 DAILY_FETCH_LIMIT = int(os.getenv("DAILY_FETCH_LIMIT", "10"))
 
 # ダッシュボード保護＆GitHub Pages公開設定
-DASHBOARD_PASSWORD = os.getenv("DASHBOARD_PASSWORD", "")
+DASHBOARD_PASSWORD = os.getenv("DASHBOARD_PASSWORD", "")  # 管理者用合言葉（情報保護解除）
+DASHBOARD_MEMBER_PASSWORD = os.getenv("DASHBOARD_MEMBER_PASSWORD", "")  # 一般会員用合言葉（情報保護有効）
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 GITHUB_REPO = os.getenv("GITHUB_REPO", "")
 
