@@ -69,7 +69,13 @@ def upload_project():
             if f in EXCLUDE_FILES:
                 continue
             path = Path(root) / f
-            if path.suffix.lower() in INCLUDE_EXTS or f in ["LICENSE", "Procfile"]:
+            if path.suffix.lower() in INCLUDE_EXTS or f in [
+                "LICENSE",
+                "Procfile",
+                ".gitignore",
+                "requirements.txt",
+                ".env.example",
+            ]:
                 rel_path = path.relative_to(BASE_DIR).as_posix()
                 files_to_upload.append((path, rel_path))
 
