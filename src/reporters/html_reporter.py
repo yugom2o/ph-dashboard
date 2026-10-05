@@ -242,10 +242,12 @@ class HTMLReporter:
             products_json=products_json_str if allow_unencrypted else "[]",
         )
 
-        # レンダリング結果の出力
         if allow_unencrypted:
-            # プレビュー専用モード（R4対応）: 公開用 docs/index.html や dashboard.html は汚染せず、別名プレビューファイルにのみ出力
-            preview_file = self.output_path.parent / "preview_unencrypted.html"
+            # プレビュー専用モード: 公開用 docs/index.html や dashboard.html は汚染せず、
+            # アップロード除外対象の scratch ディレクトリ内にのみ出力
+            preview_dir = self.output_path.parent / "scratch"
+            preview_dir.mkdir(parents=True, exist_ok=True)
+            preview_file = preview_dir / "preview_unencrypted.html"
             preview_file.write_text(rendered_html, encoding="utf-8")
             print(f"  [Security] 平文プレビューを出力しました: {preview_file} (本番公開用ファイルは保護されました)")
             return preview_file
