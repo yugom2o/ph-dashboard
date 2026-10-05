@@ -223,7 +223,8 @@ class DailyPipeline:
             )
             import os
             if not os.getenv("GITHUB_ACTIONS"):
-                self.github_uploader.trigger_workflow_dispatch("daily_analyzer.yml")
+                # Pagesのデプロイのみをトリガー（daily_analyzer.ymlを誤実行してThreads二重投稿するのを防止）
+                self.github_uploader.trigger_workflow_dispatch("deploy_pages.yml")
 
         # 6. Threads への自動投稿 (有効時)
         should_publish_threads = (
