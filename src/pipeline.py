@@ -288,17 +288,14 @@ class DailyPipeline:
                     post2_text = reply_draft
                 else:
                     one_line = item.get("one_line_summary", "")
-                    target = item.get("target_market", "")
-                    adaptation = item.get("jp_adaptation", "")
                     post2_text = (
-                        f"🇯🇵 日本市場でのタイムマシン事業チャンス\n\n"
-                        f"💡 コンセプト: {one_line}\n"
-                        f"🎯 ターゲット: {target}\n"
-                        f"🚀 勝機: {adaptation[:110]}..."
+                        f"🇯🇵 日本市場での着眼点：\n"
+                        f"{one_line}\n\n"
+                        f"👉 日本版MVPの具体的な機能要件・想定ARR試算は、プロフィール欄のnote週刊レポートにて徹底解剖しています📝"
                     )
 
                 if official_url and official_url not in post2_text:
-                    post2_text += f"\n\n🔗 公式サイト: {official_url}"
+                    post2_text += f"\n\n🔗 海外公式サイト: {official_url}"
 
             print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} (画像: {'あり' if image_url else 'なし'} / ツリーリプライ: {'有効' if post2_text else '無効'}) ...")
             parent_id, reply_id = self.threads_publisher.publish_thread(
