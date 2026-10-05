@@ -1,11 +1,12 @@
 from typing import List, Literal, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class CompetitorItem(BaseModel):
     name: str = Field(..., description="日本国内の実在する競合サービス名または企業名")
     description: str = Field(..., description="競合のサービス概要・特徴")
     differentiation: str = Field(..., description="本プロダクトとの違い・差別化ポイント")
+    url: Optional[str] = Field(default=None, description="競合の公式サイトURL（確認可能な場合）")
 
 
 class EvaluationResult(BaseModel):
@@ -47,3 +48,16 @@ class EvaluationResult(BaseModel):
         default=None,
         description="SNSツリー2通目用リプライ案（120〜220字程度。日本市場での具体的なタイムマシン事業の勝機・想定ターゲット・アレンジ案・国内連携ツールを提示。※外部リンク導線はシステム側で自動付与）",
     )
+
+    @model_validator(mode="after")
+    def sync_rank_with_score(self):
+        """スコアとランクの整合性をコード側で強制同期（S: >=85, A: 70-84, B: 50-69, C: <50）"""
+        if self.score >= 85:
+            self.rank = "S"
+        elif self.score >= 70:
+            self.rank = "A"
+        elif self.score >= 50:
+            self.rank = "B"
+        else:
+            self.rank = "C"
+        return self
