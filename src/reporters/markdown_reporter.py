@@ -7,6 +7,7 @@ from config import REPORTS_DIR
 class MarkdownReporter:
     def __init__(self, output_dir: Path = REPORTS_DIR):
         self.output_dir = output_dir
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def generate_daily_report(self, items: List[Dict[str, Any]], target_date: str) -> Path:
         """日次Markdownレポートの生成"""
