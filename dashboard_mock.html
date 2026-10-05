@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0e1218">
+<title>Global Tech Radar 🇯🇵 海外最新テック＆日本市場適応分析</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0e1218;
+    --surface: #151a22;
+    --surface-2: #1c222c;
+    --line: rgba(255, 255, 255, .08);
+    --line-strong: rgba(255, 255, 255, .18);
+    --text: #eaeef4;
+    --muted: #a3adbb;
+    --faint: #7f8a99;
+    --accent: #8b9cff;
+    --good: #6ee7b7;
+    --mid: #fcd34d;
+    --low: #fda4af;
+    --saved: #fbbf24;
+    --sans: 'Inter', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', system-ui, sans-serif;
+  }
+
+  /* ランク色（タイル・ドット・見出しで共通利用） */
+  .r-S { --c: #fb7185; --c-bg: rgba(251, 113, 133, .14); }
+  .r-A { --c: #fbbf24; --c-bg: rgba(251, 191, 36, .14); }
+  .r-B { --c: #60a5fa; --c-bg: rgba(96, 165, 250, .14); }
+  .r-C { --c: #94a3b8; --c-bg: rgba(148, 163, 184, .14); }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 400 15px/1.75 var(--sans);
+    -webkit-font-smoothing: antialiased;
+    word-break: auto-phrase;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+  h1, h2, h3, p, dl, dd { margin: 0; }
+  button { font: inherit; color: inherit; }
+  ::selection { background: rgba(139, 156, 255, .35); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .sr {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .wrap {
+    max-width: 1120px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  @media (min-width: 640px) {
+    .wrap { padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px)); }
+  }
+
+  .ic { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ───────── ヘッダー ───────── */
+  .site-header { padding-top: calc(20px + env(safe-area-inset-top, 0px)); padding-bottom: 20px; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .logo {
+    width: 40px; height: 40px; border-radius: 12px; flex: none;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4); color: #fff;
+    display: grid; place-items: center;
+    font: 800 20px/1 'Inter', sans-serif;
+  }
+  .brand-info { min-width: 0; display: flex; flex-direction: column; }
+  .brand-title-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .brand h1 { font-size: 18px; line-height: 1.3; font-weight: 700; letter-spacing: -.01em; margin: 0; }
+  .brand .date { font-size: 13.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+  .header-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 40px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent;
+    color: var(--muted); font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--line-strong); }
+  .print-btn { white-space: nowrap; }
+  @media (max-width: 639px) {
+    .print-btn { width: 44px; min-height: 44px; padding: 0; }
+    .print-btn span { display: none; }
+  }
+  .btn.plain { border-color: transparent; padding: 0 10px; }
+  .btn.plain:hover { background: var(--surface); }
+
+  /* ───────── 絞り込み ───────── */
+  .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  @media (min-width: 900px) {
+    .controls { flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; }
+  }
+  .chips {
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+    margin: 0 -16px; padding: 2px 16px;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  @media (min-width: 640px) { .chips { margin: 0 -28px; padding: 2px 28px; } }
+  @media (min-width: 900px) { .chips { margin: 0; padding: 2px 0; overflow: visible; } }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; flex: none;
+    height: 40px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent;
+    color: var(--muted); font-size: 14px; font-weight: 500; line-height: 1;
+    white-space: nowrap; cursor: pointer;
+    transition: color .15s, background .15s, border-color .15s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--line-strong); }
+  .chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--bg); }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+  .chip .n { font-variant-numeric: tabular-nums; font-weight: 600; opacity: .65; }
+  .chip .ic { width: 16px; height: 16px; color: var(--saved); }
+
+  .search { position: relative; display: block; flex: none; }
+  @media (min-width: 900px) { .search { width: 300px; } }
+  .search .ic { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--faint); pointer-events: none; }
+  .search input {
+    width: 100%; height: 44px; padding: 0 44px 0 42px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    color: var(--text); font: 400 16px/1 var(--sans);
+    transition: border-color .15s;
+  }
+  .search input::placeholder { color: var(--faint); }
+  .search input:hover { border-color: var(--line-strong); }
+  .search input:focus { outline: none; border-color: var(--accent); }
+  .search input::-webkit-search-cancel-button { display: none; }
+  .search .clear {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 36px; height: 36px; border: 0; border-radius: 10px; background: transparent;
+    color: var(--muted); cursor: pointer; display: grid; place-items: center;
+  }
+  .search .clear:hover { color: var(--text); background: var(--surface-2); }
+  .search .clear .ic { position: static; transform: none; width: 16px; height: 16px; color: inherit; }
+
+  /* ───────── リスト見出し ───────── */
+  .list-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+  .list-head h2 { font-size: 20px; line-height: 1.4; font-weight: 700; letter-spacing: -.01em; }
+  .list-head h2 .lh-rank { font-family: 'Inter', sans-serif; font-weight: 800; color: var(--c); margin-right: 10px; }
+  .list-head p { font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .list-tools { display: flex; align-items: center; gap: 4px; flex: none; }
+  .list-tools .count { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; padding-right: 6px; }
+
+  /* ───────── カード ───────── */
+  .cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (min-width: 960px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
+
+  .card {
+    --gap: 20px;
+    display: flex; flex-direction: column; gap: var(--gap);
+    padding: 20px; border-radius: 20px;
+    background: var(--surface); border: 1px solid var(--line);
+    transition: border-color .2s;
+  }
+  .card:hover { border-color: var(--line-strong); }
+  @media (min-width: 640px) { .card { padding: 28px; --gap: 22px; } }
+
+  .card-head { display: flex; align-items: center; gap: 14px; }
+  .tile {
+    width: 44px; height: 44px; border-radius: 12px; flex: none;
+    background: var(--c-bg); color: var(--c);
+    display: grid; place-items: center;
+    font: 800 22px/1 'Inter', sans-serif;
+  }
+  .ident { min-width: 0; }
+  .name { font-size: 17px; line-height: 1.35; font-weight: 700; letter-spacing: -.005em; font-feature-settings: "palt"; overflow-wrap: anywhere; }
+  .cat { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  /* 元のプロダクト → 日本版 → ターゲット */
+  .brief { display: flex; flex-direction: column; gap: 20px; }
+  .lbl { display: block; font-size: 13px; line-height: 1.5; color: var(--faint); margin-bottom: 4px; }
+  .lbl-note { margin-left: 8px; }
+  .orig { padding-left: 14px; border-left: 2px solid var(--line-strong); }
+  .orig p { font-size: 15px; line-height: 1.7; color: var(--muted); }
+  .jp .lbl { color: var(--c); font-weight: 600; }
+  .idea {
+    font-size: 18px; line-height: 1.6; font-weight: 700; letter-spacing: .005em;
+    font-feature-settings: "palt"; text-wrap: balance;
+  }
+  @media (min-width: 640px) { .idea { font-size: 20px; } }
+  .card.pass .idea { color: var(--muted); }
+  .jp-body { font-size: 15px; line-height: 1.8; color: #cbd3de; margin-top: 8px; }
+  .target { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .target .lbl { margin: 0; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .tag {
+    padding: 3px 12px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    font-size: 14px; line-height: 1.6; color: var(--text);
+  }
+
+  .signals {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 20px;
+  }
+  @media (min-width: 640px) { .signals { gap: 18px 24px; } }
+  @media (max-width: 339px) { .signals { grid-template-columns: minmax(0, 1fr); } }
+  .sig dt { font-size: 13px; color: var(--faint); line-height: 1.5; }
+  .sig dd { font-size: 15px; font-weight: 600; line-height: 1.5; margin-top: 2px; }
+  .sig dd.good { color: var(--good); }
+  .sig dd.mid { color: var(--mid); }
+  .sig dd.low { color: var(--low); }
+
+  .card-actions {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding-top: 12px; border-top: 1px solid var(--line);
+    margin-top: -4px;
+  }
+  .more-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    min-height: 40px; padding: 0 10px 0 4px; margin-left: -4px;
+    border: 0; border-radius: 10px; background: transparent;
+    color: var(--muted); font-size: 14px; font-weight: 500; cursor: pointer;
+  }
+  .more-btn:hover { color: var(--text); }
+  .more-btn .ic { width: 18px; height: 18px; transition: transform .25s ease; }
+  .card.open .more-btn .ic { transform: rotate(180deg); }
+
+  .icons { display: flex; align-items: center; gap: 2px; margin-right: -8px; }
+  .icon-btn {
+    width: 40px; height: 40px; border: 0; border-radius: 12px; background: transparent;
+    color: var(--muted); cursor: pointer;
+    display: grid; place-items: center; text-decoration: none;
+    transition: color .15s, background .15s;
+  }
+  .icon-btn:hover { color: var(--text); background: var(--surface-2); }
+  .icon-btn.on { color: var(--saved); }
+  .icon-btn.on .ic { fill: currentColor; }
+
+  /* 詳細（開閉） */
+  .more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; margin-top: calc(-1 * var(--gap)); }
+  .more-in { overflow: hidden; min-height: 0; visibility: hidden; transition: visibility 0s .28s; }
+  .card.open .more { grid-template-rows: 1fr; }
+  .card.open .more-in { visibility: visible; transition-delay: 0s; }
+  .more-pad { display: flex; flex-direction: column; gap: 20px; padding-top: var(--gap); }
+  .adapt { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .adapt li { position: relative; padding-left: 18px; font-size: 15px; line-height: 1.75; color: #cbd3de; }
+  .adapt li::before { content: ""; position: absolute; left: 0; top: .8em; width: 6px; height: 6px; border-radius: 2px; background: var(--c); }
+  .notes { display: flex; flex-direction: column; gap: 12px; }
+  .notes dt { font-size: 13px; color: var(--faint); line-height: 1.5; }
+  .notes dd { font-size: 14px; color: var(--muted); line-height: 1.7; }
+  .src { font-size: 13px; color: var(--faint); line-height: 1.6; overflow-wrap: anywhere; }
+
+  /* ───────── 空状態 / トースト ───────── */
+  .empty { padding: 72px 16px; text-align: center; }
+  .empty-title { font-size: 17px; font-weight: 700; }
+  .empty-body { font-size: 14px; color: var(--muted); margin: 6px 0 20px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+    padding: 12px 20px; border-radius: 14px;
+    background: var(--text); color: var(--bg);
+    font-size: 14px; font-weight: 600; line-height: 1.4; white-space: nowrap;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
+    transition: opacity .2s ease, transform .2s ease; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* タッチ端末の基本設定 */
+  @media (pointer: coarse) {
+    .chip { height: 42px; }
+    .icon-btn { width: 42px; height: 42px; }
+    .more-btn { min-height: 42px; }
+  }
+
+  /* ───────── スマートフォン・タブレット表示最適化 (max-width: 640px) ───────── */
+  @media (max-width: 640px) {
+    .site-header {
+      padding-top: calc(14px + env(safe-area-inset-top, 0px));
+      padding-bottom: 12px;
+    }
+    .bar {
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .brand {
+      gap: 10px;
+      flex: 1 1 auto;
+    }
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+    .brand-title-line {
+      gap: 6px;
+    }
+    .brand h1 {
+      font-size: 15.5px;
+    }
+    .brand .date {
+      font-size: 12px;
+      margin-top: 1px;
+    }
+    .header-actions {
+      gap: 6px;
+    }
+    .header-actions .btn {
+      min-height: 34px !important;
+      height: 34px;
+      padding: 0 10px;
+      font-size: 12px;
+      gap: 4px;
+      border-radius: 999px;
+    }
+    .header-actions .btn svg.ic {
+      width: 14px;
+      height: 14px;
+    }
+
+    .controls {
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .chips {
+      padding: 2px 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chip {
+      height: 38px !important;
+      padding: 0 13px;
+      font-size: 13px;
+      gap: 6px;
+    }
+
+    .list-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .list-head h2 {
+      font-size: 18px;
+    }
+    .list-tools {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .cards {
+      gap: 14px;
+    }
+    .card {
+      padding: 16px;
+      border-radius: 16px;
+      --gap: 16px;
+      gap: 16px;
+    }
+    .card-head {
+      gap: 10px;
+    }
+    .tile {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+    .name {
+      font-size: 16px;
+    }
+    .cat {
+      font-size: 12.5px;
+    }
+    .orig p {
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+    .idea {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .jp-body {
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+    .tag {
+      font-size: 12px;
+      padding: 2px 10px;
+    }
+    .signals {
+      gap: 10px 14px;
+    }
+    .sig dt {
+      font-size: 11.5px;
+    }
+    .sig dd {
+      font-size: 13px;
+    }
+    .card-actions {
+      padding-top: 10px;
+    }
+    .icon-btn {
+      width: 38px !important;
+      height: 38px !important;
+    }
+    .more-pad {
+      gap: 16px;
+    }
+
+    #manualDrawer {
+      width: 100%;
+      max-width: 100vw;
+    }
+    .drawer-head {
+      padding: 14px 18px;
+    }
+    .drawer-body {
+      padding: 18px 16px;
+      gap: 16px;
+    }
+
+    #lockModal {
+      padding: 14px;
+      align-items: center;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .lock-card {
+      padding: 24px 18px;
+      border-radius: 16px;
+      max-height: calc(100vh - 28px);
+      overflow-y: auto;
+    }
+    .lock-card h2 {
+      font-size: 19px;
+    }
+    .lock-card p.lock-sub {
+      font-size: 12.5px;
+      margin-bottom: 16px;
+    }
+    .lock-features {
+      padding: 12px 14px;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    .lock-input {
+      padding: 12px 14px;
+      font-size: 15px;
+    }
+    .lock-btn {
+      padding: 12px;
+      font-size: 14px;
+    }
+  }
+
+  /* ───────── 極小スマートフォン最適化 (max-width: 440px) ───────── */
+  @media (max-width: 440px) {
+    .site-header .bar {
+      gap: 10px 6px;
+    }
+    .site-header .brand {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .site-header .header-actions {
+      width: 100%;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+    }
+    .site-header .header-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0s !important; transition-delay: 0s !important; }
+  }
+
+  /* ───────── 印刷（A4・明色・詳細を展開） ───────── */
+  @media print {
+    :root {
+      --bg: #fff; --surface: #fff; --surface-2: #f3f4f6; --line: #d5dae1; --line-strong: #b8c0cc;
+      --text: #111827; --muted: #374151; --faint: #4b5563;
+      --good: #047857; --mid: #b45309; --low: #be123c;
+    }
+    .r-S { --c: #e11d48; --c-bg: #ffe4e9; }
+    .r-A { --c: #b45309; --c-bg: #fef3c7; }
+    .r-B { --c: #1d4ed8; --c-bg: #dbeafe; }
+    .r-C { --c: #475569; --c-bg: #e2e8f0; }
+    *, *::before, *::after { transition: none !important; }
+    body { padding-bottom: 0; font-size: 12pt; }
+    .site-header .print-btn, .controls, .list-tools, .card-actions, .toast { display: none !important; }
+    .cards { grid-template-columns: 1fr; gap: 12px; }
+    .card { break-inside: avoid; padding: 18px; }
+    .more { grid-template-rows: 1fr !important; }
+    .more-in { visibility: visible !important; }
+    .adapt li, .jp-body { color: #111827; }
+    .tile, .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  /* ロックモーダル用スタイル（会員制プレミアムUI） */
+  #lockModal {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(10, 14, 20, .92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .lock-card {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 20px;
+    padding: 36px 32px;
+    max-width: 440px; width: 100%;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .75);
+    text-align: center;
+    animation: modalIn .25s ease-out;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .lock-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 999px;
+    background: rgba(139, 156, 255, .15); border: 1px solid rgba(139, 156, 255, .3);
+    color: var(--accent); font-size: 12px; font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .lock-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; color: var(--text); letter-spacing: -.01em; }
+  .lock-card p.lock-sub { font-size: 13.5px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+  
+  .lock-features {
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 22px;
+    text-align: left; font-size: 12.5px; color: var(--text); line-height: 1.65;
+  }
+  .lock-features ul { margin: 6px 0 0; padding-left: 18px; }
+  .lock-features li { margin-bottom: 4px; color: var(--muted); }
+  .lock-features li strong { color: var(--text); }
+
+  .lock-input {
+    width: 100%; padding: 14px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    color: var(--text); font-size: 16px; font-weight: 600;
+    margin-bottom: 14px; outline: none; transition: border-color .2s, box-shadow .2s;
+    letter-spacing: .05em; text-align: center;
+  }
+  .lock-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 156, 255, .2); }
+  .lock-save-row {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 13px; color: var(--muted); margin-bottom: 20px; cursor: pointer; user-select: none;
+  }
+  .lock-save-row input { cursor: pointer; }
+  .lock-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #6366f1, #8b9cff); color: #fff;
+    border: none; border-radius: 12px;
+    font-weight: 700; font-size: 15px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, .4);
+    transition: opacity .2s, transform .1s;
+  }
+  .lock-btn:hover { opacity: .95; }
+  .lock-btn:active { transform: scale(.98); }
+  #lockError {
+    display: none; color: #fb7185; font-size: 13px; font-weight: 600;
+    margin-top: 12px; padding: 8px; border-radius: 8px;
+    background: rgba(251, 113, 133, .12); border: 1px solid rgba(251, 113, 133, .25);
+  }
+  .lock-cta-divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 24px 0 16px; font-size: 12px; color: var(--faint);
+  }
+  .lock-cta-divider::before, .lock-cta-divider::after {
+    content: ""; flex: 1; height: 1px; background: var(--line);
+  }
+  .lock-note-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 12px;
+    background: transparent; color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, .35); border-radius: 12px;
+    font-weight: 700; font-size: 13.5px; text-decoration: none;
+    transition: background .2s, border-color .2s;
+  }
+  .lock-note-btn:hover { background: rgba(34, 197, 94, .08); border-color: rgba(34, 197, 94, .6); }
+
+  .date-chip {
+    font-size: 11px;
+    color: var(--muted);
+    background: rgba(255, 255, 255, .06);
+    padding: 2px 7px;
+    border-radius: 6px;
+    margin-left: 6px;
+    font-weight: 500;
+    vertical-align: middle;
+  }
+  .new-chip {
+    font-size: 11px;
+    color: #34d399;
+    background: rgba(52, 211, 153, .14);
+    border: 1px solid rgba(52, 211, 153, .3);
+    padding: 1px 7px;
+    border-radius: 6px;
+    margin-left: 6px;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+
+  /* メンバーシップ限定アナウンスバー */
+  .member-banner {
+    background: linear-gradient(90deg, rgba(99, 102, 241, .14), rgba(6, 182, 212, .14));
+    border-bottom: 1px solid rgba(139, 156, 255, .2);
+    padding: 10px 16px; font-size: 13px; text-align: center; color: var(--text);
+  }
+  .member-banner a {
+    color: var(--accent); font-weight: 700; text-decoration: underline; margin-left: 6px;
+  }
+  .auth-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    background: rgba(110, 231, 183, .12); border: 1px solid rgba(110, 231, 183, .25);
+    color: var(--good); font-size: 12px; font-weight: 600;
+  }
+  .auth-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+
+  /* =========================================================
+     利用マニュアル・ドロワー
+     ========================================================= */
+  #manualBackdrop {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, .65); backdrop-filter: blur(5px);
+    z-index: 998; opacity: 0; pointer-events: none; transition: opacity .25s ease;
+  }
+  #manualBackdrop.open { opacity: 1; pointer-events: auto; }
+  
+  #manualDrawer {
+    position: fixed; top: 0; right: 0; width: 480px; max-width: 92vw; height: 100vh;
+    background: var(--bg); border-left: 1px solid var(--line);
+    z-index: 999; transform: translateX(100%); transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -12px 0 40px rgba(0,0,0,.6); display: flex; flex-direction: column;
+  }
+  #manualDrawer.open { transform: translateX(0); }
+
+  .drawer-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; border-bottom: 1px solid var(--line); background: var(--surface);
+  }
+  .drawer-title { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin: 0; }
+  .drawer-close {
+    background: none; border: 1px solid var(--line); border-radius: 8px;
+    width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+    color: var(--muted); cursor: pointer; transition: all .15s; font-size: 16px;
+  }
+  .drawer-close:hover { color: var(--text); border-color: var(--text); background: var(--surface-2); }
+
+  .drawer-body {
+    flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px;
+    line-height: 1.65; font-size: 14px;
+  }
+  .guide-sec {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px;
+  }
+  .guide-sec h3 {
+    margin: 0 0 10px; font-size: 15px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .guide-sec p { margin: 0 0 8px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .guide-sec ul { margin: 8px 0 0; padding-left: 18px; color: var(--text); font-size: 13px; }
+  .guide-sec li { margin-bottom: 6px; }
+
+  .rank-badge-item {
+    display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px;
+  }
+  .rank-badge-pill {
+    padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; flex-shrink: 0;
+  }
+  .r-s-pill { background: rgba(52, 211, 153, .16); color: #34d399; border: 1px solid rgba(52, 211, 153, .4); }
+  .r-a-pill { background: rgba(96, 165, 250, .16); color: #60a5fa; border: 1px solid rgba(96, 165, 250, .4); }
+  .r-b-pill { background: rgba(251, 191, 36, .16); color: #fbbf24; border: 1px solid rgba(251, 191, 36, .4); }
+  .r-c-pill { background: rgba(156, 163, 175, .16); color: #9ca3af; border: 1px solid rgba(156, 163, 175, .3); }
+
+  /* =========================================================
+     情報盗難防止対策 (DRM-Lite)
+     ========================================================= */
+  body.protected-mode {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  body.protected-mode input,
+  body.protected-mode textarea {
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    user-select: auto;
+  }
+
+  /* 会員モード時の印刷・PDF保存の遮断 */
+  @media print {
+    body.protected-mode {
+      display: none !important;
+      visibility: hidden !important;
+    }
+  }
+
+  /* 画面切り替え・Windows切り取りツール（Win+Shift+S等）対策のシールド */
+  .screen-shield {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 15, 29, .96);
+    backdrop-filter: blur(24px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .12s ease;
+  }
+  .screen-shield.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  body.protected-mode.screen-blurred > *:not(.screen-shield):not(.screenshot-warn) {
+    filter: blur(28px) !important;
+    user-select: none !important;
+  }
+
+  /* スクリーンショット警告オーバーレイ */
+  .screenshot-warn {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .92);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .screenshot-warn.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .screenshot-warn-box {
+    background: var(--surface);
+    border: 1px solid rgba(239, 68, 68, .4);
+    box-shadow: 0 20px 50px rgba(239, 68, 68, .2);
+    border-radius: 16px;
+    padding: 32px 28px;
+    max-width: 440px;
+  }
+  .screenshot-warn-box h4 {
+    margin: 0 0 10px;
+    font-size: 19px;
+    color: #f87171;
+  }
+  .screenshot-warn-box p {
+    margin: 0 0 20px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+</style>
+</head>
+
+<body>
+
+
+<!-- 会員限定ロックモーダル -->
+<div id="lockModal">
+  <div class="lock-card">
+    <div class="lock-badge">🔒 MEMBER ONLY</div>
+    <h2>Global Tech Lab 会員専用</h2>
+    <p class="lock-sub">本ダッシュボードは会員限定データベースです。<br>閲覧用の合言葉（パスワード）を入力してください。</p>
+
+    <div class="lock-features">
+      <strong>✨ 会員アンロック特典:</strong>
+      <ul>
+        <li><strong>S / Aランク全件検索</strong>（日本市場での勝機・想定ARR試算）</li>
+        <li><strong>全プロダクト詳細・競合比較</strong>（過去リサーチDBすべて）</li>
+        <li><strong>SNS発信用ツリー原稿</strong>の1クリックコピー</li>
+      </ul>
+    </div>
+
+    <form id="lockForm" onsubmit="event.preventDefault(); handleUnlock();">
+      <input type="password" id="lockInput" class="lock-input" placeholder="合言葉（パスワード）を入力" autofocus required autocomplete="current-password">
+      <label class="lock-save-row">
+        <input type="checkbox" id="lockRemember" checked>
+        この端末に合言葉を記憶する
+      </label>
+      <button type="submit" class="lock-btn">アンロックして開く</button>
+      <div id="lockError">合言葉（パスワード）が正しくありません</div>
+    </form>
+
+    <div class="lock-cta-divider">合言葉をお持ちでない方</div>
+    <a href="https://note.com/globaltechinfo" target="_blank" rel="noopener noreferrer" class="lock-note-btn">
+      <span>📝 noteメンバーシップで合言葉を取得</span>
+    </a>
+  </div>
+</div>
+
+
+<div class="member-banner">
+  <span>💡 <strong>Global Tech Lab 会員専用ダッシュボード</strong>：毎週の深掘りレポートは</span>
+  <a href="https://note.com/globaltechinfo" target="_blank" rel="noopener noreferrer">note公式ページへ ↗</a>
+</div>
+
+<!-- アイコン -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <div class="wrap bar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">🌐</div>
+      <div class="brand-info">
+        <div class="brand-title-line">
+          <h1>Global Tech Radar</h1>
+          <span class="auth-chip" id="authBadge" title="認証ステータス"><span class="dot"></span>認証済み</span>
+        </div>
+        <p class="date" id="reportDate"></p>
+      </div>
+    </div>
+    <div class="header-actions">
+      
+      <button class="btn btn-logout" type="button" onclick="handleLogout()" title="合言葉をクリアしてログアウト">
+        <svg class="ic" aria-hidden="true" style="width:16px; height:16px;"><use href="#i-lock"/></svg>
+        <span class="btn-text">ログアウト</span>
+      </button>
+      
+      <button class="btn btn-guide" type="button" onclick="openManual()" aria-label="利用マニュアル・ガイドを開く">
+        <svg class="ic" aria-hidden="true" style="width:16px; height:16px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span class="btn-text">利用ガイド</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- キャプチャ防止シールド（Win+Shift+S / 画面切り替え時に即時遮断） -->
+<div class="screen-shield" id="screenShield" aria-hidden="true" onclick="this.classList.remove('active'); document.body.classList.remove('screen-blurred');">
+  <div style="font-size:48px; margin-bottom:12px;">🛡️</div>
+  <h3 style="font-size:20px; font-weight:700; color:var(--text); margin-bottom:8px;">会員様限定コンテンツ保護中</h3>
+  <p style="font-size:14px; color:var(--muted); max-width:420px; margin:0;">
+    画面キャプチャ防止のためコンテンツを非表示にしています。<br>画面をクリックすると表示が戻ります。
+  </p>
+</div>
+
+<!-- スクリーンショット警告オーバーレイ -->
+<div class="screenshot-warn" id="screenshotWarn">
+  <div class="screenshot-warn-box">
+    <div style="font-size:38px; margin-bottom:12px;">🛡️</div>
+    <h4>無断キャプチャ・転載禁止</h4>
+    <p>本ダッシュボードの分析データは会員限定コンテンツです。<br>スクリーンショットの撮影や無断転載・再配布は規約により固く禁止されています。</p>
+    <button class="btn" type="button" onclick="closeScreenshotWarn()" style="width:100%; justify-content:center; padding:10px;">理解しました</button>
+  </div>
+</div>
+
+<!-- 利用マニュアル ドロワー -->
+<div id="manualBackdrop" onclick="closeManual()"></div>
+<aside id="manualDrawer" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
+  <div class="drawer-head">
+    <h2 class="drawer-title" id="manualTitle">📖 利用マニュアル & ガイド</h2>
+    <button class="drawer-close" type="button" onclick="closeManual()" aria-label="閉じる">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="guide-sec" style="border-left: 3px solid var(--accent);">
+      <h3>🌐 Global Tech Radar とは</h3>
+      <p>米国・海外でローンチされた最先端AI・SaaSプロダクトを毎日定点観測し、「日本市場でのローカライズ可能性（タイムマシン事業チャンス）」を独自分析・スコアリングした会員専用データベースです。</p>
+    </div>
+
+    <div class="guide-sec">
+      <h3>🎯 判定ランクの見方（スコア基準）</h3>
+      <div class="rank-badge-item">
+        <span class="rank-badge-pill r-s-pill">Sランク (85点〜)</span>
+        <div><strong>即検討推奨</strong>：国内の強いペイン・先行者余地大。最優先でMVP検討すべき超有望案件。</div>
+      </div>
+      <div class="rank-badge-item">
+        <span class="rank-badge-pill r-a-pill">Aランク (70〜84点)</span>
+        <div><strong>有望・要調整</strong>：日本の商習慣（稟議・請求書・API連携）への適合で高い勝算がある案件。</div>
+      </div>
+      <div class="rank-badge-item">
+        <span class="rank-badge-pill r-b-pill">Bランク (50〜69点)</span>
+        <div><strong>要検証</strong>：ニッチまたは特定業界に絞り込めば成立余地がある検証案件。</div>
+      </div>
+      <div class="rank-badge-item">
+        <span class="rank-badge-pill r-c-pill">Cランク (〜49点)</span>
+        <div><strong>見送り</strong>：国内市場規模が小さい、またはARR化・マネタイズが困難な案件。</div>
+      </div>
+    </div>
+
+    <div class="guide-sec">
+      <h3>🔍 主な機能と活用方法</h3>
+      <ul>
+        <li><strong>ランクチップ & 検索</strong>：上のチップでランク別絞り込みや、「営業」「自動化」「Notion」などの単語で全文検索が可能。</li>
+        <li><strong>しおり（保存）機能</strong>：カードのしおりアイコンで気になるプロダクトを個人保存可能（閲覧ブラウザごとに安全保持）。</li>
+        <li><strong>詳細の展開</strong>：各カードの「詳細」を押すと、日本版設計ポイント・競合分析・想定価格・SNSツリー原稿が展開されます。</li>
+        <li><strong>SNS発信ツリー原稿</strong>：カード内の「全文コピー」「1通目をコピー」ボタンを活用し、ご自身のXやThreadsでの情報発信・一次情報シェアに活用できます。</li>
+      </ul>
+    </div>
+
+    <div class="guide-sec" style="border: 1px solid rgba(239, 68, 68, .3); background: rgba(239, 68, 68, .04);">
+      <h3 style="color: #f87171;">🛡️ コンテンツ保護・利用規約</h3>
+      <p>本ダッシュボードの分析データ・仕様考察・想定ARR試算は、会員専用の限定公開コンテンツです。</p>
+      <ul>
+        <li><strong>転載・複製の禁止</strong>：テキストの丸コピー転載、全文の外部公開、スクリーンショット撮影によるSNS投稿、商用再配布は禁止されています。</li>
+        <li><strong>免責事項</strong>：本分析は公開情報をもとにAIと独自基準で算出した参考情報であり、事業や投資の成果を保証するものではありません。</li>
+      </ul>
+    </div>
+
+    <div class="guide-sec">
+      <h3>💎 メンバーシップについて</h3>
+      <p>noteメンバーシップにて、毎週の深掘り週報・最上位SランクのMVP仕様書の公開を行っています。</p>
+      <a href="https://note.com/globaltechinfo" target="_blank" rel="noopener noreferrer" class="lock-note-btn" style="display:inline-flex; text-align:center; justify-content:center; text-decoration:none; margin-top:8px;">
+        noteメンバーシップ公式ページ ↗
+      </a>
+    </div>
+  </div>
+</aside>
+
+<main class="wrap">
+
+  <section class="controls" aria-label="絞り込み">
+    <div class="chips" id="chips" role="group" aria-label="判定ランク"></div>
+    <label class="search">
+      <span class="sr">キーワード検索</span>
+      <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="q" type="search" placeholder="キーワードで検索" autocomplete="off" enterkeyhint="search">
+      <button id="clear" class="clear" type="button" aria-label="検索をクリア" hidden>
+        <svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>
+      </button>
+    </label>
+  </section>
+
+  <div class="list-head">
+    <div>
+      <h2 id="listTitle"></h2>
+      <p id="listDesc"></p>
+    </div>
+    <div class="list-tools">
+      <span class="count" id="count" aria-live="polite"></span>
+      <button class="btn plain" id="toggleAll" type="button">すべて開く</button>
+    </div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="empty" id="empty" hidden>
+    <p class="empty-title" id="emptyTitle"></p>
+    <p class="empty-body" id="emptyBody"></p>
+    <button class="btn" id="emptyBtn" type="button"></button>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   データ（毎日の更新はここだけ）
+   rank : S / A / B / C
+   orig : 元のプロダクトが何をするか（1文）／ origNote : その根拠（タグラインより要約 など）
+   idea / body : 日本版の見出しと説明 ／ target : 日本版のターゲット（複数可）
+   adapt : 日本版の設計ポイント（3つ程度、省略可）
+   signals の t : good（強み） / mid（普通） / low（弱み） / 省略で無色
+   n    : 「詳細」を開いたときに表示する補足
+   ========================================================= */
+const REPORT_DATE = '2026-10-05';
+
+const RANKS = {
+  S: { label: '即検討推奨',   desc: '国内強いペイン・先行余地大' },
+  A: { label: '有望・要調整', desc: '商慣習の最適化で勝算' },
+  B: { label: '要検証',       desc: 'ニッチ特化なら成立余地' },
+  C: { label: '見送り',       desc: '市場小またはARR化困難' }
+};
+
+const IS_ENCRYPTED = true;
+const ENCRYPTED_PAYLOAD = {"version": "2", "packets": [{"role": "admin", "salt": "UF4B2wZGvOmiSt8zYCz48g==", "iv": "HL6kaLssHJuPfHfq", "key": "Qmk/L0dfX8BhgzXjZyFEGGW+kY+OBw/pLiGfmVZZk/NzVN5ATDVggR6+ebCX5Nqn"}, {"role": "member", "salt": "C3jgjsPB13DIVzAN6xkl8Q==", "iv": "BBXpR4CuV1D4HOrC", "key": "HTq9wUJ2IF8DS2v5hyOQT+i+eUu9KQUAqyar5IaevSEHrEthmbKZ7WIPhllGaFni"}], "iv": "osAAR4eTnu9YB4b1", "data": "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"};
+let PRODUCTS = [];
+
+/* =========================================================
+   ロジック
+   ========================================================= */
+const KEY = 'ph_saved_products';           // 既存のブックマークを引き継ぐ
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = (s) => String(s).normalize('NFKC').toLowerCase();
+const ico = (id) => `<svg class="ic" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+
+let rank = 'all';
+let query = '';
+let saved = loadSaved();
+const els = new Map();
+
+function loadSaved() {
+  try { const v = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(v) ? v : []; }
+  catch (e) { return []; }
+}
+function persistSaved() {
+  try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* 保存不可の環境では無視 */ }
+}
+
+/* 検索用インデックスの構築 */
+function buildIndex() {
+  PRODUCTS.forEach((p) => {
+    p._idx = norm([
+      p.name, p.cat, p.tagline, p.orig, p.idea, p.body,
+      ...(p.target || []), ...(p.adapt || []),
+      ...(p.signals || []).flatMap((s) => [s.k, s.v, s.n || ''])
+    ].join(' '));
+  });
+}
+
+
+/* ---------- 描画 ---------- */
+function renderChips() {
+  const count = (r) => PRODUCTS.filter((p) => p.rank === r).length;
+  const todayCount = PRODUCTS.filter((p) => p.date === REPORT_DATE).length;
+  const chip = (key, inner) =>
+    `<button class="chip ${RANKS[key] ? 'r-' + key : ''}" type="button" data-rank="${key}" aria-pressed="false">${inner}</button>`;
+
+  $('#chips').innerHTML =
+    chip('all', `すべて <span class="n">${PRODUCTS.length}</span>`) +
+    (todayCount > 0 ? chip('today', `✨ 本日新着 <span class="n">${todayCount}</span>`) : '') +
+    Object.keys(RANKS).map((r) => chip(r, `<span class="dot"></span>${r} <span class="n">${count(r)}</span>`)).join('') +
+    chip('saved', `${ico('bookmark')}保存 <span class="n" id="savedN">0</span>`);
+}
+
+function cardHTML(p) {
+  const sigList = Array.isArray(p.signals) ? p.signals : [];
+  const sigs = sigList.map((s) =>
+    `<div class="sig"><dt>${esc(s && s.k ? s.k : '')}</dt><dd class="${(s && s.t) || ''}">${esc(s && s.v ? s.v : '')}</dd></div>`).join('');
+  const notes = sigList.filter((s) => s && s.n).map((s) =>
+    `<div><dt>${esc(s.k || '')}</dt><dd>${esc(s.n || '')}</dd></div>`).join('');
+  const tags = (Array.isArray(p.target) ? p.target : []).map((t) => `<li class="tag">${esc(t)}</li>`).join('');
+  const adapt = (Array.isArray(p.adapt) ? p.adapt : []).map((a) => `<li>${esc(a)}</li>`).join('');
+
+  const isToday = p.date === REPORT_DATE;
+  const dateBadge = isToday
+    ? `<span class="new-chip">本日新着</span>`
+    : (p.date ? `<span class="date-chip">📅 ${esc(p.date)}</span>` : '');
+
+  return `
+  <article class="card r-${p.rank}${p.pass ? ' pass' : ''}" data-id="${esc(p.id)}">
+    <div class="card-head">
+      <div class="tile"><span class="sr">${p.rank}ランク</span><span aria-hidden="true">${p.rank}</span></div>
+      <div class="ident">
+        <h3 class="name">${esc(p.name)}</h3>
+        <p class="cat">${esc(p.cat)}${dateBadge}</p>
+      </div>
+    </div>
+
+    ${p.image && (p.image.startsWith('http://') || p.image.startsWith('https://')) ? `
+    <div class="thumb" style="overflow:hidden; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); aspect-ratio:2/1; max-height:220px;">
+      <img src="${esc(p.image)}" alt="${esc(p.name)}" style="width:100%; height:100%; object-fit:cover; display:block;" loading="lazy" onerror="this.parentElement.style.display='none'">
+    </div>` : ''}
+
+    <div class="brief">
+      <div class="orig">
+        <span class="lbl">元のプロダクト${p.origNote ? `<span class="lbl-note">${esc(p.origNote)}</span>` : ''}</span>
+        <p>${esc(p.orig)}</p>
+      </div>
+      <div class="jp">
+        <span class="lbl">${esc(p.jpLabel || '日本版')}</span>
+        <p class="idea">${esc(p.idea)}</p>
+        <p class="jp-body">${esc(p.body)}</p>
+      </div>
+      <div class="target">
+        <span class="lbl">ターゲット</span>
+        <ul class="tags">${tags}</ul>
+      </div>
+    </div>
+
+    <dl class="signals">${sigs}</dl>
+
+    <div class="card-actions">
+      <button class="more-btn" type="button" data-act="toggle" aria-expanded="false" aria-controls="more-${esc(p.id)}">
+        詳細${ico('chevron')}
+      </button>
+      <div class="icons">
+        <button class="icon-btn" type="button" data-act="bookmark" aria-pressed="false" aria-label="${esc(p.name)}を保存">${ico('bookmark')}</button>
+        <button class="icon-btn" type="button" data-act="copy" aria-label="内容をコピー">${ico('copy')}</button>
+        ${p.url && (p.url.startsWith('http://') || p.url.startsWith('https://')) ? `<a class="icon-btn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="公式サイトを開く">${ico('link')}</a>` : ''}
+      </div>
+    </div>
+
+    <div class="more" id="more-${esc(p.id)}">
+      <div class="more-in">
+        <div class="more-pad">
+          ${adapt ? `<div><span class="lbl">日本版の設計ポイント</span><ul class="adapt">${adapt}</ul></div>` : ''}
+          ${notes ? `<div><span class="lbl">判定メモ</span><dl class="notes">${notes}</dl></div>` : ''}
+          ${p.snsDraft ? `
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <span class="lbl">📱 SNS発信ツリー原稿 (X / Threads用)</span>
+              <button class="btn plain" style="font-size:12px; padding:2px 10px; min-height:28px; border:1px solid var(--line); border-radius:6px;" type="button" data-act="copy-tree">全文コピー</button>
+            </div>
+            
+            <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px;">
+              <div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+                <span>🧵 1通目（親ポスト・画像添付）</span>
+                <button type="button" data-act="copy-post1" style="background:none; border:none; color:var(--text); cursor:pointer; font-size:11px; padding:0; text-decoration:underline;">1通目をコピー</button>
+              </div>
+              <div style="white-space:pre-wrap; font-size:13px; line-height:1.65; color:var(--text); font-family:inherit; word-break:break-word; overflow-wrap:anywhere;">${esc(p.snsDraft)}</div>
+            </div>
+
+            ${p.snsReplyDraft ? `
+            <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 14px;">
+              <div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
+                <span>↪️ 2通目（リプライ・事業化考察＆リンク）</span>
+                <button type="button" data-act="copy-post2" style="background:none; border:none; color:var(--text); cursor:pointer; font-size:11px; padding:0; text-decoration:underline;">2通目をコピー</button>
+              </div>
+              <div style="white-space:pre-wrap; font-size:13px; line-height:1.65; color:var(--text); font-family:inherit; word-break:break-word; overflow-wrap:anywhere;">${esc(p.snsReplyDraft)}</div>
+            </div>` : ''}
+          </div>` : ''}
+          <p class="src">海外公式発表: “${esc(p.tagline)}”</p>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderCards() {
+  els.clear();
+  const htmls = [];
+  PRODUCTS.forEach((p) => {
+    try {
+      htmls.push(cardHTML(p));
+    } catch (e) {
+      console.error('Failed to render card for', p.id, e);
+    }
+  });
+  $('#cards').innerHTML = htmls.join('');
+  document.querySelectorAll('.card').forEach((el) => {
+    if (el.dataset.id) els.set(el.dataset.id, el);
+  });
+}
+
+/* ---------- 絞り込み ---------- */
+function apply() {
+  const terms = norm(query).split(/\s+/).filter(Boolean);
+  let shown = 0;
+
+  PRODUCTS.forEach((p) => {
+    const okRank = rank === 'all' || 
+                   (rank === 'today' ? p.date === REPORT_DATE : 
+                   (rank === 'saved' ? saved.includes(p.id) : p.rank === rank));
+    const okText = terms.every((t) => (p._idx || '').includes(t));
+    const show = okRank && okText;
+    const el = els.get(p.id);
+    if (el) {
+      el.hidden = !show;
+    }
+    if (show) shown++;
+  });
+
+  document.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.rank === rank)));
+  $('#clear').hidden = !query;
+
+  // ヘッダー日付表示
+  const dateEl = $('#reportDate');
+  if (dateEl) {
+    dateEl.textContent = `最終更新: ${REPORT_DATE}`;
+  }
+
+  // 見出し
+  const h = $('#listTitle');
+  const todayCount = PRODUCTS.filter((p) => p.date === REPORT_DATE).length;
+  if (rank === 'all') {
+    h.textContent = 'すべて';
+    if (todayCount > 0) {
+      $('#listDesc').textContent = `本日(${REPORT_DATE})新着: ${todayCount}件 ／ 蓄積データ: 全${PRODUCTS.length}件`;
+    } else {
+      $('#listDesc').textContent = `最新分析日: ${REPORT_DATE} ／ 蓄積データ: 全${PRODUCTS.length}件`;
+    }
+  } else if (rank === 'today') {
+    h.textContent = '本日新着';
+    $('#listDesc').textContent = `${REPORT_DATE} 日次レポート掲載プロダクト（全${todayCount}件）`;
+  } else if (rank === 'saved') {
+    h.textContent = '保存済み';
+    $('#listDesc').textContent = 'しおりを付けたプロダクト';
+  } else {
+    h.innerHTML = `<span class="lh-rank r-${rank}">${rank}</span>${esc(RANKS[rank].label)}`;
+    const rankTotal = PRODUCTS.filter((p) => p.rank === rank).length;
+    $('#listDesc').textContent = `${RANKS[rank].desc}（全${rankTotal}件）`;
+  }
+  $('#count').textContent = `${shown}件`;
+
+  // 空状態
+  const empty = $('#empty');
+  empty.hidden = shown > 0;
+  if (shown === 0) {
+    const noSaved = rank === 'saved' && saved.length === 0 && !query;
+    $('#emptyTitle').textContent = noSaved ? '保存したものはまだありません' : '該当するものがありません';
+    $('#emptyBody').textContent  = noSaved ? 'カードのしおりアイコンで保存できます。' : 'キーワードや絞り込みを変えてみてください。';
+    $('#emptyBtn').textContent   = noSaved ? 'すべて表示' : '条件をリセット';
+  }
+  syncToggleAll();
+}
+
+/* ---------- 詳細の開閉 ---------- */
+function setOpen(card, open) {
+  card.classList.toggle('open', open);
+  card.querySelector('.more-btn').setAttribute('aria-expanded', String(open));
+}
+function visibleCards() { return [...document.querySelectorAll('.card:not([hidden])')]; }
+function syncToggleAll() {
+  const cards = visibleCards();
+  const allOpen = cards.length > 0 && cards.every((c) => c.classList.contains('open'));
+  const btn = $('#toggleAll');
+  btn.textContent = allOpen ? 'すべて閉じる' : 'すべて開く';
+  btn.hidden = cards.length === 0;
+}
+
+/* ---------- ブックマーク ---------- */
+function refreshSaved() {
+  $('#savedN').textContent = saved.length;
+  PRODUCTS.forEach((p) => {
+    const el = els.get(p.id);
+    if (!el) return;
+    const b = el.querySelector('[data-act="bookmark"]');
+    if (!b) return;
+    const on = saved.includes(p.id);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+}
+function toggleSaved(id) {
+  const i = saved.indexOf(id);
+  if (i > -1) { saved.splice(i, 1); toast('保存を解除しました'); }
+  else        { saved.push(id);     toast('保存しました'); }
+  persistSaved();
+  refreshSaved();
+  if (rank === 'saved') apply();
+}
+
+/* ---------- コピー / トースト ---------- */
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  toast(ok ? 'コピーしました' : 'コピーできませんでした');
+}
+
+let _allowCopyOperation = false;
+
+function copyText(text, successMsg = 'コピーしました') {
+  if (!text) return;
+  _allowCopyOperation = true;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(
+      () => { _allowCopyOperation = false; toast(successMsg); },
+      () => { _allowCopyOperation = false; fallbackCopy(text); }
+    );
+  } else {
+    fallbackCopy(text);
+    _allowCopyOperation = false;
+  }
+}
+
+function copyIdea(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  const text = `${p.name}（元: ${p.orig}）\n日本版: ${p.idea}\n${p.body}\nターゲット: ${(p.target || []).join('、')}`;
+  copyText(text, '内容をコピーしました');
+}
+
+function copySnsTree(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  const text = (p.snsDraft || '') + (p.snsReplyDraft ? '\n\n---\n\n' + p.snsReplyDraft : '');
+  copyText(text, 'ツリー原稿をコピーしました');
+}
+
+function copySnsPost1(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  copyText(p.snsDraft, '1通目をコピーしました');
+}
+
+function copySnsPost2(id) {
+  const p = PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  copyText(p.snsReplyDraft, '2通目をコピーしました');
+}
+
+/* =========================================================
+   利用マニュアル (ドロワー)
+   ========================================================= */
+function openManual() {
+  const d = $('#manualDrawer');
+  const b = $('#manualBackdrop');
+  if (d && b) {
+    d.classList.add('open');
+    b.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeManual() {
+  const d = $('#manualDrawer');
+  const b = $('#manualBackdrop');
+  if (d && b) {
+    d.classList.remove('open');
+    b.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeManual();
+});
+
+/* =========================================================
+   情報盗難防止対策 (DRM-Lite / スクショ・コピー防止)
+   ========================================================= */
+let CURRENT_ROLE = 'member'; // 'admin' (保護解除) または 'member' (保護有効)
+const PROTECTION_CONFIG = {
+  enabled: true,
+};
+
+let _protectionInitialized = false;
+
+function initProtection() {
+  if (_protectionInitialized) return;
+  _protectionInitialized = true;
+
+  // 画面切り替え・Windows切り取りツール（Win+Shift+S / Snipping Tool / Game Bar）対策
+  const handleBlur = () => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    const shield = document.getElementById('screenShield');
+    if (shield) shield.classList.add('active');
+    document.body.classList.add('screen-blurred');
+  };
+
+  const handleFocus = () => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    const shield = document.getElementById('screenShield');
+    if (shield) shield.classList.remove('active');
+    document.body.classList.remove('screen-blurred');
+  };
+
+  window.addEventListener('blur', handleBlur);
+  window.addEventListener('focus', handleFocus);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') handleBlur();
+    else handleFocus();
+  });
+
+  // 右クリック禁止 (Capture phase)
+  window.addEventListener('contextmenu', (e) => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    if (!e.target.closest('input, textarea')) {
+      e.preventDefault();
+      e.stopPropagation();
+      toast('⚠️ 会員様限定コンテンツのため右クリックは禁止されています');
+    }
+  }, { capture: true });
+
+  // キーボードショートカットブロック (Capture phase で全キャプチャショートカットを奪取)
+  const blockShortcuts = (e) => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    const isInput = e.target.closest && e.target.closest('input, textarea');
+    const key = (e.key || '').toLowerCase();
+    const code = e.code || '';
+    const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+
+    // Windowsキー（Meta）を使用した切り取り・キャプチャショートカット
+    // Win+Shift+S, Win+PrtScn, Win+Alt+PrtScn, Win+G, MacのCmd+Shift+3/4/5
+    if (e.metaKey) {
+      if (e.shiftKey || e.altKey || key === 's' || code === 'KeyS' || key === 'printscreen' || code === 'PrintScreen' || ['3', '4', '5'].includes(key)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        showScreenshotWarn();
+        return false;
+      }
+    }
+
+    // Edge Web Capture / Chrome スクショ (Ctrl+Shift+S / Cmd+Shift+S / Ctrl+Shift+X)
+    if (isCtrlOrMeta && e.shiftKey && (key === 's' || code === 'KeyS' || key === 'x' || code === 'KeyX')) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      toast('⚠️ スクリーンショット（Webキャプチャ）は禁止されています');
+      showScreenshotWarn();
+      return false;
+    }
+
+    // PrintScreen（単体、Alt+PrintScreen、Ctrl+PrintScreen等）
+    if (key === 'printscreen' || code === 'PrintScreen' || e.keyCode === 44) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      showScreenshotWarn();
+      return false;
+    }
+
+    // Ctrl+C / Cmd+C (入力欄以外)
+    if (isCtrlOrMeta && (key === 'c' || code === 'KeyC') && !isInput) {
+      e.preventDefault();
+      e.stopPropagation();
+      toast('⚠️ 本文の無断コピーは禁止されています');
+      return false;
+    }
+
+    // Ctrl+A / Cmd+A (入力欄以外)
+    if (isCtrlOrMeta && (key === 'a' || code === 'KeyA') && !isInput) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // Ctrl+P / Cmd+P (印刷・PDF化)
+    if (isCtrlOrMeta && (key === 'p' || code === 'KeyP')) {
+      e.preventDefault();
+      e.stopPropagation();
+      toast('⚠️ PDF保存・印刷は禁止されています');
+      return false;
+    }
+
+    // Ctrl+S / Cmd+S (HTML保存 - Shift無しの単独S)
+    if (isCtrlOrMeta && !e.shiftKey && (key === 's' || code === 'KeyS')) {
+      e.preventDefault();
+      e.stopPropagation();
+      toast('⚠️ ページの保存は禁止されています');
+      return false;
+    }
+
+    // Ctrl+U / Cmd+U (ソース表示)
+    if (isCtrlOrMeta && (key === 'u' || code === 'KeyU')) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // F12 / デベロッパーツール
+    if (e.key === 'F12' || e.keyCode === 123) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  };
+
+  window.addEventListener('keydown', blockShortcuts, { capture: true });
+  window.addEventListener('keyup', (e) => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    const key = (e.key || '').toLowerCase();
+    const code = e.code || '';
+    if (key === 'printscreen' || code === 'PrintScreen' || e.keyCode === 44 || (e.metaKey && e.shiftKey)) {
+      e.preventDefault();
+      showScreenshotWarn();
+    }
+  }, { capture: true });
+
+  // コピーイベントフック（ドラッグ選択によるコピーを遮断）
+  document.addEventListener('copy', (e) => {
+    if (!PROTECTION_CONFIG.enabled) return;
+    if (_allowCopyOperation) return; // カード内正規コピーボタンは許可
+    if (!e.target.closest('input, textarea')) {
+      e.preventDefault();
+      toast('⚠️ テキストの無断コピーは禁止されています');
+    }
+  });
+}
+
+function showScreenshotWarn() {
+  try {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText('【警告】会員様限定コンテンツの無断キャプチャ・転載は固く禁止されています。');
+    }
+  } catch(e) {}
+  const warn = $('#screenshotWarn');
+  if (warn) warn.classList.add('active');
+}
+function closeScreenshotWarn() {
+  const warn = $('#screenshotWarn');
+  if (warn) warn.classList.remove('active');
+}
+
+/* ---------- イベント ---------- */
+$('#chips').addEventListener('click', (e) => {
+  const c = e.target.closest('.chip');
+  if (!c) return;
+  rank = c.dataset.rank;
+  apply();
+});
+
+$('#q').addEventListener('input', (e) => { query = e.target.value; apply(); });
+$('#clear').addEventListener('click', () => { $('#q').value = ''; query = ''; apply(); $('#q').focus(); });
+
+$('#cards').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const card = b.closest('.card');
+  if (!card) return;
+  const id = card.dataset.id;
+  if (b.dataset.act === 'toggle')     { setOpen(card, !card.classList.contains('open')); syncToggleAll(); }
+  if (b.dataset.act === 'bookmark')   toggleSaved(id);
+  if (b.dataset.act === 'copy')       copyIdea(id);
+  if (b.dataset.act === 'copy-tree')  copySnsTree(id);
+  if (b.dataset.act === 'copy-post1') copySnsPost1(id);
+  if (b.dataset.act === 'copy-post2') copySnsPost2(id);
+});
+
+$('#toggleAll').addEventListener('click', () => {
+  const cards = visibleCards();
+  const open = !cards.every((c) => c.classList.contains('open'));
+  cards.forEach((c) => setOpen(c, open));
+  syncToggleAll();
+});
+
+$('#emptyBtn').addEventListener('click', () => {
+  $('#q').value = ''; query = ''; rank = 'all'; apply();
+});
+
+/* ---------- 暗号化・復号処理 (WebCrypto API) ---------- */
+const PASS_KEY = 'ph_dash_password';
+
+async function decryptPayload(password, payload) {
+  const enc = new TextEncoder();
+  const dec = new TextDecoder();
+
+  // Version 2 (マルチロール対応エンベロープ暗号化)
+  if (payload.version === "2" && Array.isArray(payload.packets)) {
+    const dataIv = Uint8Array.from(atob(payload.iv), (c) => c.charCodeAt(0));
+    const encryptedData = Uint8Array.from(atob(payload.data), (c) => c.charCodeAt(0));
+
+    // パケット（admin / member）を順に試行
+    for (const packet of payload.packets) {
+      try {
+        const salt = Uint8Array.from(atob(packet.salt), (c) => c.charCodeAt(0));
+        const iv = Uint8Array.from(atob(packet.iv), (c) => c.charCodeAt(0));
+        const encryptedKey = Uint8Array.from(atob(packet.key), (c) => c.charCodeAt(0));
+
+        const baseKey = await window.crypto.subtle.importKey(
+          'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+        );
+        const kek = await window.crypto.subtle.deriveKey(
+          { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+          baseKey,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['decrypt']
+        );
+
+        // DEK (データ暗号化キー) の復号
+        const decryptedDekRaw = await window.crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: iv }, kek, encryptedKey
+        );
+
+        // DEKを使って本体データを復号
+        const dek = await window.crypto.subtle.importKey(
+          'raw', decryptedDekRaw, { name: 'AES-GCM' }, false, ['decrypt']
+        );
+        const decryptedData = await window.crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: dataIv }, dek, encryptedData
+        );
+
+        return {
+          products: JSON.parse(dec.decode(decryptedData)),
+          role: packet.role || 'member'
+        };
+      } catch (err) {
+        // パスワード不一致のパケットはスキップして次のロールを試す
+        continue;
+      }
+    }
+    throw new Error('合言葉が正しくありません');
+  }
+
+  // Version 1 (互換性維持)
+  const salt = Uint8Array.from(atob(payload.salt), (c) => c.charCodeAt(0));
+  const iv = Uint8Array.from(atob(payload.iv), (c) => c.charCodeAt(0));
+  const data = Uint8Array.from(atob(payload.data), (c) => c.charCodeAt(0));
+
+  const baseKey = await window.crypto.subtle.importKey(
+    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  const key = await window.crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+    baseKey,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['decrypt']
+  );
+  const decrypted = await window.crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv }, key, data
+  );
+  return {
+    products: JSON.parse(dec.decode(decrypted)),
+    role: 'admin'
+  };
+}
+
+async function handleUnlock() {
+  const input = document.getElementById('lockInput');
+  const remember = document.getElementById('lockRemember').checked;
+  const err = document.getElementById('lockError');
+  err.style.display = 'none';
+
+  if (!input || !input.value) return;
+
+  try {
+    const res = await decryptPayload(input.value, ENCRYPTED_PAYLOAD);
+    PRODUCTS = res.products;
+    CURRENT_ROLE = res.role;
+    if (remember) {
+      localStorage.setItem(PASS_KEY, input.value);
+    }
+    const modal = document.getElementById('lockModal');
+    if (modal) modal.style.display = 'none';
+    initDashboard();
+  } catch (e) {
+    err.style.display = 'block';
+  }
+}
+
+function handleLogout() {
+  if (confirm('ログアウトして合言葉をクリアしますか？')) {
+    localStorage.removeItem(PASS_KEY);
+    location.reload();
+  }
+}
+
+/* ---------- 初期化 ---------- */
+function initDashboard() {
+  try {
+    buildIndex();
+
+    // ロールに応じた保護モードの切り替え
+    if (CURRENT_ROLE === 'admin') {
+      PROTECTION_CONFIG.enabled = false;
+      document.body.classList.remove('protected-mode');
+    } else {
+      PROTECTION_CONFIG.enabled = true;
+      document.body.classList.add('protected-mode');
+    }
+    initProtection();
+
+    // 認証バッジの表示 (管理者 vs 会員)
+    const badge = document.getElementById('authBadge');
+    if (badge) {
+      if (IS_ENCRYPTED) {
+        badge.style.display = 'inline-flex';
+        if (CURRENT_ROLE === 'admin') {
+          badge.innerHTML = '<span class="dot" style="background:#38bdf8;"></span>👑 管理者';
+          badge.style.background = 'rgba(56, 189, 248, 0.12)';
+          badge.style.borderColor = 'rgba(56, 189, 248, 0.28)';
+          badge.style.color = '#38bdf8';
+        } else {
+          badge.innerHTML = '<span class="dot"></span>🔒 会員様';
+          badge.style.background = 'rgba(110, 231, 183, 0.12)';
+          badge.style.borderColor = 'rgba(110, 231, 183, 0.25)';
+          badge.style.color = 'var(--good)';
+        }
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // 本日新着データが存在する場合は初期表示を「本日新着」にする
+    const hasToday = PRODUCTS.some((p) => p.date === REPORT_DATE);
+    rank = hasToday ? 'today' : 'all';
+    const rd = $('#reportDate');
+    if (rd) rd.textContent = `最終更新: ${REPORT_DATE}`;
+    renderChips();
+    renderCards();
+    refreshSaved();
+    apply();
+  } catch (err) {
+    console.error('initDashboard error:', err);
+  }
+}
+
+(async function() {
+  if (IS_ENCRYPTED && ENCRYPTED_PAYLOAD) {
+    const savedPass = localStorage.getItem(PASS_KEY);
+    if (savedPass) {
+      try {
+        const res = await decryptPayload(savedPass, ENCRYPTED_PAYLOAD);
+        PRODUCTS = res.products;
+        CURRENT_ROLE = res.role;
+        const modal = document.getElementById('lockModal');
+        if (modal) modal.style.display = 'none';
+        initDashboard();
+        return;
+      } catch (e) {
+        localStorage.removeItem(PASS_KEY);
+      }
+    }
+    // パスワード未保存または復号失敗時はモーダルを表示
+    const modal = document.getElementById('lockModal');
+    if (modal) modal.style.display = 'flex';
+  } else {
+    initDashboard();
+  }
+})();
+</script>
+</body>
+</html>
