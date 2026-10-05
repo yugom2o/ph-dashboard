@@ -21,3 +21,6 @@ ENV/
 # Scratch & temporary workspace
 scratch/
 .system_generated/
+preview_unencrypted.html
+*mock*.html
+*preview*.html
