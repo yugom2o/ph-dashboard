@@ -186,7 +186,7 @@ class DailyPipeline:
         print(f"  -> Markdown レポート出力: {md_file}")
 
         # HTML ダッシュボード (日本語詳細解説がある高品質データのみ抽出)
-        all_recent = self.db.get_all_recent_evaluations(limit=50)
+        all_recent = self.db.get_all_recent_evaluations(limit=100)
         valid_recent = [it for it in all_recent if it.get("original_summary_ja")]
         if not valid_recent:
             valid_recent = all_recent
