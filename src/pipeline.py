@@ -340,12 +340,16 @@ class DailyPipeline:
                     post2_text += f"\n\n🔗 海外公式サイト: {official_url}"
 
             print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} (画像: {'あり' if image_url else 'なし'} / ツリーリプライ: {'有効' if post2_text else '無効'}) ...")
-            # Step 1: 外部API呼び出し前に原子的に予約・枠確保 (二重投稿・結果不明時の再送防止: 第3回指摘2対応)
+            # Step 1: 外部API呼び出し前に原子的に予約・枠確保 (BEGIN IMMEDIATE 排他制御: 第4回P1対応)
             record_id = self.db.reserve_threads_post(
                 product_id=p_id,
                 text=post1_text,
                 image_url=image_url,
+                daily_limit=THREADS_MAX_DAILY_POSTS,
             )
+            if record_id is None:
+                print("  [Skip] 予約済み、または本日の投稿枠を取得できませんでした（同時実行抑止）。")
+                continue
 
             # Step 2: 親ポストの外部公開呼び出し
             parent_id = None
