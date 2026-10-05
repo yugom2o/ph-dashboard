@@ -80,6 +80,9 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+      - name: Pull remote changes to avoid conflict
+        run: git pull --rebase origin main || true
+
       - name: Commit & Push reports and database
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
