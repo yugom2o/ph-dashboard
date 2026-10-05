@@ -163,14 +163,14 @@ class HTMLReporter:
                 },
                 {
                     "k": "国内競合",
-                    "v": comp_summary if comp_summary else "先行余地あり",
-                    "t": "mid" if comp_summary else "good",
-                    "n": "競合状況: " + (comp_summary or "直接の類似SaaSは限定的"),
+                    "v": comp_summary if comp_summary else "直接競合は未確認 / 要追加調査",
+                    "t": "mid",
+                    "n": "競合状況: " + (comp_summary or "直接の類似SaaSは未確認（要追加調査）"),
                 },
                 {
                     "k": "参入障壁",
-                    "v": "要商習慣適合" if "法規制" in it.get("jp_barriers", "") else "低〜中",
-                    "t": "good" if score >= 80 else "mid",
+                    "v": "要商習慣適合" if "法規制" in it.get("jp_barriers", "") else "中",
+                    "t": "good" if score >= 85 else "mid",
                     "n": it.get("jp_barriers", "")[:120],
                 },
                 {
@@ -242,7 +242,15 @@ class HTMLReporter:
             products_json=products_json_str if allow_unencrypted else "[]",
         )
 
-        # ローカル用とGitHub Pages (docs/index.html) の両方に出力
+        # レンダリング結果の出力
+        if allow_unencrypted:
+            # プレビュー専用モード（R4対応）: 公開用 docs/index.html や dashboard.html は汚染せず、別名プレビューファイルにのみ出力
+            preview_file = self.output_path.parent / "preview_unencrypted.html"
+            preview_file.write_text(rendered_html, encoding="utf-8")
+            print(f"  [Security] 平文プレビューを出力しました: {preview_file} (本番公開用ファイルは保護されました)")
+            return preview_file
+
+        # 通常（暗号化）出力: ローカル用とGitHub Pages (docs/index.html) の両方に出力
         self.output_path.write_text(rendered_html, encoding="utf-8")
         self.docs_output_path.parent.mkdir(parents=True, exist_ok=True)
         self.docs_output_path.write_text(rendered_html, encoding="utf-8")
