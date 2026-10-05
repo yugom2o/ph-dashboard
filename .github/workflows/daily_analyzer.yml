@@ -42,6 +42,8 @@ jobs:
           PRODUCTHUNT_TOKEN: ${{ secrets.PRODUCTHUNT_TOKEN }}
           GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+          DASHBOARD_MEMBER_PASSWORD: ${{ secrets.DASHBOARD_MEMBER_PASSWORD }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           DAILY_FETCH_LIMIT: 10
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_AUTO_PUBLISH: 'true'
@@ -83,8 +85,8 @@ jobs:
       - name: Pull remote changes to avoid conflict
         run: git pull --rebase origin main || true
 
-      - name: Commit & Push reports and database
+      - name: Commit & Push encrypted dashboard
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Automated daily analysis: update reports and history"
-          file_pattern: "reports/*.md reports/weekly/*.md reports/weekly/**/*.md data/*.db dashboard.html docs/index.html index.html"
+          commit_message: "Automated daily analysis: update dashboard"
+          file_pattern: "dashboard.html docs/index.html index.html"
