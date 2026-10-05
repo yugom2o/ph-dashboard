@@ -198,14 +198,14 @@ class ThreadsPublisher:
                 print(f"[Threads] 🎉 画像付き投稿が正常に公開されました！ (Post ID: {post_id})")
                 return post_id
             else:
-                print(f"[Threads] 画像投稿の公開に失敗しました: {p_data}")
-                print("[Threads] -> テキストのみの投稿へフォールバックします...")
-                return self.publish_text(text)
+                # threads_publish 送信失敗時は二重投稿リスクがあるため安易にテキスト投稿へフォールバックせず安全に中断
+                print(f"[Threads] [Error] 画像投稿の公開に失敗しました: {p_data}")
+                return None
 
         except Exception as e:
-            print(f"[Threads] 画像投稿処理中に例外が発生しました: {e}")
-            print("[Threads] -> テキストのみの投稿へフォールバックします...")
-            return self.publish_text(text)
+            # 例外発生時も二重投稿を防止するためテキストフォールバックは行わず中断
+            print(f"[Threads] [Error] 画像投稿処理中に例外が発生しました: {e}")
+            return None
 
     def publish(self, text: str, image_url: Optional[str] = None) -> Optional[str]:
         """画像URLがあれば画像付きで、なければテキストのみでThreadsへ投稿"""
