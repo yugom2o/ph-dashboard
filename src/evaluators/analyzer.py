@@ -25,10 +25,14 @@ class GeminiEvaluator:
         description: str,
         lp_text: str = "",
         is_mock: bool = False,
-    ) -> EvaluationResult:
-        """プロダクトを評価してEvaluationResultを返却"""
-        if is_mock or not self.client:
+    ) -> Optional[EvaluationResult]:
+        """プロダクトを評価してEvaluationResultを返却（失敗時または非モックでクライアント未設定時はNone）"""
+        if is_mock:
             return self._generate_mock_evaluation(product_name, tagline, description)
+
+        if not self.client:
+            print(f"[Warning] Gemini client is not initialized. Cannot evaluate '{product_name}'.")
+            return None
 
         import time
         # レートリミット (15 RPM) 防止のためのウェイト
@@ -57,7 +61,9 @@ class GeminiEvaluator:
                 res_text = response.text.strip()
                 res_text = re.sub(r"^```json\s*", "", res_text)
                 res_text = re.sub(r"\s*```$", "", res_text)
-                return self._parse_json_safely(res_text, product_name, tagline, description)
+                parsed = self._parse_json_safely(res_text, product_name, tagline, description, is_mock=False)
+                if parsed:
+                    return parsed
 
             except Exception as e:
                 err_str = str(e)
@@ -65,12 +71,18 @@ class GeminiEvaluator:
                     print("[Info] Rate limit reached (429). Waiting 6 seconds before retry...")
                     time.sleep(6)
                     continue
-                print(f"[Warning] Gemini evaluation attempt failed: {e}")
+                print(f"[Warning] Gemini evaluation attempt {attempt + 1} failed: {e}")
+                if attempt == 0:
+                    time.sleep(3)
+                    continue
                 break
 
-        return self._generate_mock_evaluation(product_name, tagline, description)
+        print(f"[Error] Gemini evaluation failed for '{product_name}'.")
+        return None
 
-    def _parse_json_safely(self, text: str, product_name: str, tagline: str, description: str) -> EvaluationResult:
+    def _parse_json_safely(
+        self, text: str, product_name: str, tagline: str, description: str, is_mock: bool = False
+    ) -> Optional[EvaluationResult]:
         """JSON文字列から安全にEvaluationResultを復元"""
         try:
             return EvaluationResult.model_validate_json(text)
@@ -87,7 +99,9 @@ class GeminiEvaluator:
                 return EvaluationResult.model_validate(data)
             except Exception as ex:
                 print(f"[Warning] Failed to parse model output as EvaluationResult: {ex}")
-                return self._generate_mock_evaluation(product_name, tagline, description)
+                if is_mock:
+                    return self._generate_mock_evaluation(product_name, tagline, description)
+                return None
 
     def _generate_mock_evaluation(self, product_name: str, tagline: str, description: str) -> EvaluationResult:
         """APIキーなし・テスト実行用の高品質モック評価"""
