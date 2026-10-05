@@ -149,6 +149,7 @@ class HTMLReporter:
                         f"🚀 勝機: {body[:120]}...\n\n"
                         f"🔗 公式サイト: {it.get('official_url') or ph_url}"
                     ) if one_line else "",
+                    "signals": signals,
                     "image": it.get("image_url") or "",
                 }
             )
