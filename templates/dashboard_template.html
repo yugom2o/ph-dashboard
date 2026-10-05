@@ -428,6 +428,155 @@
     color: var(--good); font-size: 12px; font-weight: 600;
   }
   .auth-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); }
+
+  /* =========================================================
+     利用マニュアル・ドロワー
+     ========================================================= */
+  #manualBackdrop {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, .65); backdrop-filter: blur(5px);
+    z-index: 998; opacity: 0; pointer-events: none; transition: opacity .25s ease;
+  }
+  #manualBackdrop.open { opacity: 1; pointer-events: auto; }
+  
+  #manualDrawer {
+    position: fixed; top: 0; right: 0; width: 480px; max-width: 92vw; height: 100vh;
+    background: var(--bg); border-left: 1px solid var(--line);
+    z-index: 999; transform: translateX(100%); transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -12px 0 40px rgba(0,0,0,.6); display: flex; flex-direction: column;
+  }
+  #manualDrawer.open { transform: translateX(0); }
+
+  .drawer-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; border-bottom: 1px solid var(--line); background: var(--surface);
+  }
+  .drawer-title { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin: 0; }
+  .drawer-close {
+    background: none; border: 1px solid var(--line); border-radius: 8px;
+    width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+    color: var(--muted); cursor: pointer; transition: all .15s; font-size: 16px;
+  }
+  .drawer-close:hover { color: var(--text); border-color: var(--text); background: var(--surface-2); }
+
+  .drawer-body {
+    flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px;
+    line-height: 1.65; font-size: 14px;
+  }
+  .guide-sec {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px;
+  }
+  .guide-sec h3 {
+    margin: 0 0 10px; font-size: 15px; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .guide-sec p { margin: 0 0 8px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .guide-sec ul { margin: 8px 0 0; padding-left: 18px; color: var(--text); font-size: 13px; }
+  .guide-sec li { margin-bottom: 6px; }
+
+  .rank-badge-item {
+    display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px;
+  }
+  .rank-badge-pill {
+    padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; flex-shrink: 0;
+  }
+  .r-s-pill { background: rgba(52, 211, 153, .16); color: #34d399; border: 1px solid rgba(52, 211, 153, .4); }
+  .r-a-pill { background: rgba(96, 165, 250, .16); color: #60a5fa; border: 1px solid rgba(96, 165, 250, .4); }
+  .r-b-pill { background: rgba(251, 191, 36, .16); color: #fbbf24; border: 1px solid rgba(251, 191, 36, .4); }
+  .r-c-pill { background: rgba(156, 163, 175, .16); color: #9ca3af; border: 1px solid rgba(156, 163, 175, .3); }
+
+  /* =========================================================
+     情報盗難防止対策 (DRM-Lite)
+     ========================================================= */
+  body.protected-mode {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  body.protected-mode input,
+  body.protected-mode textarea {
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    user-select: auto;
+  }
+
+  /* 印刷・PDF保存の完全遮断 */
+  @media print {
+    body {
+      display: none !important;
+      visibility: hidden !important;
+    }
+  }
+
+  /* ウォーターマーク（透かし）オーバーレイ */
+  .watermark-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 800;
+    opacity: 0.038;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 120px 80px;
+    padding: 40px;
+    transform: rotate(-16deg) scale(1.4);
+    user-select: none;
+  }
+  .watermark-item {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--text);
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  /* スクリーンショット警告オーバーレイ */
+  .screenshot-warn {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .92);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .screenshot-warn.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .screenshot-warn-box {
+    background: var(--surface);
+    border: 1px solid rgba(239, 68, 68, .4);
+    box-shadow: 0 20px 50px rgba(239, 68, 68, .2);
+    border-radius: 16px;
+    padding: 32px 28px;
+    max-width: 440px;
+  }
+  .screenshot-warn-box h4 {
+    margin: 0 0 10px;
+    font-size: 19px;
+    color: #f87171;
+  }
+  .screenshot-warn-box p {
+    margin: 0 0 20px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
 </style>
 </head>
 
@@ -506,13 +655,88 @@
         <span>ログアウト</span>
       </button>
       {% endif %}
-      <button class="btn print-btn" type="button" onclick="window.print()" aria-label="印刷 / PDF保存">
-        <svg class="ic" aria-hidden="true"><use href="#i-print"/></svg>
-        <span>印刷 / PDF</span>
+      <button class="btn" type="button" onclick="openManual()" aria-label="利用マニュアル・ガイドを開く" style="font-size:13px; padding:0 12px; gap:6px;">
+        <svg class="ic" aria-hidden="true" style="width:16px; height:16px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span>📖 利用ガイド</span>
       </button>
     </div>
   </div>
 </header>
+
+<!-- ウォーターマーク (透かし) -->
+<div class="watermark-overlay" id="watermarkOverlay" aria-hidden="true"></div>
+
+<!-- スクリーンショット警告オーバーレイ -->
+<div class="screenshot-warn" id="screenshotWarn">
+  <div class="screenshot-warn-box">
+    <div style="font-size:38px; margin-bottom:12px;">🛡️</div>
+    <h4>無断キャプチャ・転載禁止</h4>
+    <p>本ダッシュボードの分析データは会員限定コンテンツです。<br>スクリーンショットの撮影や無断転載・再配布は規約により固く禁止されています。</p>
+    <button class="btn" type="button" onclick="closeScreenshotWarn()" style="width:100%; justify-content:center; padding:10px;">理解しました</button>
+  </div>
+</div>
+
+<!-- 利用マニュアル ドロワー -->
+<div id="manualBackdrop" onclick="closeManual()"></div>
+<aside id="manualDrawer" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
+  <div class="drawer-head">
+    <h2 class="drawer-title" id="manualTitle">📖 利用マニュアル & ガイド</h2>
+    <button class="drawer-close" type="button" onclick="closeManual()" aria-label="閉じる">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="guide-sec" style="border-left: 3px solid var(--accent);">
+      <h3>🌐 Global Tech Radar とは</h3>
+      <p>米国・海外でローンチされた最先端AI・SaaSプロダクトを毎日定点観測し、「日本市場でのローカライズ可能性（タイムマシン事業チャンス）」を独自分析・スコアリングした会員専用データベースです。</p>
+    </div>
+
+    <div class="guide-sec">
+      <h3>🎯 判定ランクの見方（スコア基準）</h3>
+      <div class="rank-badge-item">
+        <span class="rank-badge-pill r-s-pill">Sランク (85点〜)</span>
+        <div><strong>即検討推奨</strong>：国内の強いペイン・先行者余地大。最優先でMVP検討すべき超有望案件。</div>
+      </div>
+      <div class="rank-badge-item">
+        <span class="rank-badge-pill r-a-pill">Aランク (70〜84点)</span>
+        <div><strong>有望・要調整</strong>：日本の商習慣（稟議・請求書・API連携）への適合で高い勝算がある案件。</div>
+      </div>
+      <div class="rank-badge-item">
+        <span class="rank-badge-pill r-b-pill">Bランク (50〜69点)</span>
+        <div><strong>要検証</strong>：ニッチまたは特定業界に絞り込めば成立余地がある検証案件。</div>
+      </div>
+      <div class="rank-badge-item">
+        <span class="rank-badge-pill r-c-pill">Cランク (〜49点)</span>
+        <div><strong>見送り</strong>：国内市場規模が小さい、またはARR化・マネタイズが困難な案件。</div>
+      </div>
+    </div>
+
+    <div class="guide-sec">
+      <h3>🔍 主な機能と活用方法</h3>
+      <ul>
+        <li><strong>ランクチップ & 検索</strong>：上のチップでランク別絞り込みや、「営業」「自動化」「Notion」などの単語で全文検索が可能。</li>
+        <li><strong>しおり（保存）機能</strong>：カードのしおりアイコンで気になるプロダクトを個人保存可能（閲覧ブラウザごとに安全保持）。</li>
+        <li><strong>詳細の展開</strong>：各カードの「詳細」を押すと、日本版設計ポイント・競合分析・想定価格・SNSツリー原稿が展開されます。</li>
+        <li><strong>SNS発信ツリー原稿</strong>：カード内の「全文コピー」「1通目をコピー」ボタンを活用し、ご自身のXやThreadsでの情報発信・一次情報シェアに活用できます。</li>
+      </ul>
+    </div>
+
+    <div class="guide-sec" style="border: 1px solid rgba(239, 68, 68, .3); background: rgba(239, 68, 68, .04);">
+      <h3 style="color: #f87171;">🛡️ コンテンツ保護・利用規約</h3>
+      <p>本ダッシュボードの分析データ・仕様考察・想定ARR試算は、会員専用の限定公開コンテンツです。</p>
+      <ul>
+        <li><strong>転載・複製の禁止</strong>：テキストの丸コピー転載、全文の外部公開、スクリーンショット撮影によるSNS投稿、商用再配布は禁止されています。</li>
+        <li><strong>免責事項</strong>：本分析は公開情報をもとにAIと独自基準で算出した参考情報であり、事業や投資の成果を保証するものではありません。</li>
+      </ul>
+    </div>
+
+    <div class="guide-sec">
+      <h3>💎 メンバーシップについて</h3>
+      <p>noteメンバーシップにて、毎週の深掘り週報・最上位SランクのMVP仕様書の公開を行っています。</p>
+      <a href="https://note.com/globaltechinfo" target="_blank" rel="noopener noreferrer" class="lock-note-btn" style="display:inline-flex; text-align:center; justify-content:center; text-decoration:none; margin-top:8px;">
+        noteメンバーシップ公式ページ ↗
+      </a>
+    </div>
+  </div>
+</aside>
 
 <main class="wrap">
 
@@ -850,15 +1074,19 @@ function fallbackCopy(text) {
   toast(ok ? 'コピーしました' : 'コピーできませんでした');
 }
 
+let _allowCopyOperation = false;
+
 function copyText(text, successMsg = 'コピーしました') {
   if (!text) return;
+  _allowCopyOperation = true;
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).then(
-      () => toast(successMsg),
-      () => fallbackCopy(text)
+      () => { _allowCopyOperation = false; toast(successMsg); },
+      () => { _allowCopyOperation = false; fallbackCopy(text); }
     );
   } else {
     fallbackCopy(text);
+    _allowCopyOperation = false;
   }
 }
 
@@ -886,6 +1114,121 @@ function copySnsPost2(id) {
   const p = PRODUCTS.find((x) => x.id === id);
   if (!p) return;
   copyText(p.snsReplyDraft, '2通目をコピーしました');
+}
+
+/* =========================================================
+   利用マニュアル (ドロワー)
+   ========================================================= */
+function openManual() {
+  const d = $('#manualDrawer');
+  const b = $('#manualBackdrop');
+  if (d && b) {
+    d.classList.add('open');
+    b.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+function closeManual() {
+  const d = $('#manualDrawer');
+  const b = $('#manualBackdrop');
+  if (d && b) {
+    d.classList.remove('open');
+    b.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeManual();
+});
+
+/* =========================================================
+   情報盗難防止対策 (DRM-Lite / スクショ・コピー防止)
+   ========================================================= */
+const PROTECTION_CONFIG = {
+  enabled: true, // 基本は保護有効（将来のPro/Dev会員はランクに応じてfalse切り替え可能）
+  watermarkText: 'Global Tech Radar ｜ 会員限定 ｜ 無断転載禁止'
+};
+
+function initProtection() {
+  if (!PROTECTION_CONFIG.enabled) return;
+  document.body.classList.add('protected-mode');
+
+  // ウォーターマーク生成
+  const wm = $('#watermarkOverlay');
+  if (wm && !wm.hasChildNodes()) {
+    let wmHTML = '';
+    for (let i = 0; i < 48; i++) {
+      wmHTML += `<span class="watermark-item">${PROTECTION_CONFIG.watermarkText}</span>`;
+    }
+    wm.innerHTML = wmHTML;
+  }
+
+  // 右クリック禁止
+  document.addEventListener('contextmenu', (e) => {
+    if (!e.target.closest('input, textarea')) {
+      e.preventDefault();
+      toast('⚠️ 会員限定コンテンツのため右クリックは禁止されています');
+    }
+  });
+
+  // キーボードショートカットブロック
+  document.addEventListener('keydown', (e) => {
+    const isInput = e.target.closest('input, textarea');
+    // Ctrl+C / Cmd+C (入力欄以外)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C') && !isInput) {
+      e.preventDefault();
+      toast('⚠️ 本文の無断コピーは禁止されています');
+    }
+    // Ctrl+A / Cmd+A
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A') && !isInput) {
+      e.preventDefault();
+    }
+    // Ctrl+P / Cmd+P (印刷・PDF化)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+      e.preventDefault();
+      toast('⚠️ PDF保存・印刷は禁止されています');
+    }
+    // Ctrl+S / Cmd+S (HTML保存)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+      e.preventDefault();
+      toast('⚠️ ページの保存は禁止されています');
+    }
+    // Ctrl+U / Cmd+U (ソース表示)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
+      e.preventDefault();
+    }
+    // F12 (DevTools)
+    if (e.key === 'F12') {
+      e.preventDefault();
+    }
+    // PrintScreen キー検知
+    if (e.key === 'PrintScreen') {
+      showScreenshotWarn();
+    }
+  });
+
+  // コピーイベントフック（ドラッグ選択によるコピーを遮断）
+  document.addEventListener('copy', (e) => {
+    if (_allowCopyOperation) return; // カード内正規コピーボタンは許可
+    if (!e.target.closest('input, textarea')) {
+      e.preventDefault();
+      toast('⚠️ テキストの無断コピーは禁止されています');
+    }
+  });
+}
+
+function showScreenshotWarn() {
+  try {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText('【警告】Global Tech Radar 会員限定コンテンツの無断キャプチャ・転載は禁止されています。');
+    }
+  } catch(e) {}
+  const warn = $('#screenshotWarn');
+  if (warn) warn.classList.add('active');
+}
+function closeScreenshotWarn() {
+  const warn = $('#screenshotWarn');
+  if (warn) warn.classList.remove('active');
 }
 
 /* ---------- イベント ---------- */
@@ -983,6 +1326,7 @@ function handleLogout() {
 function initDashboard() {
   try {
     buildIndex();
+    initProtection();
     // 認証バッジの表示
     const badge = document.getElementById('authBadge');
     if (badge) badge.style.display = IS_ENCRYPTED ? 'inline-flex' : 'none';
