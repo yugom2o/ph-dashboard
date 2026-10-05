@@ -1,10 +1,12 @@
 name: Product Hunt Daily Analyzer
 
 on:
-  schedule:
-    # 毎日 日本時間 06:35 (UTC 21:35) に自動実行 (毎時00分の世界的な混雑遅延を回避し、07:00前に確実に完了させる)
-    - cron: '35 21 * * *'
-  workflow_dispatch: # GitHub画面からの手動実行ボタン
+  # ※ローカル原本運用方針（R1対応）:
+  # 日次分析・DB蓄積・Threads自動投稿はローカルWindows環境で一元実行するため、
+  # クラウド（Actions）での空DB重複起動を抑止。Pagesデプロイは deploy_pages.yml が担当。
+  # schedule:
+  #   - cron: '35 21 * * *'
+  workflow_dispatch: # 管理者による手動緊急実行用のみ保持
 
 permissions:
   contents: write
