@@ -281,6 +281,41 @@ class Database:
             )
             return [self._parse_row(row) for row in cursor.fetchall()]
 
+    def get_threads_posts_count_by_date(self, target_date: Optional[str] = None) -> int:
+        """指定日（JST基準）のThreads投稿件数を取得"""
+        if not target_date:
+            target_date = datetime.now().strftime("%Y-%m-%d")
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT COUNT(*) FROM threads_posts 
+                WHERE date(posted_at, '+9 hours') = ? OR date(posted_at) = ?
+                """,
+                (target_date, target_date),
+            )
+            return cursor.fetchone()[0]
+
+    def get_unposted_high_scoring_evaluations(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """Threads未投稿の過去の高スコア（S/Aランク優先）プロダクトを取得"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT p.*, e.*
+                FROM evaluations e
+                JOIN products p ON e.product_id = p.id
+                LEFT JOIN threads_posts tp ON tp.product_id = p.id
+                WHERE tp.id IS NULL
+                  AND e.rank IN ('S', 'A')
+                ORDER BY e.score DESC, e.analyzed_date DESC
+                LIMIT ?
+                """,
+                (limit,),
+            )
+            rows = [self._parse_row(r) for r in cursor.fetchall()]
+            return [r for r in rows if r.get("sns_post_draft")]
+
     def is_already_posted_to_threads(self, product_id: str) -> bool:
         """指定されたプロダクトが既にThreadsに投稿済みか確認"""
         with self.get_connection() as conn:
