@@ -29,6 +29,16 @@ class HTMLReporter:
         self.docs_output_path = docs_output_path
 
     @staticmethod
+    def sanitize_url(url: Optional[str]) -> str:
+        """URLが有効なHTTP/HTTPSスキームであることを確認し、それ以外は空文字を返却（XSS防止）"""
+        if not url or not isinstance(url, str):
+            return ""
+        clean = url.strip()
+        if clean.startswith("http://") or clean.startswith("https://"):
+            return clean
+        return ""
+
+    @staticmethod
     def encrypt_data_multirole(
         plain_text: str,
         admin_password: str,
@@ -193,7 +203,7 @@ class HTMLReporter:
                     "name": name,
                     "cat": category,
                     "tagline": tagline,
-                    "url": it.get("official_url") or ph_url,
+                    "url": self.sanitize_url(it.get("official_url") or ph_url),
                     "orig": orig_text,
                     "origNote": "海外最新ツールの機能概要 (日本語解説)" if it.get("original_summary_ja") else "海外公式発表より",
                     "idea": one_line or f"{name}の日本展開モデル",
@@ -209,7 +219,7 @@ class HTMLReporter:
                         f"🔗 公式サイト: {it.get('official_url') or ph_url}"
                     ) if one_line else "",
                     "signals": signals,
-                    "image": it.get("image_url") or "",
+                    "image": self.sanitize_url(it.get("image_url")),
                 }
             )
 
