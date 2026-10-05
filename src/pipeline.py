@@ -23,11 +23,23 @@ class DailyPipeline:
     def __init__(self, is_mock: bool = False, force: bool = False):
         self.is_mock = is_mock
         self.force = force
-        self.db = Database()
+        if is_mock:
+            # モック実行時は専用の分離DB・出力先を使用（本番DB・成果物の汚染防止: R5対応）
+            from config import BASE_DIR, DATA_DIR, REPORTS_DIR
+            mock_db_path = DATA_DIR / "mock_history.db"
+            self.db = Database(db_path=mock_db_path)
+            self.md_reporter = MarkdownReporter(output_dir=REPORTS_DIR / "mock")
+            self.html_reporter = HTMLReporter(
+                output_path=BASE_DIR / "dashboard_mock.html",
+                docs_output_path=BASE_DIR / "docs" / "index_mock.html",
+            )
+        else:
+            self.db = Database()
+            self.md_reporter = MarkdownReporter()
+            self.html_reporter = HTMLReporter()
+
         self.enricher = LPScraper()
         self.evaluator = GeminiEvaluator()
-        self.md_reporter = MarkdownReporter()
-        self.html_reporter = HTMLReporter()
         self.github_uploader = GitHubUploader()
         self.notifier = WebhookNotifier()
         self.threads_publisher = ThreadsPublisher()
@@ -140,7 +152,7 @@ class DailyPipeline:
                 if lp_text:
                     print(f"  -> LPテキスト抽出成功: {len(lp_text)}文字")
 
-            print("  AI評価中 (競合Web検索 + タイムマシン事業判定)...")
+            print("  AI評価中 (LP解析 + 日本市場事業性判定)...")
             eval_result = self.evaluator.evaluate(
                 product_name=p.name,
                 tagline=p.tagline,
@@ -176,7 +188,7 @@ class DailyPipeline:
             # Sランクまたはスコア85以上の場合は即時アラート送信
             if eval_result.rank == "S" or eval_result.score >= 85:
                 alert_item = {**product_dict, **eval_result.model_dump()}
-                if self.notifier.is_configured:
+                if self.notifier.is_configured and not self.is_mock:
                     print("  -> 🎯 高スコア注目案件のためWebhookアラートを送信中...")
                     self.notifier.send_high_score_alert(alert_item)
 
@@ -199,7 +211,7 @@ class DailyPipeline:
         print(f"  -> GitHub Pages用ファイル更新: {self.html_reporter.docs_output_path}")
 
         # Webhook日次完了サマリー通知
-        if self.notifier.is_configured:
+        if self.notifier.is_configured and not self.is_mock:
             s_cnt = sum(1 for it in today_evaluations if it.get("rank") == "S")
             a_cnt = sum(1 for it in today_evaluations if it.get("rank") == "A")
             top_sorted = sorted(today_evaluations, key=lambda x: x.get("score", 0), reverse=True)
@@ -211,8 +223,8 @@ class DailyPipeline:
                 top_items=top_sorted,
             )
 
-        # GitHub への自動アップロード (設定時のみ)
-        if self.github_uploader.token and self.github_uploader.repo:
+        # GitHub への自動アップロード (設定時 & 非モック時のみ: R5対応)
+        if self.github_uploader.token and self.github_uploader.repo and not self.is_mock:
             print("\n[Step 5b] GitHub Pagesへ自動アップロード中...")
             self.github_uploader.upload_file(
                 file_path=html_file,
@@ -240,7 +252,7 @@ class DailyPipeline:
             elif self.is_mock:
                 print("  [Mock] モックモードのためThreads投稿をシミュレート（API呼び出しはスキップ）")
             else:
-                self._publish_top_product_to_threads(today_evaluations, today_str)
+                self._publish_top_product_to_threads(today_evaluations)
 
         print("\n==================================================")
         print(f"🎉 日次パイプライン完了！")
@@ -248,11 +260,14 @@ class DailyPipeline:
         print(f"ダッシュボード: {html_file.name}")
         print("==================================================")
 
-    def _publish_top_product_to_threads(self, evaluations: List[Dict[str, Any]], target_date: str):
+    def _publish_top_product_to_threads(self, evaluations: List[Dict[str, Any]], target_date: Optional[str] = None):
         """本日最も有望なプロダクトをThreadsに自動投稿（上限チェック＆新着0件時は未投稿の過去有望案件にフォールバック）"""
-        today_posted = self.db.get_threads_posts_count_by_date(target_date)
+        from datetime import timezone, timedelta
+        # 投稿枠判定は、分析対象日（--date）ではなく実行時点のJST現在日を常に基準とする（R3対応）
+        current_jst_date = target_date or datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+        today_posted = self.db.get_threads_posts_count_by_date(current_jst_date)
         if today_posted >= THREADS_MAX_DAILY_POSTS:
-            print(f"  [Skip] 本日のThreads投稿上限（{THREADS_MAX_DAILY_POSTS}件/日、本日投稿実績: {today_posted}件）に達しているためスキップします。")
+            print(f"  [Skip] 本日（{current_jst_date} JST）のThreads投稿上限（{THREADS_MAX_DAILY_POSTS}件/日、本日投稿実績: {today_posted}件）に達しているためスキップします。")
             return
 
         # Sランク優先、次にAランク、スコア降順
@@ -323,23 +338,39 @@ class DailyPipeline:
                     post2_text += f"\n\n🔗 海外公式サイト: {official_url}"
 
             print(f"  -> Threadsへ投稿中: 【ランク {item.get('rank')}】{item.get('name')} (画像: {'あり' if image_url else 'なし'} / ツリーリプライ: {'有効' if post2_text else '無効'}) ...")
-            parent_id, reply_id = self.threads_publisher.publish_thread(
-                post1_text=post1_text,
-                post2_text=post2_text,
-                image_url=image_url,
-            )
+            # Step 1: 親ポストの投稿
+            parent_id = self.threads_publisher.publish(text=post1_text, image_url=image_url)
+            if not parent_id:
+                print(f"  -> [Error] 親ポストの投稿に失敗したため、二重投稿防止のため中断します。")
+                break
 
-            if parent_id:
-                self.db.record_threads_post(
-                    product_id=p_id,
-                    post_id=parent_id,
-                    text=post1_text,
-                    image_url=image_url,
-                    reply_post_id=reply_id,
-                    reply_text=post2_text,
-                )
-                posted_count += 1
-                print(f"  -> 🎉 Threads投稿成功！ (親Post ID: {parent_id}, リプライID: {reply_id or 'なし'})")
+            # Step 2: 親投稿ID取得直後に即時DBコミット（中断・クラッシュ時の二重投稿を根絶: R2対応）
+            record_id = self.db.record_threads_post(
+                product_id=p_id,
+                post_id=parent_id,
+                text=post1_text,
+                image_url=image_url,
+                reply_post_id=None,
+                reply_text=None,
+            )
+            posted_count += 1
+            print(f"  -> 🎉 Threads親ポスト公開成功！ (親Post ID: {parent_id})")
+
+            # Step 3: リプライ（子ポスト）を投稿
+            if post2_text:
+                import time
+                print("  -> 親ポスト反映待ち (4秒待機後、2通目リプライを自動投稿)...")
+                time.sleep(4)
+                reply_id = self.threads_publisher.publish_reply(parent_post_id=parent_id, text=post2_text)
+                if reply_id:
+                    self.db.update_threads_post_reply(
+                        record_id=record_id,
+                        reply_post_id=reply_id,
+                        reply_text=post2_text,
+                    )
+                    print(f"  -> 🎉 Threadsリプライ公開成功！ (リプライID: {reply_id})")
+                else:
+                    print(f"  -> [Warning] 親ポストは公開されましたが、リプライの公開に失敗しました (親Post ID: {parent_id})。")
 
         if posted_count == 0 and today_posted == 0:
             print("  [Info] 本日は新規投稿対象（未投稿のS/Aランクプロダクト）がありませんでした。")
