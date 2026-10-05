@@ -19,10 +19,10 @@ from config import BASE_DIR, GITHUB_REPO, GITHUB_TOKEN
 
 import hashlib
 
-# アップロード対象の拡張子やファイル
-INCLUDE_EXTS = {".py", ".html", ".md", ".txt", ".yml", ".yaml", ".db"}
-EXCLUDE_DIRS = {".venv", ".git", "__pycache__", "scratch", ".system_generated"}
-EXCLUDE_FILES = {".env"}  # .env はセキュリティ保護のため絶対に除外
+# アップロード対象の拡張子やファイル（分析データ・レポート・DBは秘匿するため除外）
+INCLUDE_EXTS = {".py", ".html", ".yml", ".yaml"}
+EXCLUDE_DIRS = {".venv", ".git", "__pycache__", "scratch", ".system_generated", "data", "reports", "logs"}
+EXCLUDE_FILES = {".env", "sync_reports.log", "run_daily.log"}
 
 
 def get_existing_tree(headers, repo, branch="main"):
