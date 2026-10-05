@@ -1,30 +1,27 @@
-name: Product Hunt Daily Analyzer
+name: Product Hunt Diagnostic Runner (Actions)
+
+# 【ローカル原本運用方針（第3回 指摘3対応）】
+# 日次分析・DB永続化・Threads自動投稿・本番PagesデプロイはローカルWindows環境を正本（Primary Engine）とします。
+# 本ワークフローはクラウド環境での依存関係・API疎通を確認するための「診断・テスト専用」として保持され、
+# 本番SNSへの自動投稿（THREADS_AUTO_PUBLISH: 'false'）やGitHub Pagesの上書き、本番ファイルの自動コミットは行いません。
 
 on:
-  # ※ローカル原本運用方針（R1対応）:
-  # 日次分析・DB蓄積・Threads自動投稿はローカルWindows環境で一元実行するため、
-  # クラウド（Actions）での空DB重複起動を抑止。Pagesデプロイは deploy_pages.yml が担当。
-  # schedule:
-  #   - cron: '35 21 * * *'
-  workflow_dispatch: # 管理者による手動緊急実行用のみ保持
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: '取得件数（テスト用）'
+        required: false
+        default: '3'
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  analyze-and-deploy:
+  diagnostic-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -37,7 +34,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Daily Analyzer
+      - name: Run Safe Diagnostic Pipeline
         env:
           TZ: 'Asia/Tokyo'
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -46,49 +43,12 @@ jobs:
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
           DASHBOARD_MEMBER_PASSWORD: ${{ secrets.DASHBOARD_MEMBER_PASSWORD }}
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-          DAILY_FETCH_LIMIT: 10
-          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          THREADS_AUTO_PUBLISH: 'true'
-          THREADS_MAX_DAILY_POSTS: 1
+          DAILY_FETCH_LIMIT: ${{ github.event.inputs.limit || '3' }}
+          # 【安全弁】クラウドからのSNS投稿を恒久無効化
+          THREADS_AUTO_PUBLISH: 'false'
+          THREADS_MAX_DAILY_POSTS: 0
         run: |
-          python run_daily.py
+          echo "Running diagnostic pipeline in mock/isolated mode..."
+          # モックモードで安全に実行し、本番SNS・本番成果物への影響を完全防止
+          python run_daily.py --mock --limit ${{ github.event.inputs.limit || '3' }}
 
-      - name: Run Weekly Report on Weekends
-        env:
-          TZ: 'Asia/Tokyo'
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-        run: |
-          # 毎週日曜日 (JST) に過去1週間のまとめとnote用原稿を自動生成
-          DAY_OF_WEEK=$(date +%u)
-          if [ "$DAY_OF_WEEK" -eq 7 ]; then
-            echo "Today is Sunday! Generating weekly trend report for note..."
-            python run_weekly.py
-          fi
-
-      - name: Prepare Pages Artifact
-        run: |
-          mkdir -p public
-          cp dashboard.html public/index.html
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'public'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Pull remote changes to avoid conflict
-        run: git pull --rebase origin main || true
-
-      - name: Commit & Push encrypted dashboard
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Automated daily analysis: update dashboard"
-          file_pattern: "dashboard.html docs/index.html index.html"
