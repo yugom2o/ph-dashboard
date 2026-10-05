@@ -52,16 +52,19 @@ class MarkdownReporter:
         # 一覧サマリーテーブル
         md.append("## 📊 本日の注目プロダクト & 日本市場判定サマリー")
         md.append("")
-        md.append("| ランク | スコア | プロダクト | 海外キャッチコピー | 日本市場での一言判定 | 想定アレンジ / 収益モデル |")
-        md.append("| :---: | :---: | :--- | :--- | :--- | :--- |")
-        for it in items:
-            rank = it.get("rank", "-")
-            score = it.get("score", 0)
-            name = it.get("name", "")
-            tagline = it.get("tagline", "").replace("|", "/")
-            one_line = it.get("one_line_summary", "").replace("|", "/")
-            pricing = it.get("pricing_model", "").replace("|", "/")
-            md.append(f"| **{rank}** | {score} | **{name}** | {tagline} | {one_line} | {pricing} |")
+        if total == 0:
+            md.append("> 本日の新規分析プロダクトはありませんでした。（過去の蓄積データはWebダッシュボードをご参照ください）\n")
+        else:
+            md.append("| ランク | スコア | プロダクト | 海外キャッチコピー | 日本市場での一言判定 | 想定アレンジ / 収益モデル |")
+            md.append("| :---: | :---: | :--- | :--- | :--- | :--- |")
+            for it in items:
+                rank = it.get("rank", "-")
+                score = it.get("score", 0)
+                name = it.get("name", "")
+                tagline = it.get("tagline", "").replace("|", "/")
+                one_line = it.get("one_line_summary", "").replace("|", "/")
+                pricing = it.get("pricing_model", "").replace("|", "/")
+                md.append(f"| **{rank}** | {score} | **{name}** | {tagline} | {one_line} | {pricing} |")
         md.append("")
         md.append("---")
         md.append("")
@@ -71,6 +74,9 @@ class MarkdownReporter:
         md.append("")
 
         sns_drafts = []
+
+        if total == 0:
+            md.append("> 本日の新規分析プロダクトはありませんでした。\n")
 
         for idx, it in enumerate(items, start=1):
             rank = it.get("rank", "C")
