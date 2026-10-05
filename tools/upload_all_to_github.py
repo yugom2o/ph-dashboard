@@ -20,9 +20,19 @@ from config import BASE_DIR, GITHUB_REPO, GITHUB_TOKEN
 import hashlib
 
 # アップロード対象の拡張子やファイル（分析データ・レポート・DBは秘匿するため除外）
-INCLUDE_EXTS = {".py", ".html", ".yml", ".yaml"}
-EXCLUDE_DIRS = {".venv", ".git", "__pycache__", "scratch", ".system_generated", "data", "reports", "logs"}
-EXCLUDE_FILES = {".env", "sync_reports.log", "run_daily.log"}
+INCLUDE_EXTS = {".py", ".yml", ".yaml"}
+# 公開を許可するHTMLファイル（平文プレビューやモック、テスト用HTMLの流出を完全防止）
+ALLOWED_HTML_FILES = {"dashboard.html", "docs/index.html", "index.html", "templates/dashboard_template.html"}
+
+EXCLUDE_DIRS = {".venv", ".git", "__pycache__", "scratch", ".system_generated", "data", "reports", "logs", "preview"}
+EXCLUDE_FILES = {
+    ".env",
+    "sync_reports.log",
+    "run_daily.log",
+    "preview_unencrypted.html",
+    "dashboard_mock.html",
+    "index_mock.html",
+}
 
 
 def get_existing_tree(headers, repo, branch="main"):
@@ -69,14 +79,23 @@ def upload_project():
             if f in EXCLUDE_FILES:
                 continue
             path = Path(root) / f
-            if path.suffix.lower() in INCLUDE_EXTS or f in [
+            rel_path = path.relative_to(BASE_DIR).as_posix()
+
+            # HTMLファイルは許可リストに明記されたもののみ
+            if path.suffix.lower() == ".html":
+                if rel_path not in ALLOWED_HTML_FILES:
+                    continue
+                files_to_upload.append((path, rel_path))
+            elif path.suffix.lower() in INCLUDE_EXTS or f in [
                 "LICENSE",
                 "Procfile",
                 ".gitignore",
                 "requirements.txt",
                 ".env.example",
             ]:
-                rel_path = path.relative_to(BASE_DIR).as_posix()
+                # プレビューやモック、一時ファイル名を含むものは除外
+                if "mock" in f.lower() or "preview" in f.lower() or "temp" in f.lower():
+                    continue
                 files_to_upload.append((path, rel_path))
 
     print(f"-> アップロード対象ファイル数: {len(files_to_upload)} 件")
