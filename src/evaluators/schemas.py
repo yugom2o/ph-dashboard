@@ -16,15 +16,15 @@ class EvaluationResult(BaseModel):
     )
     rank: Literal["S", "A", "B", "C"] = Field(
         ...,
-        description="日本市場成立度ランク: S (即参入検討) / A (有望・要アレンジ) / B (ニッチ/要検証) / C (不適・見送り)",
+        description="日本市場成立度ランク: S (即参入検討・最厳選) / A (有望・要アレンジ) / B (ニッチ/要検証) / C (不適・見送り)",
     )
-    score: int = Field(..., ge=0, le=100, description="成立可能性スコア (0〜100点)")
+    score: int = Field(..., ge=0, le=100, description="成立可能性スコア (0〜100点。無理にSにせず厳格かつ客観的に採点)")
     one_line_summary: str = Field(
         ...,
         description="日本市場向けビジネスの見出し・キャッチコピー（※『日本版〇〇』や『ローカライズ版〇〇』のような抽象的表現は禁止！『【ターゲット×具体的提供価値】例: 企業のIRとPR TIMESから営業提案書(PPTX)を3分で自動生成するSaaS』のように具体的に書くこと）",
     )
     target_market: str = Field(..., description="日本版での明確なターゲット顧客（例: 中小企業の採用人事、Web広告代理店の運用者）")
-    pricing_model: str = Field(..., description="日本版での想定課金モデルと価格帯（例: 初期10万円＋月額3万〜5万円/社）")
+    pricing_model: str = Field(..., description="日本版での想定課金モデルと価格帯（例: 初期10万円＋月額3万〜5万円/社。※専門用語の略語は避け平易に記述）")
     jp_needs: str = Field(..., description="日本国内でのリアルな課題・ペイン・需要の背景（なぜ今日本で求められるのか）")
     jp_competitors: List[CompetitorItem] = Field(
         default_factory=list,
