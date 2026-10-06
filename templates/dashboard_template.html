@@ -707,6 +707,15 @@
   .member-banner a {
     color: var(--accent); font-weight: 700; text-decoration: underline; margin-left: 6px;
   }
+  .member-banner .banner-text-sp { display: none; }
+  @media (max-width: 640px) {
+    .member-banner {
+      padding: 6px 12px; font-size: 11.5px; line-height: 1.4;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .member-banner .banner-text-pc { display: none; }
+    .member-banner .banner-text-sp { display: inline; }
+  }
   .auth-chip {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 4px 10px; border-radius: 999px;
@@ -908,7 +917,8 @@
 {% endif %}
 
 <div class="member-banner">
-  <span>💡 <strong>Global Tech Lab が提供する Global Tech Radar 会員専用ダッシュボード</strong>：毎週の深掘りレポートは</span>
+  <span class="banner-text-pc">💡 <strong>Global Tech Lab 会員専用ダッシュボード</strong>：毎週の深掘りレポートは</span>
+  <span class="banner-text-sp">💡 <strong>毎週の深掘りレポート</strong>：</span>
   <a href="https://note.com/globaltechinfo" target="_blank" rel="noopener noreferrer">note公式ページへ ↗</a>
 </div>
 
@@ -923,6 +933,7 @@
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
     <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M6 14h12v7H6z"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></symbol>
   </defs>
 </svg>
 
@@ -946,7 +957,7 @@
       </button>
       {% endif %}
       <button class="btn btn-guide" type="button" onclick="openManual()" aria-label="利用マニュアル・ガイドを開く">
-        <svg class="ic" aria-hidden="true" style="width:16px; height:16px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <svg class="ic" aria-hidden="true" style="width:16px; height:16px;"><use href="#i-help"/></svg>
         <span class="btn-text">利用ガイド</span>
       </button>
     </div>
@@ -1062,11 +1073,11 @@
       <div class="quick-tags" id="quickTags">
         <span class="quick-tags-lbl">おすすめタグ:</span>
         <button type="button" class="q-tag" data-tag="自動化">#自動化</button>
-        <button type="button" class="q-tag" data-tag="営業">#営業支援</button>
-        <button type="button" class="q-tag" data-tag="Notion">#Notion連携</button>
-        <button type="button" class="q-tag" data-tag="マーケティング">#マーケ</button>
-        <button type="button" class="q-tag" data-tag="採用">#人事・採用</button>
-        <button type="button" class="q-tag" data-tag="開発">#開発ツール</button>
+        <button type="button" class="q-tag" data-tag="営業">#営業</button>
+        <button type="button" class="q-tag" data-tag="Notion">#Notion</button>
+        <button type="button" class="q-tag" data-tag="マーケティング">#マーケティング</button>
+        <button type="button" class="q-tag" data-tag="採用">#採用</button>
+        <button type="button" class="q-tag" data-tag="開発">#開発</button>
       </div>
     </div>
   </section>
@@ -1078,7 +1089,7 @@
     </div>
     <div class="list-tools">
       <span class="count" id="count" aria-live="polite"></span>
-      <button class="btn plain" id="toggleAll" type="button">すべて開く</button>
+      <button class="btn plain" id="toggleAll" type="button" aria-expanded="false"><span id="toggleAllIcon">📂</span> <span id="toggleAllText">すべて開く</span></button>
     </div>
   </div>
 
@@ -1106,10 +1117,10 @@
 const REPORT_DATE = '{{ report_date }}';
 
 const RANKS = {
-  S: { label: '即検討推奨',   desc: '国内強いペイン・先行余地大' },
-  A: { label: '有望・要調整', desc: '商慣習の最適化で勝算' },
+  S: { label: '即検討推奨',   desc: '強い国内ペイン・先行余地大（厳選）' },
+  A: { label: '有望・要調整', desc: '商慣習の最適化で勝算あり' },
   B: { label: '要検証',       desc: 'ニッチ特化なら成立余地' },
-  C: { label: '見送り',       desc: '市場小またはARR化困難' }
+  C: { label: '見送り',       desc: '市場規模小または継続課金化が困難' }
 };
 
 const IS_ENCRYPTED = {{ 'true' if is_encrypted else 'false' }};
@@ -1382,7 +1393,11 @@ function syncToggleAll() {
   const allOpen = cards.length > 0 && cards.every((c) => c.classList.contains('open'));
   const btn = $('#toggleAll');
   if (btn) {
-    btn.textContent = allOpen ? 'すべて閉じる' : 'すべて開く';
+    btn.setAttribute('aria-expanded', String(allOpen));
+    const txt = $('#toggleAllText');
+    const ico = $('#toggleAllIcon');
+    if (txt) txt.textContent = allOpen ? 'すべて閉じる' : 'すべて開く';
+    if (ico) ico.textContent = allOpen ? '📁' : '📂';
     btn.hidden = cards.length === 0;
   }
 }
@@ -1758,6 +1773,9 @@ if (qTagsWrap) {
       btn.classList.add('active');
       $('#q').value = tag;
       query = tag;
+      if (rank === 'today') {
+        rank = 'all'; // タグ検索時は全蓄積データから検索
+      }
     }
     apply();
     $('#q').focus();
@@ -1801,9 +1819,15 @@ $('#cards').addEventListener('click', (e) => {
 
 $('#toggleAll').addEventListener('click', () => {
   const cards = visibleCards();
-  const open = !cards.every((c) => c.classList.contains('open'));
-  cards.forEach((c) => setOpen(c, open));
+  if (cards.length === 0) return;
+  const willOpen = !cards.every((c) => c.classList.contains('open'));
+  cards.forEach((c) => {
+    setOpen(c, willOpen);
+    // Safari/WebKit reflow trigger
+    void c.offsetHeight;
+  });
   syncToggleAll();
+  toast(willOpen ? '📂 すべての詳細を開きました' : '📁 すべての詳細を閉じました');
 });
 
 $('#emptyBtn').addEventListener('click', () => {
